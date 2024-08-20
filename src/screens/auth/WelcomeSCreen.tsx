@@ -4,10 +4,14 @@ import {useNavigation} from '@react-navigation/native';
 import GradientButton from '../../components/button/GradientButton';
 import OutlineButton from '../../components/button/OutlineButton';
 import {useAnimatedValue} from '../../hooks/useAnimatedValue';
-
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
+type RootStackParamList = {
+  Login: undefined;
+  Register: undefined;
+};
 const WelcomeScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const animatedValue = useAnimatedValue(0); // Sử dụng hook
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const animatedValue = useAnimatedValue(0);
 
   return (
     <ImageBackground
