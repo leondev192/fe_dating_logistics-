@@ -12,7 +12,7 @@ export const buttonStyles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 30,
     width: '100%',
-    height: 48,
+    height: 58,
     marginVertical: 10,
   },
   outlineText: {
@@ -25,7 +25,7 @@ export const buttonStyles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 30,
     width: '100%',
-    height: 48,
+    height: 58,
     marginVertical: 10,
   },
   solidText: {
