@@ -1,11 +1,10 @@
 import React from 'react';
 import {View, StyleSheet, ImageBackground} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
 import GradientButton from '../../components/button/GradientButton';
 import OutlineButton from '../../components/button/OutlineButton';
 import {useAnimatedValue} from '../../hooks/useAnimatedValue';
 import Colors from '../../constants/colors';
-import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 type RootStackParamList = {
   Login: undefined;
   Register: undefined;

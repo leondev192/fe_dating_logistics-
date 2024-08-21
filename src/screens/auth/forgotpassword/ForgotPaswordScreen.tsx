@@ -6,18 +6,22 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import InputAuth from '../../../components/input/InputAuth';
 import ButtonComponent from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+type RootStackParamList = {
+  Login: undefined;
+};
 
 const ForgotPasswordScreen = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [identifier, setIdentifier] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();
 
   const handleForgotPassword = async () => {
     if (!identifier) {

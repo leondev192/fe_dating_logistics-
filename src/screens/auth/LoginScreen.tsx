@@ -1,9 +1,13 @@
 import React, {useState} from 'react';
 import InputAuth from '../../components/input/InputAuth';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {
+  NavigationProp,
+  useNavigation,
+  ParamListBase,
+} from '@react-navigation/native';
+
 type RootStackParamList = {
-  Forgotpassword: undefined;
-  Register: undefined;
+  ForgotPassword: undefined;
 };
 import {
   View,
@@ -13,11 +17,15 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
+import GradientButton from '../../components/button/GradientButton';
+import GradientText from '../../components/text/GradientText';
 
 const LoginScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+
+  const handleForgotPassword = async () => {};
   return (
     <ImageBackground
       source={require('../../assets/images/Login.png')}
@@ -50,8 +58,16 @@ const LoginScreen = () => {
         <TouchableOpacity
           style={styles.forgotPasswordContainer}
           onPress={() => navigation.navigate('ForgotPassword')}>
-          <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
+          <GradientText style={styles.forgotPasswordText}>
+            Quên mật khẩu?
+          </GradientText>
         </TouchableOpacity>
+        <GradientButton title="Đăng nhập" onPress={handleForgotPassword} />
+        <View style={styles.dividerContainer}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>Hoặc đăng nhập với</Text>
+          <View style={styles.dividerLine} />
+        </View>
       </View>
     </ImageBackground>
   );
@@ -96,12 +112,30 @@ const styles = StyleSheet.create({
   forgotPasswordContainer: {
     width: '80%',
     alignSelf: 'flex-end',
-    marginTop: 20,
+    marginBottom: 10,
+    marginTop: 10,
   },
   forgotPasswordText: {
     color: 'rgba(46, 99, 231, 1)',
     fontSize: 14,
     textAlign: 'right',
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+    marginHorizontal: '20%',
+  },
+  dividerText: {
+    color: '#6A707C',
+    fontSize: 14,
+    textAlign: 'center',
+    marginHorizontal: 10,
+  },
+  dividerLine: {
+    height: 1,
+    width: '50%',
+    backgroundColor: '#E8ECF4',
   },
 });
 
