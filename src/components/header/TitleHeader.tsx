@@ -14,14 +14,16 @@ const TitleHeader: React.FC<TitleHeaderProps> = ({title}) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 1,
+    width: '100%', // Ensure it takes the entire width of the header
   },
   title: {
     fontSize: 18,
     color: '#1e232c',
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

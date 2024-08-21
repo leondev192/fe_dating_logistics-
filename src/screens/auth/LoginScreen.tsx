@@ -1,4 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
+import InputAuth from '../../components/input/InputAuth';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+type RootStackParamList = {
+  Forgotpassword: undefined;
+  Register: undefined;
+};
 import {
   View,
   StyleSheet,
@@ -9,6 +15,9 @@ import {
 } from 'react-native';
 
 const LoginScreen = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   return (
     <ImageBackground
       source={require('../../assets/images/Login.png')}
@@ -18,6 +27,31 @@ const LoginScreen = () => {
         <Text style={styles.WelcomeText}>
           Vui lòng nhập thông tin đăng nhập để tiếp tục
         </Text>
+        <InputAuth
+          label=""
+          value={identifier}
+          onChangeText={text => {
+            setIdentifier(text);
+          }}
+          placeholder="Email / Số điện thoại"
+          iconName="user"
+        />
+        <InputAuth
+          label=""
+          value={password}
+          onChangeText={text => {
+            setPassword(text);
+          }}
+          placeholder="Mật khẩu"
+          secureTextEntry={true}
+          isPassword={true}
+          iconName="lock"
+        />
+        <TouchableOpacity
+          style={styles.forgotPasswordContainer}
+          onPress={() => navigation.navigate('ForgotPassword')}>
+          <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
@@ -28,6 +62,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   image: {
     flex: 1,
@@ -57,6 +92,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgba(54, 53, 56, 1)',
     fontWeight: 'bold',
+  },
+  forgotPasswordContainer: {
+    width: '80%',
+    alignSelf: 'flex-end',
+    marginTop: 20,
+  },
+  forgotPasswordText: {
+    color: 'rgba(46, 99, 231, 1)',
+    fontSize: 14,
+    textAlign: 'right',
   },
 });
 
