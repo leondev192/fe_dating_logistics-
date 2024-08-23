@@ -84,19 +84,19 @@ const InputComponent: React.FC<InputComponentProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   label: {
-    marginBottom: 5,
     fontSize: 16,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: Colors.bordercolor,
     borderRadius: 50,
     height: 56,
+    backgroundColor: '#fff',
   },
   icon: {
     padding: 10,
