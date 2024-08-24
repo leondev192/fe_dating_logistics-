@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import GradientButton from '../../components/button/GradientButton';
 import Colors from '../../constants/colors';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import LoadingSpinner from '../../components/loading/LoadingSpinner';
 
 const RegisterScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();

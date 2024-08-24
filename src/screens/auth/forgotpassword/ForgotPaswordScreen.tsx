@@ -12,7 +12,7 @@ import InputAuth from '../../../components/input/InputAuth';
 import ButtonComponent from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
-import LoadingSpinner from '../../../components/LoadingSpinner';
+import LoadingSpinner from '../../../components/loading/LoadingSpinner';
 
 type RootStackParamList = {
   Login: undefined;

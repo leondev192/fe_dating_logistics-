@@ -12,12 +12,12 @@ import {
 } from 'react-native';
 import InputAuth from '../../components/input/InputAuth';
 import GradientButton from '../../components/button/GradientButton';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import Colors from '../../constants/colors';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {Android} from 'iconsax-react-native';
+import Toast from 'react-native-toast-message';
 import {toastConfig} from '../../components/toast/ToastAuth';
-import Toast, {ToastConfigParams} from 'react-native-toast-message';
+import Overlay from '../../components/toast/OverlayWithToast';
 
 type RootStackParamList = {
   ForgotPassword: undefined;
@@ -30,6 +30,7 @@ const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({identifier: '', password: ''});
+  const [isToastVisible, setIsToastVisible] = useState(false);
 
   const handleLogin = () => {
     const errors = {identifier: '', password: ''};
@@ -49,15 +50,17 @@ const LoginScreen = () => {
     if (errors.identifier || errors.password) return;
 
     setLoading(true);
-    // Handle login logic here
     setTimeout(() => {
       setLoading(false);
+      setIsToastVisible(true); // Set toast visibility to true
       Toast.show({
         type: 'success',
-        text1: 'Đăng nhập thành công',
-        text2: 'Chào mừng bạn trở lại!',
+        position: 'top',
+        text1: 'Thất bại',
+        text2: 'Vui lòng thử lại',
+        onHide: () => setIsToastVisible(false),
       });
-    }, 1500);
+    }, 2000);
   };
 
   return (
@@ -132,18 +135,20 @@ const LoginScreen = () => {
               />
             </TouchableOpacity>
           </View>
-          <View style={styles.termsContainer}>
-            <Text style={styles.termsText}>Không có tài khoản?</Text>
-            <TouchableOpacity
-              style={styles.termsButton}
-              onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.termsButtonText}>Đăng ký ngay bây giờ</Text>
-            </TouchableOpacity>
-          </View>
         </View>
+        <View style={styles.termsContainer}>
+          <Text style={styles.termsText}>Không có tài khoản?</Text>
+          <TouchableOpacity
+            style={styles.termsButton}
+            onPress={() => navigation.navigate('Register')}>
+            <Text style={styles.termsButtonText}>Đăng ký ngay bây giờ</Text>
+          </TouchableOpacity>
+        </View>
+        <LoadingSpinner loading={loading} />
+        {isToastVisible && <Overlay />}
       </SafeAreaView>
-      <LoadingSpinner loading={loading} />
-      <Toast config={toastConfig} ref={ref => Toast.setRef(ref)} />
+
+      <Toast config={toastConfig} />
     </ImageBackground>
   );
 };
@@ -197,16 +202,11 @@ const styles = StyleSheet.create({
     width: '50%',
     backgroundColor: '#E8ECF4',
   },
-  fixedBottomContainer: {
-    position: 'absolute',
-    bottom: 20, // Điều chỉnh khoảng cách từ dưới lên
-    width: '100%',
-    alignItems: 'center',
-  },
   termsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
     marginTop: 'auto',
   },
   termsText: {

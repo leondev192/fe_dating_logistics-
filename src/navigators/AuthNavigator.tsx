@@ -25,7 +25,7 @@ const AuthNavigator = () => {
           title: '',
           headerBackTitleVisible: false,
           headerBackImage: () => <BackButton />,
-          headerTitle: () => <TitleHeader title="" />,
+          headerTitle: () => <TitleHeader title="Đăng nhập" />,
           headerTransparent: true,
           headerTitleAlign: 'center',
         }}

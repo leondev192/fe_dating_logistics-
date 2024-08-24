@@ -6,7 +6,7 @@ export const useAnimatedValue = (initialValue: number) => {
 
   useEffect(() => {
     const listener = animatedValue.addListener(({value}) => {
-      console.log(value); // Bạn có thể thay đổi logic tại đây
+      console.log(value);
     });
 
     Animated.timing(animatedValue, {
@@ -16,8 +16,8 @@ export const useAnimatedValue = (initialValue: number) => {
     }).start();
 
     return () => {
-      animatedValue.stopAnimation(); // Dừng tất cả các animation
-      animatedValue.removeAllListeners(); // Xóa tất cả các listener
+      animatedValue.stopAnimation();
+      animatedValue.removeAllListeners();
     };
   }, [animatedValue]);
 

@@ -1,8 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import {StatusBar} from 'react-native';
+import {Provider} from 'react-redux';
 import {NavigationContainer} from '@react-navigation/native';
 import SplashScreen from './src/screens/SplashScreen';
 import AppNavigator from './src/navigators/AppNavigator';
+import store from './src/redux/store';
 
 const App = () => {
   const [isShowSplash, setIsShowSplash] = useState(true);
@@ -16,10 +18,12 @@ const App = () => {
   }, []);
 
   return (
-    <NavigationContainer>
-      <StatusBar backgroundColor="transparent" translucent />
-      {isShowSplash ? <SplashScreen /> : <AppNavigator />}
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <StatusBar backgroundColor="transparent" translucent />
+        {isShowSplash ? <SplashScreen /> : <AppNavigator />}
+      </NavigationContainer>
+    </Provider>
   );
 };
 

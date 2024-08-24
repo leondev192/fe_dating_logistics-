@@ -1,38 +1,42 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
-import Toast from 'react-native-toast-message';
+import {ToastConfig, ToastConfigParams} from 'react-native-toast-message';
 
-// Định nghĩa kiểu cho props
 interface CustomToastProps {
-  text1: string;
+  text1?: string;
   text2?: string;
+  type: 'success' | 'error';
 }
 
-// Component tùy chỉnh cho Toast
-const CustomToast: React.FC<CustomToastProps> = props => {
+const CustomToast: React.FC<CustomToastProps> = ({text1, text2, type}) => {
+  const textColor = type === 'success' ? styles.successText : styles.errorText;
+
   return (
     <View style={styles.customToastContainer}>
       <Image
-        source={require('../../assets/images/success.png')}
+        source={
+          type === 'success'
+            ? require('../../assets/images/success.png')
+            : require('../../assets/images/Error.png')
+        }
         style={styles.icon}
       />
       <View>
-        <Text style={styles.title}>{props.text1}</Text>
-        {props.text2 ? (
-          <Text style={styles.subtitle}>{props.text2}</Text>
+        <Text style={[styles.title, textColor]}>{text1}</Text>
+        {text2 ? (
+          <Text style={[styles.subtitle, textColor]}>{text2}</Text>
         ) : null}
       </View>
     </View>
   );
 };
 
-// Cấu hình toast
-export const toastConfig = {
-  success: ({text1, text2}: {text1: string; text2?: string}) => (
-    <CustomToast text1={text1} text2={text2} />
+export const toastConfig: ToastConfig = {
+  success: ({text1, text2}: ToastConfigParams<any>) => (
+    <CustomToast text1={text1} text2={text2} type="success" />
   ),
-  error: ({text1, text2}: {text1: string; text2?: string}) => (
-    <CustomToast text1={text1} text2={text2} />
+  error: ({text1, text2}: ToastConfigParams<any>) => (
+    <CustomToast text1={text1} text2={text2} type="error" />
   ),
 };
 
@@ -41,7 +45,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 15,
     paddingHorizontal: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)', // Hiệu ứng mờ
+    backgroundColor: '#DEF7FF',
     borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
@@ -50,22 +54,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 10,
     elevation: 5,
-    maxWidth: '80%', // Để toast không quá lớn
+    maxWidth: '95%',
     alignSelf: 'center',
+    marginTop: '15%',
   },
   icon: {
-    width: 35,
-    height: 35,
+    width: 40,
+    height: 40,
     marginRight: 15,
   },
   title: {
-    color: '#fff',
     fontWeight: 'bold',
     fontSize: 18,
   },
   subtitle: {
-    color: '#ddd',
     fontSize: 14,
+  },
+  successText: {
+    color: 'green',
+  },
+  errorText: {
+    color: 'red',
   },
 });
 
