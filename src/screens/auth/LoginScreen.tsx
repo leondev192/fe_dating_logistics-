@@ -5,10 +5,10 @@ import {
   Text,
   TouchableOpacity,
   ImageBackground,
+  Image,
   SafeAreaView,
   StatusBar,
   Platform,
-  Image,
 } from 'react-native';
 import InputAuth from '../../components/input/InputAuth';
 import GradientButton from '../../components/button/GradientButton';
@@ -16,11 +16,8 @@ import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import Colors from '../../constants/colors';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
-import {loginVendor} from '../../apis/authAPI';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Thư viện để lưu trữ dữ liệu
-import {useDispatch} from 'react-redux';
-import {loginSuccess} from '../../redux/auth/authSlice';
 import {toastConfig} from '../../components/toast/ToastAuth';
+import Overlay from '../../components/toast/OverlayWithToast';
 
 type RootStackParamList = {
   ForgotPassword: undefined;
@@ -29,13 +26,13 @@ type RootStackParamList = {
 
 const LoginScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const dispatch = useDispatch();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({identifier: '', password: ''});
+  const [isToastVisible, setIsToastVisible] = useState(false);
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     const errors = {identifier: '', password: ''};
 
     if (!identifier) {
@@ -53,53 +50,17 @@ const LoginScreen = () => {
     if (errors.identifier || errors.password) return;
 
     setLoading(true);
-    try {
-      const response = await loginVendor({identifier, password});
-      console.log('Phản hồi API:', response); // Log phản hồi từ API
-
-      if (response.status === 'success') {
-        // Lưu thông tin người dùng vào Redux
-        dispatch(loginSuccess(response.data));
-
-        // Lưu token và thông tin vào AsyncStorage
-        await AsyncStorage.setItem('@token', response.data.token);
-        await AsyncStorage.setItem('@user', JSON.stringify(response.data));
-
-        Toast.show({
-          type: 'success',
-          text1: 'Đăng nhập thành công',
-        });
-
-        // Điều hướng đến màn hình chính hoặc màn hình khác
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: 'Đăng nhập thất bại',
-          text2:
-            response.message || 'Vui lòng kiểm tra lại thông tin đăng nhập.',
-        });
-      }
-    } catch (error: any) {
-      if (error.response && error.response.data) {
-        console.error('Lỗi trong quá trình đăng nhập:', error.response.data); // Log chi tiết lỗi từ API
-        Toast.show({
-          type: 'error',
-          text1: 'Lỗi đăng nhập',
-          text2:
-            error.response.data.message || 'Có lỗi xảy ra, vui lòng thử lại.',
-        });
-      } else {
-        // Xử lý các lỗi khác không liên quan đến phản hồi từ API
-        console.error('Lỗi trong quá trình đăng nhập:', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Lỗi đăng nhập',
-          text2: 'Có lỗi xảy ra, vui lòng thử lại.',
-        });
-      }
-    } finally {
+    setTimeout(() => {
       setLoading(false);
-    }
+      setIsToastVisible(true); // Set toast visibility to true
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        text1: 'Thất bại',
+        text2: 'Vui lòng thử lại',
+        onHide: () => setIsToastVisible(false),
+      });
+    }, 2000);
   };
 
   return (
@@ -137,8 +98,9 @@ const LoginScreen = () => {
               setError({...error, password: ''});
             }}
             placeholder="Mật khẩu"
-            secureTextEntry
+            secureTextEntry={true}
             iconName="lock"
+            isPassword={true}
             hasError={!!error.password}
             errorMessage={error.password}
           />
@@ -183,6 +145,7 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
         <LoadingSpinner loading={loading} />
+        {isToastVisible && <Overlay />}
       </SafeAreaView>
 
       <Toast config={toastConfig} />
