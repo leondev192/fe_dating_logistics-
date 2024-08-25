@@ -73,10 +73,13 @@ const LoginScreen = () => {
           text1: 'Đăng nhập thành công',
           onHide: () => setIsToastVisible(false),
         });
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Main'}],
-        });
+
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{name: 'Main'}],
+          }),
+        );
       } else {
         Toast.show({
           onHide: () => setIsToastVisible(false),

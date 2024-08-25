@@ -23,7 +23,7 @@ const HomeScreen = () => {
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{name: 'Auth'}],
+          routes: [{name: 'Auth'}], // Điều hướng đến stack Auth, nơi chứa LoginScreen
         }),
       );
     } catch (error) {

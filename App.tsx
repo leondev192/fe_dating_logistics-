@@ -8,6 +8,7 @@ import store from './src/redux/store';
 
 const App = () => {
   const [isShowSplash, setIsShowSplash] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // Set mặc định là true để bỏ qua kiểm tra token
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -21,7 +22,11 @@ const App = () => {
     <Provider store={store}>
       <NavigationContainer>
         <StatusBar backgroundColor="transparent" translucent />
-        {isShowSplash ? <SplashScreen /> : <AppNavigator />}
+        {isShowSplash ? (
+          <SplashScreen />
+        ) : (
+          <AppNavigator isLoggedIn={isLoggedIn} />
+        )}
       </NavigationContainer>
     </Provider>
   );
