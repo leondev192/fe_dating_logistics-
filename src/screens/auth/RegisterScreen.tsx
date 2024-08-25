@@ -4,6 +4,7 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 
 type RootStackParamList = {
   Login: undefined;
+  Auth: undefined;
 };
 
 import {
@@ -62,6 +63,7 @@ const RegisterScreen = () => {
     }
 
     if (hasError) return;
+    navigation.navigate('Auth');
 
     setLoading(true);
   };

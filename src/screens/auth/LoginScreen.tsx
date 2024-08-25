@@ -22,6 +22,7 @@ import {useDispatch} from 'react-redux';
 import {loginSuccess} from '../../redux/auth/authSlice';
 import {toastConfig} from '../../components/toast/ToastAuth';
 import Overlay from '../../components/toast/OverlayWithToast';
+import {CommonActions} from '@react-navigation/native';
 
 type RootStackParamList = {
   ForgotPassword: undefined;
@@ -73,11 +74,16 @@ const LoginScreen = () => {
           onHide: () => setIsToastVisible(false),
         });
 
-        // Điều hướng đến màn hình chính hoặc màn hình khác
+        // Chỉ điều hướng một lần sau khi login thành công
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{name: 'Main'}],
+          }),
+        );
       } else {
         Toast.show({
           onHide: () => setIsToastVisible(false),
-
           type: 'error',
           text1: 'Đăng nhập thất bại',
           text2:
@@ -87,22 +93,20 @@ const LoginScreen = () => {
       }
     } catch (error: any) {
       if (error.response && error.response.data) {
-        console.error('Lỗi trong quá trình đăng nhập:', error.response.data); // Log chi tiết lỗi từ API
         Toast.show({
           onHide: () => setIsToastVisible(false),
           type: 'error',
-          text1: 'Lỗi đăng nhập',
+          text1: 'Đăng nhập thất bại',
           text2:
             error.response.data.message || 'Có lỗi xảy ra, vui lòng thử lại.',
         });
         setIsToastVisible(true);
       } else {
         // Xử lý các lỗi khác không liên quan đến phản hồi từ API
-        console.error('Lỗi trong quá trình đăng nhập:', error);
         Toast.show({
           onHide: () => setIsToastVisible(false),
           type: 'error',
-          text1: 'Lỗi đăng nhập',
+          text1: 'Đăng nhập không thành công',
           text2: 'Có lỗi xảy ra, vui lòng thử lại.',
         });
         setIsToastVisible(true);
@@ -224,7 +228,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   forgotPasswordContainer: {
-    width: '80%',
     alignSelf: 'flex-end',
     marginVertical: 10,
   },

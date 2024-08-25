@@ -12,7 +12,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({loading}) => {
   return (
     <View style={styles.loadingOverlay}>
       <LottieView
-        source={require('../../assets/animations/loading.json')}
+        source={require('../../assets/animations/loadingg.json')}
         autoPlay
         loop
         style={styles.lottie}
@@ -29,8 +29,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   lottie: {
-    width: 200,
-    height: 200,
+    width: 100,
+    height: 100,
   },
 });
 

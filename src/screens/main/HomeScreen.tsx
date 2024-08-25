@@ -1,8 +1,44 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {useSelector, useDispatch} from 'react-redux';
+import {RootState} from '../../redux/store';
+import {logout} from '../../redux/auth/authSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation, CommonActions} from '@react-navigation/native';
 
 const HomeScreen = () => {
-  return <View style={styles.container}></View>;
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('@token');
+      await AsyncStorage.removeItem('@user');
+
+      // Đảm bảo chỉ dispatch và điều hướng một lần
+      dispatch(logout());
+
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'Auth'}],
+        }),
+      );
+    } catch (error) {
+      console.error('Đăng xuất không thành công:', error);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>User ID: {user?.id}</Text>
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutButtonText}>Đăng xuất</Text>
+      </TouchableOpacity>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -10,9 +46,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   text: {
     fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  logoutButton: {
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#ff4d4d',
+    borderRadius: 5,
+  },
+  logoutButtonText: {
+    color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });

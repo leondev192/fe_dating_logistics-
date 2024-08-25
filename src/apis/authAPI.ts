@@ -7,10 +7,9 @@ export const loginVendor = async (data: {
 }) => {
   try {
     const response = await apiClient.post('/auth/vendor/login', data);
-    console.log('Phản hồi từ API:', response.data); // Log phản hồi từ API
+    console.log('Phản hồi từ API:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Lỗi khi gọi API:', error); // Log lỗi nếu có
     throw error;
   }
 };
