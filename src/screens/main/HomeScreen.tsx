@@ -14,16 +14,16 @@ const HomeScreen = () => {
 
   const handleLogout = async () => {
     try {
+      // Xóa token và thông tin user khỏi AsyncStorage
       await AsyncStorage.removeItem('@token');
       await AsyncStorage.removeItem('@user');
 
-      // Đảm bảo chỉ dispatch và điều hướng một lần
+      // Dispatch action để cập nhật trạng thái đăng nhập trong Redux
       dispatch(logout());
-
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{name: 'Auth'}],
+          routes: [{name: 'Auth'}], // Điều hướng đến stack Auth, nơi chứa LoginScreen
         }),
       );
     } catch (error) {

@@ -27,6 +27,7 @@ import {CommonActions} from '@react-navigation/native';
 type RootStackParamList = {
   ForgotPassword: undefined;
   Register: undefined;
+  Main: undefined;
 };
 
 const LoginScreen = () => {
@@ -58,7 +59,6 @@ const LoginScreen = () => {
     setLoading(true);
     try {
       const response = await loginVendor({identifier, password});
-      console.log('Phản hồi API:', response); // Log phản hồi từ API
 
       if (response.status === 'success') {
         // Lưu thông tin người dùng vào Redux
@@ -73,17 +73,14 @@ const LoginScreen = () => {
           text1: 'Đăng nhập thành công',
           onHide: () => setIsToastVisible(false),
         });
-
-        // Chỉ điều hướng một lần sau khi login thành công
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{name: 'Main'}],
-          }),
-        );
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Main'}],
+        });
       } else {
         Toast.show({
           onHide: () => setIsToastVisible(false),
+
           type: 'error',
           text1: 'Đăng nhập thất bại',
           text2:
@@ -102,7 +99,6 @@ const LoginScreen = () => {
         });
         setIsToastVisible(true);
       } else {
-        // Xử lý các lỗi khác không liên quan đến phản hồi từ API
         Toast.show({
           onHide: () => setIsToastVisible(false),
           type: 'error',
