@@ -8,7 +8,7 @@ import store from './src/redux/store';
 
 const App = () => {
   const [isShowSplash, setIsShowSplash] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Set mặc định là true để bỏ qua kiểm tra token
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
