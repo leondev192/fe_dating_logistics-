@@ -31,6 +31,7 @@ type Props = {
 
 const ResetPasswordScreen: React.FC<Props> = ({route, navigation}) => {
   const {token} = route.params;
+  console.log('Token in ResetPasswordScreen:', token); // Log token để kiểm tra
   const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,15 +42,25 @@ const ResetPasswordScreen: React.FC<Props> = ({route, navigation}) => {
       return;
     }
 
-    //daovanquyet1909@gmail.com
     setLoading(true);
     try {
-      await resetPassword({token, newPassword});
+      console.log('Sending payload:', {token, newPassword});
+      const response = await resetPassword({token, newPassword});
+      console.log('Response from API:', response);
       setLoading(false);
       navigation.navigate('Login');
-    } catch (error) {
+    } catch (error: any) {
       setLoading(false);
-      setError('Lỗi khi đặt lại mật khẩu, vui lòng thử lại');
+      if (error.response && error.response.data) {
+        console.error('Server Error:', error.response.data);
+        setError(
+          error.response.data.message ||
+            'Lỗi khi đặt lại mật khẩu, vui lòng thử lại',
+        );
+      } else {
+        console.error('Error:', error.message);
+        setError('Lỗi khi đặt lại mật khẩu, vui lòng thử lại');
+      }
     }
   };
 

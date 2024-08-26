@@ -17,7 +17,7 @@ import {forgotPassword} from '../../../apis/authService'; // Import API service
 
 type RootStackParamList = {
   Login: undefined;
-  VerifyOtp: undefined;
+  VerifyOtpForgotPassword: {identifier: string};
 };
 
 const ForgotPasswordScreen = () => {
@@ -27,12 +27,12 @@ const ForgotPasswordScreen = () => {
   const [loading, setLoading] = useState(false);
 
   const validateIdentifier = (value: string) => {
-    // Simple validation logic for both email and phone number
     const isEmail = value.includes('@');
     const isPhone = /^[0-9]{10,15}$/.test(value);
     return isEmail || isPhone;
   };
 
+  // ForgotPasswordScreen.tsx
   const handleForgotPassword = async () => {
     if (!identifier) {
       setError('Vui lòng nhập email hoặc số điện thoại');
@@ -45,7 +45,8 @@ const ForgotPasswordScreen = () => {
         // Gọi API để yêu cầu quên mật khẩu
         await forgotPassword({identifier});
         setLoading(false);
-        navigation.navigate('VerifyOtp');
+        // Điều hướng sang màn hình VerifyOtp và truyền identifier qua params
+        navigation.navigate('VerifyOtpForgotPassword', {identifier});
       } catch (error) {
         setLoading(false);
         setError('Đã xảy ra lỗi, vui lòng thử lại sau.');

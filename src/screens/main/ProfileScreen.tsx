@@ -33,7 +33,6 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>User ID: {user?.id}</Text>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Đăng xuất</Text>
       </TouchableOpacity>

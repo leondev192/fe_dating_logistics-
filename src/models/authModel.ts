@@ -7,9 +7,29 @@ export interface LoginResponse {
   status: string;
   message: string;
   data: {
-    id: string;
     username: string;
     token: string;
+  };
+}
+export interface RegisterRequest {
+  identifier: string;
+  password: string;
+}
+
+export interface RegisterResponse {
+  status: string;
+  message: string;
+}
+export interface VerifyOtpRequest {
+  identifier: string;
+  otp: string;
+}
+
+export interface VerifyOtpResponse {
+  status: string;
+  message: string;
+  data: {
+    username: string;
   };
 }
 

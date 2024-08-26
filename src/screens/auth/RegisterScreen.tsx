@@ -1,12 +1,6 @@
 import React, {useState} from 'react';
 import InputAuth from '../../components/input/InputAuth';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-
-type RootStackParamList = {
-  Login: undefined;
-  Auth: undefined;
-};
-
+import {useNavigation, NavigationProp} from '@react-navigation/native';
 import {
   View,
   StyleSheet,
@@ -21,6 +15,15 @@ import {
 import GradientButton from '../../components/button/GradientButton';
 import Colors from '../../constants/colors';
 import LoadingSpinner from '../../components/loading/LoadingSpinner';
+import {register} from '../../apis/authService';
+
+type RootStackParamList = {
+  VerifyOtp: {
+    identifier: string;
+  };
+  Login: undefined;
+  Auth: undefined;
+};
 
 const RegisterScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -28,26 +31,29 @@ const RegisterScreen = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [emailError, setEmailError] = useState('');
+  const [identifierError, setidentifierError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+
+  const validateIdentifier = (value: string) => {
+    const isEmail = value.includes('@');
+    const isPhone = /^[0-9]{10,15}$/.test(value);
+    return isEmail || isPhone;
+  };
 
   const handleRegister = async () => {
     let hasError = false;
 
-    // Kiểm tra email
+    // Kiểm tra email hoặc số điện thoại
     if (!identifier) {
-      setEmailError('Vui lòng nhập email');
+      console.log('Validation Error: Missing identifier');
+      setidentifierError('Vui lòng nhập email hoặc số điện thoại');
       hasError = true;
-    } else if (!identifier.includes('@')) {
-      setEmailError('Nhập đúng định dạng email');
-      hasError = true;
-    } else {
-      setEmailError('');
     }
 
     // Kiểm tra mật khẩu
     if (!password) {
+      console.log('Validation Error: Missing password');
       setPasswordError('Vui lòng nhập mật khẩu');
       hasError = true;
     } else {
@@ -56,16 +62,37 @@ const RegisterScreen = () => {
 
     // Kiểm tra mật khẩu xác nhận
     if (password !== confirmPassword) {
+      console.log('Validation Error: Passwords do not match');
       setConfirmPasswordError('Mật khẩu không trùng khớp');
       hasError = true;
     } else {
       setConfirmPasswordError('');
     }
 
+    // Nếu có lỗi, dừng quá trình đăng ký
     if (hasError) return;
-    navigation.navigate('Auth');
 
+    // Gọi API đăng ký nếu không có lỗi
     setLoading(true);
+    try {
+      console.log('Payload being sent:', {identifier, password});
+      const response = await register({identifier, password});
+      console.log('Registration Response:', response);
+
+      setLoading(false);
+      // Điều hướng đến trang xác thực OTP
+      navigation.navigate('VerifyOtp', {identifier});
+    } catch (error: any) {
+      setLoading(false);
+      console.error('Registration Error:', error);
+      if (error.response && error.response.data) {
+        setidentifierError(
+          error.response.data.message || 'Đã xảy ra lỗi, vui lòng thử lại sau.',
+        );
+      } else {
+        setidentifierError('Đã xảy ra lỗi, vui lòng thử lại sau.');
+      }
+    }
   };
 
   return (
@@ -88,12 +115,12 @@ const RegisterScreen = () => {
             value={identifier}
             onChangeText={text => {
               setIdentifier(text);
-              setEmailError('');
+              setidentifierError('');
             }}
             placeholder="Email / Số điện thoại"
             iconName="user"
-            hasError={!!emailError}
-            errorMessage={emailError}
+            hasError={!!identifierError}
+            errorMessage={identifierError}
           />
           <InputAuth
             label=""

@@ -6,8 +6,9 @@ import RegisterScreen from '../screens/auth/RegisterScreen';
 import WelcomeScreen from '../screens/auth/WelcomeSCreen';
 import BackButton from '../components/header/ArrowLeft';
 import TitleHeader from '../components/header/TitleHeader';
-import ForgotPasswordScreen from '../screens/auth/forgotpassword/ForgotPaswordScreen';
-import VerifyOtpScreen from '../screens/auth/forgotpassword/VerifyOtpScreen';
+import ForgotPassword from '../screens/auth/forgotpassword/ForgotPaswordScreen';
+import VerifyOtpScreen from '../screens/auth/VerifyOtpScreen';
+import VerifyOtpForgotPassword from '../screens/auth/forgotpassword/VerifyOtpScreen';
 import ResetPasswordScreen from '../screens/auth/forgotpassword/ResetPasswordScreen';
 
 type RootStackParamList = {
@@ -15,8 +16,9 @@ type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   ForgotPassword: undefined;
-  VerifyOtp: undefined;
+  VerifyOtpForgotPassword: undefined;
   ResetPassword: {token: string};
+  VerifyOtp: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -55,7 +57,7 @@ const AuthNavigator = () => {
       />
       <Stack.Screen
         name="ForgotPassword"
-        component={ForgotPasswordScreen}
+        component={ForgotPassword}
         options={{
           title: '',
           headerBackTitleVisible: false,
@@ -66,8 +68,8 @@ const AuthNavigator = () => {
         }}
       />
       <Stack.Screen
-        name="VerifyOtp"
-        component={VerifyOtpScreen}
+        name="VerifyOtpForgotPassword"
+        component={VerifyOtpForgotPassword}
         options={{
           title: '',
           headerBackTitleVisible: false,
@@ -80,6 +82,18 @@ const AuthNavigator = () => {
       <Stack.Screen
         name="ResetPassword"
         component={ResetPasswordScreen} // Đảm bảo component này nhận đúng kiểu props
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Quên mật khẩu" />,
+          headerTransparent: true,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="VerifyOtp"
+        component={VerifyOtpScreen} // Đảm bảo component này nhận đúng kiểu props
         options={{
           title: '',
           headerBackTitleVisible: false,

@@ -1,20 +1,20 @@
 import React, {useState} from 'react';
 import {View, StyleSheet, Text, ScrollView} from 'react-native';
-import InputAuth from '../../../components/input/InputAuth';
-import ButtonComponent from '../../../components/button/GradientButton';
-import Colors from '../../../constants/colors';
+import InputAuth from '../../components/input/InputAuth';
+import ButtonComponent from '../../components/button/GradientButton';
+import Colors from '../../constants/colors';
 import {
   useNavigation,
   NavigationProp,
   RouteProp,
   useRoute,
 } from '@react-navigation/native';
-import LoadingSpinner from '../../../components/loading/LoadingSpinner';
-import {verifyOtpResetPassword} from '../../../apis/authService';
+import LoadingSpinner from '../../components/loading/LoadingSpinner';
+import {verifyOtp} from '../../apis/authService';
 
 type RootStackParamList = {
-  ResetPassword: {token: string};
-  VerifyOtp: {identifier: string}; // Định nghĩa params cho VerifyOtp
+  Login: undefined;
+  VerifyOtp: {identifier: string};
 };
 
 const VerifyOtpScreen = () => {
@@ -28,21 +28,36 @@ const VerifyOtpScreen = () => {
 
   const handleVerifyOtp = async () => {
     if (!otp) {
+      console.log('Validation Error: OTP is missing');
       setError('Vui lòng nhập OTP');
       return;
     }
+
+    console.log('Starting OTP verification...');
+    console.log('Identifier:', identifier);
+    console.log('OTP:', otp);
+
     setLoading(true);
     try {
-      const response = await verifyOtpResetPassword({identifier, otp});
+      // Gọi API xác thực OTP
+      const response = await verifyOtp({identifier, otp});
+      console.log('OTP Verification Response:', response);
+
       setLoading(false);
-      console.log('Token received:', response.token);
-      // Log để kiểm tra token
-      console.log('Token received after OTP verification:', response.token);
-      // Nếu OTP hợp lệ, điều hướng đến màn hình đặt lại mật khẩu với token nhận được
-      navigation.navigate('ResetPassword', {token: response.token});
-    } catch (error) {
+      // Điều hướng đến màn hình Home sau khi xác thực OTP thành công
+      console.log('OTP verified successfully, navigating to Home screen...');
+      navigation.navigate('Login');
+    } catch (error: any) {
       setLoading(false);
-      setError('OTP không hợp lệ hoặc đã hết hạn');
+      console.error('OTP Verification Error:', error);
+      if (error.response && error.response.data) {
+        console.error('Server Error Response:', error.response.data);
+        setError(
+          error.response.data.message || 'OTP không hợp lệ hoặc đã hết hạn',
+        );
+      } else {
+        setError('OTP không hợp lệ hoặc đã hết hạn');
+      }
     }
   };
 
