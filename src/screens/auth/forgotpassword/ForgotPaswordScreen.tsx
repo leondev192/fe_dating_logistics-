@@ -13,9 +13,11 @@ import ButtonComponent from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
 import LoadingSpinner from '../../../components/loading/LoadingSpinner';
+import {forgotPassword} from '../../../apis/authService'; // Import API service
 
 type RootStackParamList = {
   Login: undefined;
+  VerifyOtp: undefined;
 };
 
 const ForgotPasswordScreen = () => {
@@ -24,15 +26,30 @@ const ForgotPasswordScreen = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleForgotPassword = () => {
+  const validateIdentifier = (value: string) => {
+    // Simple validation logic for both email and phone number
+    const isEmail = value.includes('@');
+    const isPhone = /^[0-9]{10,15}$/.test(value);
+    return isEmail || isPhone;
+  };
+
+  const handleForgotPassword = async () => {
     if (!identifier) {
-      setError('Vui lòng nhập email');
-    } else if (!identifier.includes('@')) {
-      setError('Nhập đúng định dạng email');
+      setError('Vui lòng nhập email hoặc số điện thoại');
+    } else if (!validateIdentifier(identifier)) {
+      setError('Vui lòng nhập đúng định dạng email hoặc số điện thoại hợp lệ');
     } else {
       setError('');
       setLoading(true);
-      // Handle your API call here
+      try {
+        // Gọi API để yêu cầu quên mật khẩu
+        await forgotPassword({identifier});
+        setLoading(false);
+        navigation.navigate('VerifyOtp');
+      } catch (error) {
+        setLoading(false);
+        setError('Đã xảy ra lỗi, vui lòng thử lại sau.');
+      }
     }
   };
 
@@ -44,8 +61,8 @@ const ForgotPasswordScreen = () => {
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <Text style={styles.instructionText}>
-            Đừng lo lắng! Nó xảy ra. Vui lòng nhập địa chỉ email được liên kết
-            với tài khoản của bạn
+            Đừng lo lắng! Nó xảy ra. Vui lòng nhập email hoặc số điện thoại được
+            liên kết với tài khoản của bạn
           </Text>
           <InputAuth
             label=""
@@ -54,7 +71,7 @@ const ForgotPasswordScreen = () => {
               setIdentifier(text);
               setError('');
             }}
-            placeholder="Nhập Email của bạn "
+            placeholder="Nhập Email hoặc Số điện thoại của bạn"
             iconName="user"
             hasError={!!error}
             errorMessage={error}
@@ -71,7 +88,7 @@ const ForgotPasswordScreen = () => {
           <TouchableOpacity
             style={styles.termsButton}
             onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.termsButtonText}>Đăng Nhập </Text>
+            <Text style={styles.termsButtonText}>Đăng Nhập</Text>
           </TouchableOpacity>
         </View>
       </View>

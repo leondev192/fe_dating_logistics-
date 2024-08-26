@@ -11,10 +11,9 @@ import {loginSuccess} from './src/redux/auth/authSlice';
 
 const App = () => {
   const [isShowSplash, setIsShowSplash] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // `null` để kiểm tra trạng thái chưa biết
-
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   useEffect(() => {
-    let isMounted = true; // Thêm cờ để tránh cập nhật state nếu component đã unmount
+    let isMounted = true;
 
     const checkLoginStatus = async () => {
       try {
@@ -39,16 +38,15 @@ const App = () => {
       if (isMounted) {
         setIsShowSplash(false);
       }
-    }, 1500); // Giảm thời gian cho Splash
+    }, 1500);
 
     return () => {
-      isMounted = false; // Cleanup
+      isMounted = false;
       clearTimeout(timer);
     };
   }, []);
 
   if (isLoggedIn === null) {
-    // Chờ cho đến khi xác định trạng thái đăng nhập
     return null;
   }
 

@@ -12,3 +12,33 @@ export interface LoginResponse {
     token: string;
   };
 }
+
+export interface ForgotPasswordRequest {
+  identifier: string;
+}
+
+export interface ForgotPasswordResponse {
+  status: string;
+  message: string;
+}
+
+export interface VerifyOtpResetPasswordRequest {
+  identifier: string;
+  otp: string;
+}
+
+export interface VerifyOtpResetPasswordResponse {
+  status: string;
+  message: string;
+  token: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  status: string;
+  message: string;
+}

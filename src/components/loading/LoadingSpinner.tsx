@@ -12,7 +12,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({loading}) => {
   return (
     <View style={styles.loadingOverlay}>
       <LottieView
-        source={require('../../assets/animations/loadingg.json')}
+        source={require('../../assets/animations/loading.json')}
         autoPlay
         loop
         style={styles.lottie}
