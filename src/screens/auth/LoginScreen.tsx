@@ -38,6 +38,10 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({identifier: '', password: ''});
   const [isToastVisible, setIsToastVisible] = useState(false);
+  const resetAction = CommonActions.reset({
+    index: 0,
+    routes: [{name: 'Main'}],
+  });
 
   const handleLogin = async () => {
     const errors = {identifier: '', password: ''};
@@ -74,12 +78,7 @@ const LoginScreen = () => {
           onHide: () => setIsToastVisible(false),
         });
 
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{name: 'Main'}],
-          }),
-        );
+        navigation.dispatch(resetAction);
       } else {
         Toast.show({
           onHide: () => setIsToastVisible(false),
