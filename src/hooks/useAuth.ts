@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {loginVendor} from '../apis/authService';
+import {loginVendor} from '../apis/authServices';
 import {LoginRequest, LoginResponse} from '../models/authModel';
 
 export const useAuth = () => {

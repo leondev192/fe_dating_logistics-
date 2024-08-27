@@ -1,6 +1,12 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, Text, ScrollView} from 'react-native';
-import InputAuth from '../../components/input/InputAuth';
+import {
+  View,
+  StyleSheet,
+  Text,
+  ScrollView,
+  Platform,
+  ImageBackground,
+} from 'react-native';
 import ButtonComponent from '../../components/button/GradientButton';
 import Colors from '../../constants/colors';
 import {
@@ -11,6 +17,10 @@ import {
 } from '@react-navigation/native';
 import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import {verifyOtp} from '../../apis/authService';
+import OtpInputComponent from '../../components/input/OtpInput';
+import Toast from 'react-native-toast-message';
+import BlurredToast from '../../components/toast/BlurredToast';
+import {toastConfig} from '../../components/toast/ToastAuth';
 
 type RootStackParamList = {
   Login: undefined;
@@ -20,78 +30,83 @@ type RootStackParamList = {
 const VerifyOtpScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, 'VerifyOtp'>>();
-  const {identifier} = route.params; // Lấy identifier từ params
+  const {identifier} = route.params;
 
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isToastVisible, setIsToastVisible] = useState(false);
 
   const handleVerifyOtp = async () => {
-    if (!otp) {
-      console.log('Validation Error: OTP is missing');
-      setError('Vui lòng nhập OTP');
+    if (otp.length !== 6) {
+      setError('Vui lòng nhập đủ 6 ký tự OTP');
       return;
     }
-
-    console.log('Starting OTP verification...');
-    console.log('Identifier:', identifier);
-    console.log('OTP:', otp);
-
     setLoading(true);
     try {
-      // Gọi API xác thực OTP
       const response = await verifyOtp({identifier, otp});
-      console.log('OTP Verification Response:', response);
-
       setLoading(false);
-      // Điều hướng đến màn hình Home sau khi xác thực OTP thành công
-      console.log('OTP verified successfully, navigating to Home screen...');
+      Toast.show({
+        type: 'success',
+        text1: 'Xác minh thành công',
+        onHide: () => setIsToastVisible(false),
+        position: 'top',
+        topOffset: 300,
+      });
       navigation.navigate('Login');
     } catch (error: any) {
       setLoading(false);
-      console.error('OTP Verification Error:', error);
-      if (error.response && error.response.data) {
-        console.error('Server Error Response:', error.response.data);
-        setError(
-          error.response.data.message || 'OTP không hợp lệ hoặc đã hết hạn',
-        );
-      } else {
-        setError('OTP không hợp lệ hoặc đã hết hạn');
-      }
+      Toast.show({
+        type: 'error',
+        text1: 'OTP không hợp lệ',
+        text2: 'Vui lòng kiểm tra lại OTP hoặc yêu cầu mã mới.',
+        position: 'top',
+        topOffset: 300,
+      });
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.instructionText}>
-        Vui lòng nhập OTP đã được gửi đến bạn
-      </Text>
-      <InputAuth
-        label=""
-        value={otp}
-        onChangeText={text => setOtp(text)}
-        placeholder="Nhập OTP"
-        iconName="user"
-        hasError={!!error}
-        errorMessage={error}
-      />
-      <ButtonComponent title="Xác Minh OTP" onPress={handleVerifyOtp} />
-      <LoadingSpinner loading={loading} />
-    </ScrollView>
+    <ImageBackground
+      source={require('../../assets/images/Background.png')}
+      style={styles.imageBackground}
+      resizeMode="cover">
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.instructionText}>
+          Vui lòng nhập OTP đã được gửi đến bạn
+        </Text>
+        <OtpInputComponent length={6} onChange={setOtp} />
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        <ButtonComponent title="Xác Minh OTP" onPress={handleVerifyOtp} />
+        <LoadingSpinner loading={loading} />
+      </ScrollView>
+      <BlurredToast config={toastConfig} />
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  imageBackground: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
   container: {
     flexGrow: 1,
     padding: 20,
-    justifyContent: 'center',
+    marginTop: Platform.OS === 'android' ? 110 : 110,
+    paddingHorizontal: 20,
   },
   instructionText: {
     fontSize: 16,
     color: Colors.textbody,
     textAlign: 'center',
     marginVertical: 10,
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
   },
 });
 

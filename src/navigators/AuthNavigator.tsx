@@ -10,6 +10,7 @@ import ForgotPassword from '../screens/auth/forgotpassword/ForgotPaswordScreen';
 import VerifyOtpScreen from '../screens/auth/VerifyOtpScreen';
 import VerifyOtpForgotPassword from '../screens/auth/forgotpassword/VerifyOtpScreen';
 import ResetPasswordScreen from '../screens/auth/forgotpassword/ResetPasswordScreen';
+import ResetPasswordSuccessScreen from '../screens/auth/forgotpassword/ResetPasswordSuccessScreen';
 
 type RootStackParamList = {
   Welcome: undefined;
@@ -19,6 +20,7 @@ type RootStackParamList = {
   VerifyOtpForgotPassword: undefined;
   ResetPassword: {token: string};
   VerifyOtp: undefined;
+  ResetPasswordSuccess: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -82,6 +84,18 @@ const AuthNavigator = () => {
       <Stack.Screen
         name="ResetPassword"
         component={ResetPasswordScreen} // Đảm bảo component này nhận đúng kiểu props
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Quên mật khẩu" />,
+          headerTransparent: true,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="ResetPasswordSuccess"
+        component={ResetPasswordSuccessScreen} // Đảm bảo component này nhận đúng kiểu props
         options={{
           title: '',
           headerBackTitleVisible: false,

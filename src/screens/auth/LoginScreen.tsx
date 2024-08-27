@@ -20,9 +20,9 @@ import {loginVendor} from '../../apis/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {loginSuccess} from '../../redux/auth/authSlice';
-import {toastConfig} from '../../components/toast/ToastAuth';
-import Overlay from '../../components/toast/OverlayWithToast';
 import {CommonActions} from '@react-navigation/native';
+import {toastConfig} from '../../components/toast/ToastAuth';
+import BlurredToast from '../../components/toast/BlurredToast';
 
 type RootStackParamList = {
   ForgotPassword: undefined;
@@ -38,6 +38,7 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({identifier: '', password: ''});
   const [isToastVisible, setIsToastVisible] = useState(false);
+
   const resetAction = CommonActions.reset({
     index: 0,
     routes: [{name: 'Main'}],
@@ -76,6 +77,8 @@ const LoginScreen = () => {
           type: 'success',
           text1: 'Đăng nhập thành công',
           onHide: () => setIsToastVisible(false),
+          position: 'top',
+          topOffset: 300,
         });
 
         navigation.dispatch(resetAction);
@@ -87,6 +90,8 @@ const LoginScreen = () => {
           text1: 'Đăng nhập thất bại',
           text2:
             response.message || 'Vui lòng kiểm tra lại thông tin đăng nhập.',
+          position: 'top',
+          topOffset: 300,
         });
         setIsToastVisible(true);
       }
@@ -98,6 +103,8 @@ const LoginScreen = () => {
           text1: 'Đăng nhập thất bại',
           text2:
             error.response.data.message || 'Có lỗi xảy ra, vui lòng thử lại.',
+          position: 'top',
+          topOffset: 300,
         });
         setIsToastVisible(true);
       } else {
@@ -106,6 +113,8 @@ const LoginScreen = () => {
           type: 'error',
           text1: 'Đăng nhập không thành công',
           text2: 'Có lỗi xảy ra, vui lòng thử lại.',
+          position: 'top',
+          topOffset: 300,
         });
         setIsToastVisible(true);
       }
@@ -195,10 +204,9 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
         <LoadingSpinner loading={loading} />
-        {isToastVisible && <Overlay />}
       </SafeAreaView>
 
-      <Toast config={toastConfig} />
+      <BlurredToast config={toastConfig} />
     </ImageBackground>
   );
 };

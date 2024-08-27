@@ -178,8 +178,6 @@ const RegisterScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-
-        <LoadingSpinner loading={loading} />
         <View style={styles.termsContainer}>
           <Text style={styles.termsText}>Đã có tài khoản?</Text>
           <TouchableOpacity
@@ -188,6 +186,8 @@ const RegisterScreen = () => {
             <Text style={styles.termsButtonText}>Đăng nhập ngay</Text>
           </TouchableOpacity>
         </View>
+
+        <LoadingSpinner loading={loading} />
       </SafeAreaView>
     </ImageBackground>
   );
