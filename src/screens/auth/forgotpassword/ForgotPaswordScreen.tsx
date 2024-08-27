@@ -100,14 +100,7 @@ const ForgotPasswordScreen = () => {
         />
       </ScrollView>
       <LoadingSpinner loading={loading} />
-      <View style={styles.termsContainer}>
-        <Text style={styles.termsText}>Nhớ Mật Khẩu?</Text>
-        <TouchableOpacity
-          style={styles.termsButton}
-          onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.termsButtonText}>Đăng Nhập</Text>
-        </TouchableOpacity>
-      </View>
+
       <BlurredToast config={toastConfig} />
     </ImageBackground>
   );
@@ -129,26 +122,6 @@ const styles = StyleSheet.create({
     color: Colors.textbody,
     textAlign: 'center',
     marginVertical: 10,
-  },
-  termsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    marginTop: 'auto',
-  },
-  termsText: {
-    fontSize: 15,
-    color: '#1E232C',
-    textAlign: 'center',
-  },
-  termsButton: {
-    marginLeft: 10,
-  },
-  termsButtonText: {
-    color: Colors.primary,
-    fontWeight: 'bold',
-    fontSize: 15,
   },
 });
 

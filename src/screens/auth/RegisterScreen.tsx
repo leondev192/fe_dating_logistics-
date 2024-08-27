@@ -178,14 +178,6 @@ const RegisterScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.termsContainer}>
-          <Text style={styles.termsText}>Đã có tài khoản?</Text>
-          <TouchableOpacity
-            style={styles.termsButton}
-            onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.termsButtonText}>Đăng nhập ngay</Text>
-          </TouchableOpacity>
-        </View>
 
         <LoadingSpinner loading={loading} />
       </SafeAreaView>
@@ -232,27 +224,7 @@ const styles = StyleSheet.create({
     width: '50%',
     backgroundColor: '#E8ECF4',
   },
-  termsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    marginTop: 'auto',
-  },
-  termsText: {
-    color: '#1E232C',
-    fontSize: 15,
-    textAlign: 'center',
-  },
-  termsButton: {
-    marginLeft: 10,
-  },
-  termsButtonText: {
-    color: Colors.primary,
-    fontSize: 15,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
+
   socialLoginContainer: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',

@@ -41,7 +41,7 @@ const LoginScreen = () => {
 
   const resetAction = CommonActions.reset({
     index: 0,
-    routes: [{name: 'Main'}],
+    routes: [{name: 'Merchant'}],
   });
 
   const handleLogin = async () => {
@@ -195,14 +195,7 @@ const LoginScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.termsContainer}>
-          <Text style={styles.termsText}>Không có tài khoản?</Text>
-          <TouchableOpacity
-            style={styles.termsButton}
-            onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.termsButtonText}>Đăng ký ngay bây giờ</Text>
-          </TouchableOpacity>
-        </View>
+
         <LoadingSpinner loading={loading} />
       </SafeAreaView>
 
@@ -259,27 +252,7 @@ const styles = StyleSheet.create({
     width: '50%',
     backgroundColor: '#E8ECF4',
   },
-  termsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    marginTop: 'auto',
-  },
-  termsText: {
-    color: '#1E232C',
-    fontSize: 15,
-    textAlign: 'center',
-  },
-  termsButton: {
-    marginLeft: 10,
-  },
-  termsButtonText: {
-    color: Colors.primary,
-    fontSize: 15,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
+
   socialLoginContainer: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
