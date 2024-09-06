@@ -60,6 +60,7 @@ const AuthNavigator = () => {
           headerTitleAlign: 'center',
         }}
       />
+      //vq ne
       <Stack.Screen
         name="VerifyOtpForgotPassword"
         component={VerifyOtpForgotPassword}
