@@ -1,4 +1,4 @@
-// AuthNavigator.js
+// src/navigators/AuthNavigator.tsx
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import LoginScreen from '../screens/auth/LoginScreen';
@@ -10,20 +10,11 @@ import ForgotPassword from '../screens/auth/forgotpassword/ForgotPaswordScreen';
 import VerifyOtpScreen from '../screens/auth/VerifyOtpScreen';
 import VerifyOtpForgotPassword from '../screens/auth/forgotpassword/VerifyOtpScreen';
 import ResetPasswordScreen from '../screens/auth/forgotpassword/ResetPasswordScreen';
-import ResetPasswordSuccessScreen from '../screens/auth/forgotpassword/ResetPasswordSuccessScreen';
 
-type RootStackParamList = {
-  Welcome: undefined;
-  Login: undefined;
-  Register: undefined;
-  ForgotPassword: undefined;
-  VerifyOtpForgotPassword: undefined;
-  ResetPassword: {token: string};
-  VerifyOtp: undefined;
-  ResetPasswordSuccess: undefined;
-};
+// Import the types from navigationTypes
+import {AuthStackParamList} from './navigationTypes';
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator = () => {
   return (
@@ -83,19 +74,7 @@ const AuthNavigator = () => {
       />
       <Stack.Screen
         name="ResetPassword"
-        component={ResetPasswordScreen} // Đảm bảo component này nhận đúng kiểu props
-        options={{
-          title: '',
-          headerBackTitleVisible: false,
-          headerBackImage: () => <BackButton />,
-          headerTitle: () => <TitleHeader title="Quên mật khẩu" />,
-          headerTransparent: true,
-          headerTitleAlign: 'center',
-        }}
-      />
-      <Stack.Screen
-        name="ResetPasswordSuccess"
-        component={ResetPasswordSuccessScreen} // Đảm bảo component này nhận đúng kiểu props
+        component={ResetPasswordScreen}
         options={{
           title: '',
           headerBackTitleVisible: false,
@@ -107,7 +86,7 @@ const AuthNavigator = () => {
       />
       <Stack.Screen
         name="VerifyOtp"
-        component={VerifyOtpScreen} // Đảm bảo component này nhận đúng kiểu props
+        component={VerifyOtpScreen}
         options={{
           title: '',
           headerBackTitleVisible: false,

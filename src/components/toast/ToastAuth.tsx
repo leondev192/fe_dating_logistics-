@@ -1,15 +1,17 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import {
   ToastConfig,
   ToastConfigParams,
   ToastType,
 } from 'react-native-toast-message';
+import Colors from '../../constants/colors'; // Đảm bảo đường dẫn đến Colors là chính xác
 
 interface CustomToastProps {
   text1?: string;
   text2?: string;
-  type: ToastType; // Sử dụng ToastType từ thư viện
+  type: ToastType;
   onPressOk: () => void;
 }
 
@@ -31,8 +33,14 @@ const CustomToast: React.FC<CustomToastProps> = ({
       />
       <Text style={styles.mainText}>{text1}</Text>
       <Text style={styles.subText}>{text2}</Text>
-      <TouchableOpacity style={styles.okButton} onPress={onPressOk}>
-        <Text style={styles.okButtonText}>OK</Text>
+      <TouchableOpacity onPress={onPressOk} style={styles.okButton}>
+        <LinearGradient
+          colors={Colors.gradientColors} // Sử dụng màu gradient từ Colors
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 0}}
+          style={styles.okButtonGradient}>
+          <Text style={styles.okButtonText}>OK</Text>
+        </LinearGradient>
       </TouchableOpacity>
     </View>
   );
@@ -91,10 +99,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   okButton: {
-    backgroundColor: '#2495F4',
+    borderRadius: 25,
+    overflow: 'hidden',
+  },
+  okButtonGradient: {
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 30,
     paddingVertical: 10,
-    borderRadius: 25,
   },
   okButtonText: {
     color: '#FFFFFF',

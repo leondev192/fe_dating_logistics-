@@ -21,7 +21,6 @@ import {toastConfig} from '../../../components/toast/ToastAuth';
 type RootStackParamList = {
   ResetPassword: {token: string};
   Login: undefined;
-  ResetPasswordSuccess: undefined;
 };
 
 type ResetPasswordScreenRouteProp = RouteProp<
@@ -63,7 +62,7 @@ const ResetPasswordScreen: React.FC<Props> = ({route, navigation}) => {
         position: 'top',
         topOffset: 300,
       });
-      navigation.navigate('ResetPasswordSuccess');
+      navigation.navigate('Login');
     } catch (error: any) {
       setLoading(false);
       Toast.show({
@@ -80,7 +79,7 @@ const ResetPasswordScreen: React.FC<Props> = ({route, navigation}) => {
 
   return (
     <ImageBackground
-      source={require('../../../assets/images/Background.png')}
+      source={require('../../../assets/images/White.png')}
       style={styles.imageBackground}
       resizeMode="cover">
       <ScrollView contentContainerStyle={styles.container}>

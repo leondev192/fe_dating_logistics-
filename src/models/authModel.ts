@@ -1,5 +1,5 @@
 export interface LoginRequest {
-  identifier: string;
+  email: string;
   password: string;
 }
 
@@ -7,12 +7,11 @@ export interface LoginResponse {
   status: string;
   message: string;
   data: {
-    username: string;
     token: string;
   };
 }
 export interface RegisterRequest {
-  identifier: string;
+  email: string;
   password: string;
 }
 
@@ -21,7 +20,7 @@ export interface RegisterResponse {
   message: string;
 }
 export interface VerifyOtpRequest {
-  identifier: string;
+  email: string;
   otp: string;
 }
 
@@ -29,12 +28,12 @@ export interface VerifyOtpResponse {
   status: string;
   message: string;
   data: {
-    username: string;
+    email: string;
   };
 }
 
 export interface ForgotPasswordRequest {
-  identifier: string;
+  email: string;
 }
 
 export interface ForgotPasswordResponse {
@@ -43,7 +42,7 @@ export interface ForgotPasswordResponse {
 }
 
 export interface VerifyOtpResetPasswordRequest {
-  identifier: string;
+  email: string;
   otp: string;
 }
 

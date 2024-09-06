@@ -1,16 +1,19 @@
 import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import HomeScreen from '../screens/main/HomeScreen';
-import ProfileScreen from '../screens/main/ProfileScreen';
+import {createStackNavigator} from '@react-navigation/stack';
+import TabNavigator from './TabNavigator';
+import SearchScreen from '../screens/main/SearchScreen'; // Ví dụ màn hình stack riêng
 
-const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 const MainNavigator = () => {
   return (
-    <Tab.Navigator initialRouteName="Home">
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-    </Tab.Navigator>
+    <Stack.Navigator
+      screenOptions={{headerShown: false}} // Ẩn header mặc định, sử dụng custom header
+      initialRouteName="Tabs">
+      <Stack.Screen name="Tabs" component={TabNavigator} />
+      <Stack.Screen name="SearchScreen" component={SearchScreen} />
+      {/* Thêm các màn hình stack khác tại đây nếu cần */}
+    </Stack.Navigator>
   );
 };
 

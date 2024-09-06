@@ -24,13 +24,14 @@ import {toastConfig} from '../../../components/toast/ToastAuth';
 
 type RootStackParamList = {
   ResetPassword: {token: string};
-  VerifyOtp: {identifier: string};
+  VerifyOtpForgotPassword: {email: string};
 };
 
 const VerifyOtpForgotPasswordScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const route = useRoute<RouteProp<RootStackParamList, 'VerifyOtp'>>();
-  const {identifier} = route.params;
+  const route =
+    useRoute<RouteProp<RootStackParamList, 'VerifyOtpForgotPassword'>>();
+  const {email} = route.params;
 
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
@@ -44,13 +45,12 @@ const VerifyOtpForgotPasswordScreen = () => {
     }
     setLoading(true);
     try {
-      const response = await verifyOtpResetPassword({identifier, otp});
+      const response = await verifyOtpResetPassword({email, otp});
       setLoading(false);
       Toast.show({
         type: 'success',
         text1: 'Xác minh thành công',
         onHide: () => setIsToastVisible(false),
-
         position: 'top',
         topOffset: 300,
       });
@@ -62,7 +62,6 @@ const VerifyOtpForgotPasswordScreen = () => {
         text1: 'OTP không hợp lệ',
         text2: 'Vui lòng kiểm tra lại OTP hoặc yêu cầu mã mới.',
         onHide: () => setIsToastVisible(false),
-
         position: 'top',
         topOffset: 300,
       });
@@ -71,12 +70,12 @@ const VerifyOtpForgotPasswordScreen = () => {
 
   return (
     <ImageBackground
-      source={require('../../../assets/images/Background.png')}
+      source={require('../../../assets/images/White.png')}
       style={styles.imageBackground}
       resizeMode="cover">
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.instructionText}>
-          Vui lòng nhập OTP đã được gửi đến bạn
+          Vui lòng nhập OTP đã được gửi đến email của bạn
         </Text>
         <OtpInputComponent length={6} onChange={setOtp} />
         {error ? <Text style={styles.errorText}>{error}</Text> : null}

@@ -33,24 +33,24 @@ type RootStackParamList = {
 const LoginScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const dispatch = useDispatch();
-  const [identifier, setIdentifier] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState({identifier: '', password: ''});
+  const [error, setError] = useState({email: '', password: ''});
   const [isToastVisible, setIsToastVisible] = useState(false);
 
   const resetAction = CommonActions.reset({
     index: 0,
-    routes: [{name: 'Merchant'}],
+    routes: [{name: 'Main'}],
   });
 
   const handleLogin = async () => {
-    const errors = {identifier: '', password: ''};
+    const errors = {email: '', password: ''};
 
-    if (!identifier) {
-      errors.identifier = 'Vui lòng nhập email';
-    } else if (!identifier.includes('@')) {
-      errors.identifier = 'Nhập đúng định dạng email';
+    if (!email) {
+      errors.email = 'Vui lòng nhập email';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = 'Nhập đúng định dạng email';
     }
 
     if (!password) {
@@ -59,11 +59,11 @@ const LoginScreen = () => {
 
     setError(errors);
 
-    if (errors.identifier || errors.password) return;
+    if (errors.email || errors.password) return;
 
     setLoading(true);
     try {
-      const response = await loginVendor({identifier, password});
+      const response = await loginVendor({email, password});
 
       if (response.status === 'success') {
         // Lưu thông tin người dùng vào Redux
@@ -71,7 +71,6 @@ const LoginScreen = () => {
 
         // Lưu token và thông tin vào AsyncStorage
         await AsyncStorage.setItem('@token', response.data.token);
-        await AsyncStorage.setItem('@user', JSON.stringify(response.data));
 
         Toast.show({
           type: 'success',
@@ -85,7 +84,6 @@ const LoginScreen = () => {
       } else {
         Toast.show({
           onHide: () => setIsToastVisible(false),
-
           type: 'error',
           text1: 'Đăng nhập thất bại',
           text2:
@@ -125,7 +123,7 @@ const LoginScreen = () => {
 
   return (
     <ImageBackground
-      source={require('../../assets/images/Background.png')}
+      source={require('../../assets/images/White.png')}
       style={styles.imageBackground}
       resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
@@ -140,15 +138,15 @@ const LoginScreen = () => {
           </Text>
           <InputAuth
             label=""
-            value={identifier}
+            value={email}
             onChangeText={text => {
-              setIdentifier(text);
-              setError({...error, identifier: ''});
+              setEmail(text);
+              setError({...error, email: ''});
             }}
-            placeholder="Email / Số điện thoại"
+            placeholder="Email"
             iconName="user"
-            hasError={!!error.identifier}
-            errorMessage={error.identifier}
+            hasError={!!error.email}
+            errorMessage={error.email}
           />
           <InputAuth
             label=""
@@ -160,6 +158,7 @@ const LoginScreen = () => {
             placeholder="Mật khẩu"
             secureTextEntry
             iconName="lock"
+            isPassword={true}
             hasError={!!error.password}
             errorMessage={error.password}
           />
@@ -195,7 +194,14 @@ const LoginScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-
+        <View style={styles.termsContainer}>
+          <Text style={styles.termsText}>Không có tài khoản?</Text>
+          <TouchableOpacity
+            style={styles.termsButton}
+            onPress={() => navigation.navigate('Register')}>
+            <Text style={styles.termsButtonText}>Đăng ký ngay bây giờ</Text>
+          </TouchableOpacity>
+        </View>
         <LoadingSpinner loading={loading} />
       </SafeAreaView>
 
@@ -252,7 +258,27 @@ const styles = StyleSheet.create({
     width: '50%',
     backgroundColor: '#E8ECF4',
   },
-
+  termsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    marginTop: 'auto',
+  },
+  termsText: {
+    color: '#1E232C',
+    fontSize: 15,
+    textAlign: 'center',
+  },
+  termsButton: {
+    marginLeft: 10,
+  },
+  termsButtonText: {
+    color: Colors.primary,
+    fontSize: 15,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   socialLoginContainer: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',

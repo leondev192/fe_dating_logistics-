@@ -1,5 +1,11 @@
 import React from 'react';
-import {View, StyleSheet, ImageBackground} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ImageBackground,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
 import GradientButton from '../../components/button/GradientButton';
 import OutlineButton from '../../components/button/OutlineButton';
 import {useAnimatedValue} from '../../hooks/useAnimatedValue';
@@ -8,6 +14,7 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 type RootStackParamList = {
   Login: undefined;
   Register: undefined;
+  Main: undefined;
 };
 const WelcomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -15,7 +22,7 @@ const WelcomeScreen: React.FC = () => {
 
   return (
     <ImageBackground
-      source={require('../../assets/images/Welcome.png')}
+      source={require('../../assets/images/Splash.png')}
       style={styles.image}
       resizeMode="cover">
       <View style={styles.container}>
@@ -28,6 +35,13 @@ const WelcomeScreen: React.FC = () => {
           title="Đăng ký"
           onPress={() => navigation.navigate('Register')}
         />
+        <TouchableOpacity
+          style={styles.termsButton}
+          onPress={() => navigation.navigate('Main')}>
+          <Text style={styles.termsButtonText}>
+            Tiếp tục mà không cần tài khoản!
+          </Text>
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
@@ -36,7 +50,7 @@ const WelcomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 40,
     width: '100%',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -47,6 +61,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     height: '100%',
+  },
+  termsText: {
+    color: '#1E232C',
+    fontSize: 15,
+    textAlign: 'center',
+  },
+  termsButton: {
+    marginTop: 5,
+  },
+  termsButtonText: {
+    color: Colors.primary,
+    fontSize: 15,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

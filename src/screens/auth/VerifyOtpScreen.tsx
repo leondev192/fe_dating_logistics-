@@ -24,13 +24,13 @@ import {toastConfig} from '../../components/toast/ToastAuth';
 
 type RootStackParamList = {
   Login: undefined;
-  VerifyOtp: {identifier: string};
+  VerifyOtp: {email: string};
 };
 
 const VerifyOtpScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, 'VerifyOtp'>>();
-  const {identifier} = route.params;
+  const {email} = route.params;
 
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
@@ -44,7 +44,7 @@ const VerifyOtpScreen = () => {
     }
     setLoading(true);
     try {
-      const response = await verifyOtp({identifier, otp});
+      const response = await verifyOtp({email, otp});
       setLoading(false);
       Toast.show({
         type: 'success',
@@ -60,6 +60,7 @@ const VerifyOtpScreen = () => {
         type: 'error',
         text1: 'OTP không hợp lệ',
         text2: 'Vui lòng kiểm tra lại OTP hoặc yêu cầu mã mới.',
+        onHide: () => setIsToastVisible(false),
         position: 'top',
         topOffset: 300,
       });
@@ -68,12 +69,12 @@ const VerifyOtpScreen = () => {
 
   return (
     <ImageBackground
-      source={require('../../assets/images/Background.png')}
+      source={require('../../assets/images/White.png')}
       style={styles.imageBackground}
       resizeMode="cover">
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.instructionText}>
-          Vui lòng nhập OTP đã được gửi đến bạn
+          Vui lòng nhập OTP đã được gửi đến email của bạn
         </Text>
         <OtpInputComponent length={6} onChange={setOtp} />
         {error ? <Text style={styles.errorText}>{error}</Text> : null}

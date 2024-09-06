@@ -2,8 +2,7 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import AuthNavigator from './AuthNavigator';
-import MerchantNavigator from './MerchantNavigator';
-
+import MainNavigator from './MainNavigator';
 type AppNavigatorProps = {
   isLoggedIn: boolean;
 };
@@ -15,7 +14,7 @@ const AppNavigator: React.FC<AppNavigatorProps> = ({isLoggedIn}) => {
     <Stack.Navigator
       initialRouteName={isLoggedIn ? 'Main' : 'Auth'} // Chỉ định màn hình khởi đầu
       screenOptions={{headerShown: false}}>
-      <Stack.Screen name="Merchant" component={MerchantNavigator} />
+      <Stack.Screen name="Main" component={MainNavigator} />
       <Stack.Screen name="Auth" component={AuthNavigator} />
     </Stack.Navigator>
   );

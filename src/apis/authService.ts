@@ -18,23 +18,19 @@ export const loginVendor = async (
   data: LoginRequest,
 ): Promise<LoginResponse> => {
   try {
-    const response = await apiClient.post<LoginResponse>(
-      '/auth/vendor/login',
-      data,
-    );
+    const response = await apiClient.post<LoginResponse>('/auth/login', data);
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-// Quên mật khẩu (Gửi yêu cầu OTP)
 export const forgotPassword = async (
   data: ForgotPasswordRequest,
 ): Promise<ForgotPasswordResponse> => {
   try {
     const response = await apiClient.post<ForgotPasswordResponse>(
-      '/auth/vendor/forgot-password',
+      '/auth/forgot-password',
       data,
     );
     return response.data;
@@ -43,13 +39,12 @@ export const forgotPassword = async (
   }
 };
 
-// Xác thực OTP để nhận token cho reset mật khẩu
 export const verifyOtpResetPassword = async (
   data: VerifyOtpResetPasswordRequest,
 ): Promise<VerifyOtpResetPasswordResponse> => {
   try {
     const response = await apiClient.post<VerifyOtpResetPasswordResponse>(
-      '/auth/vendor/verify-otp-resetpassword',
+      '/auth/verify-otp-forgot-password',
       data,
     );
     return response.data;
@@ -63,7 +58,7 @@ export const resetPassword = async (
 ): Promise<ResetPasswordResponse> => {
   try {
     const response = await apiClient.post<ResetPasswordResponse>(
-      '/auth/vendor/resetpassword',
+      '/auth/reset-password',
       data,
     );
     return response.data;
@@ -78,7 +73,7 @@ export const register = async (
   try {
     console.log('API Request Data:', data);
     const response = await apiClient.post<RegisterResponse>(
-      '/auth/vendor/register',
+      '/auth/register',
       data,
     );
     console.log('API Response:', response.data);
@@ -101,7 +96,7 @@ export const verifyOtp = async (
 
     // Gọi API xác thực OTP
     const response = await apiClient.post<VerifyOtpResponse>(
-      '/auth/vendor/verify-otp',
+      '/auth/verify-otp',
       data,
     );
 

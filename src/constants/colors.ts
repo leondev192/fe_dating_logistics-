@@ -1,10 +1,10 @@
 const Colors = {
-  primary: '#02457A',
+  primary: '#110088',
   secondary: '#018ABE',
   tertiary: '#4CD964',
   quaternary: '#FF3B30',
   quinary: '#5856D6',
-  gradientColors: ['#00d2ff', '#3a7bd5'],
+  gradientColors: ['#FF358A', '#110088'],
 
   error: '#FF3B30',
   text: '#1E232C',

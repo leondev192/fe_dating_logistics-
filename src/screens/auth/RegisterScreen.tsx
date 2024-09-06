@@ -19,7 +19,7 @@ import {register} from '../../apis/authService';
 
 type RootStackParamList = {
   VerifyOtp: {
-    identifier: string;
+    email: string;
   };
   Login: undefined;
   Auth: undefined;
@@ -27,28 +27,32 @@ type RootStackParamList = {
 
 const RegisterScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [identifier, setIdentifier] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [identifierError, setidentifierError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
-  const validateIdentifier = (value: string) => {
-    const isEmail = value.includes('@');
-    const isPhone = /^[0-9]{10,15}$/.test(value);
-    return isEmail || isPhone;
+  const validateEmail = (value: string) => {
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    return isEmail;
   };
 
   const handleRegister = async () => {
     let hasError = false;
 
-    // Kiểm tra email hoặc số điện thoại
-    if (!identifier) {
-      console.log('Validation Error: Missing identifier');
-      setidentifierError('Vui lòng nhập email hoặc số điện thoại');
+    // Kiểm tra email
+    if (!email) {
+      console.log('Validation Error: Missing email');
+      setEmailError('Vui lòng nhập email');
       hasError = true;
+    } else if (!validateEmail(email)) {
+      setEmailError('Vui lòng nhập đúng định dạng email');
+      hasError = true;
+    } else {
+      setEmailError('');
     }
 
     // Kiểm tra mật khẩu
@@ -75,29 +79,29 @@ const RegisterScreen = () => {
     // Gọi API đăng ký nếu không có lỗi
     setLoading(true);
     try {
-      console.log('Payload being sent:', {identifier, password});
-      const response = await register({identifier, password});
+      console.log('Payload being sent:', {email, password});
+      const response = await register({email, password});
       console.log('Registration Response:', response);
 
       setLoading(false);
       // Điều hướng đến trang xác thực OTP
-      navigation.navigate('VerifyOtp', {identifier});
+      navigation.navigate('VerifyOtp', {email});
     } catch (error: any) {
       setLoading(false);
       console.error('Registration Error:', error);
       if (error.response && error.response.data) {
-        setidentifierError(
+        setEmailError(
           error.response.data.message || 'Đã xảy ra lỗi, vui lòng thử lại sau.',
         );
       } else {
-        setidentifierError('Đã xảy ra lỗi, vui lòng thử lại sau.');
+        setEmailError('Đã xảy ra lỗi, vui lòng thử lại sau.');
       }
     }
   };
 
   return (
     <ImageBackground
-      source={require('../../assets/images/Background.png')}
+      source={require('../../assets/images/White.png')}
       style={styles.imageBackground}
       resizeMode="cover">
       <SafeAreaView style={styles.safeArea}>
@@ -108,19 +112,19 @@ const RegisterScreen = () => {
         />
         <View style={styles.container}>
           <Text style={styles.WelcomeText}>
-            Vui lòng nhập thông tin đăng nhập để tiếp tục
+            Vui lòng nhập thông tin đăng ký để tiếp tục
           </Text>
           <InputAuth
             label=""
-            value={identifier}
+            value={email}
             onChangeText={text => {
-              setIdentifier(text);
-              setidentifierError('');
+              setEmail(text);
+              setEmailError('');
             }}
-            placeholder="Email / Số điện thoại"
+            placeholder="Email"
             iconName="user"
-            hasError={!!identifierError}
-            errorMessage={identifierError}
+            hasError={!!emailError}
+            errorMessage={emailError}
           />
           <InputAuth
             label=""
@@ -178,6 +182,14 @@ const RegisterScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
+        <View style={styles.termsContainer}>
+          <Text style={styles.termsText}>Đã có tài khoản?</Text>
+          <TouchableOpacity
+            style={styles.termsButton}
+            onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.termsButtonText}>Đăng nhập ngay</Text>
+          </TouchableOpacity>
+        </View>
 
         <LoadingSpinner loading={loading} />
       </SafeAreaView>
@@ -224,7 +236,27 @@ const styles = StyleSheet.create({
     width: '50%',
     backgroundColor: '#E8ECF4',
   },
-
+  termsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    marginTop: 'auto',
+  },
+  termsText: {
+    color: '#1E232C',
+    fontSize: 15,
+    textAlign: 'center',
+  },
+  termsButton: {
+    marginLeft: 10,
+  },
+  termsButtonText: {
+    color: Colors.primary,
+    fontSize: 15,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   socialLoginContainer: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',

@@ -20,45 +20,44 @@ import {toastConfig} from '../../../components/toast/ToastAuth';
 
 type RootStackParamList = {
   Login: undefined;
-  VerifyOtpForgotPassword: {identifier: string};
+  VerifyOtpForgotPassword: {email: string};
 };
 
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const [identifier, setIdentifier] = useState('');
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isToastVisible, setIsToastVisible] = useState(false);
 
-  const validateIdentifier = (value: string) => {
-    const isEmail = value.includes('@');
-    const isPhone = /^[0-9]{10,15}$/.test(value);
-    return isEmail || isPhone;
+  const validateEmail = (value: string) => {
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    return isEmail;
   };
 
   const handleForgotPassword = async () => {
-    if (!identifier) {
-      setError('Vui lòng nhập email hoặc số điện thoại');
+    if (!email) {
+      setError('Vui lòng nhập email');
       return;
-    } else if (!validateIdentifier(identifier)) {
-      setError('Vui lòng nhập đúng định dạng email hoặc số điện thoại hợp lệ');
+    } else if (!validateEmail(email)) {
+      setError('Vui lòng nhập đúng định dạng email');
       return;
     }
 
     setError('');
     setLoading(true);
     try {
-      await forgotPassword({identifier});
+      await forgotPassword({email});
       setLoading(false);
       Toast.show({
         type: 'success',
         text1: 'Yêu cầu thành công',
-        text2: 'Vui lòng kiểm tra email hoặc tin nhắn để nhận OTP.',
+        text2: 'Vui lòng kiểm tra email để nhận OTP.',
         onHide: () => setIsToastVisible(false),
         position: 'top',
         topOffset: 300,
       });
-      navigation.navigate('VerifyOtpForgotPassword', {identifier});
+      navigation.navigate('VerifyOtpForgotPassword', {email});
     } catch (error) {
       setLoading(false);
       Toast.show({
@@ -74,22 +73,22 @@ const ForgotPasswordScreen = () => {
 
   return (
     <ImageBackground
-      source={require('../../../assets/images/Background.png')}
+      source={require('../../../assets/images/White.png')}
       style={styles.imageBackground}
       resizeMode="cover">
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Text style={styles.instructionText}>
-          Đừng lo lắng! Nó xảy ra. Vui lòng nhập email hoặc số điện thoại được
-          liên kết với tài khoản của bạn.
+          Đừng lo lắng! Nó xảy ra. Vui lòng nhập email được liên kết với tài
+          khoản của bạn.
         </Text>
         <InputAuth
           label=""
-          value={identifier}
+          value={email}
           onChangeText={text => {
-            setIdentifier(text);
+            setEmail(text);
             setError('');
           }}
-          placeholder="Nhập Email hoặc Số điện thoại của bạn"
+          placeholder="Nhập Email của bạn"
           iconName="user"
           hasError={!!error}
           errorMessage={error}
@@ -100,7 +99,14 @@ const ForgotPasswordScreen = () => {
         />
       </ScrollView>
       <LoadingSpinner loading={loading} />
-
+      <View style={styles.termsContainer}>
+        <Text style={styles.termsText}>Nhớ Mật Khẩu?</Text>
+        <TouchableOpacity
+          style={styles.termsButton}
+          onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.termsButtonText}>Đăng Nhập</Text>
+        </TouchableOpacity>
+      </View>
       <BlurredToast config={toastConfig} />
     </ImageBackground>
   );
@@ -122,6 +128,26 @@ const styles = StyleSheet.create({
     color: Colors.textbody,
     textAlign: 'center',
     marginVertical: 10,
+  },
+  termsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    marginTop: 'auto',
+  },
+  termsText: {
+    fontSize: 15,
+    color: '#1E232C',
+    textAlign: 'center',
+  },
+  termsButton: {
+    marginLeft: 10,
+  },
+  termsButtonText: {
+    color: Colors.primary,
+    fontWeight: 'bold',
+    fontSize: 15,
   },
 });
 
