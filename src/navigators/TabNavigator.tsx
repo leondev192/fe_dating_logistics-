@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform} from 'react-native';
+import {Platform, Text} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   Home,
@@ -17,7 +17,8 @@ import MessagesScreen from '../screens/main/MessagesScreen';
 import NotificationScreen from '../screens/main/NotificationScreen';
 import AccountScreen from '../screens/main/AccountScreen';
 import CustomHeader from '../components/customheader/CustomHomeHeader';
-import {RootStackParamList, TabParamList} from './navigationTypes'; // Import your types
+import {RootStackParamList, TabParamList} from './navigationTypes';
+import Colors from '../constants/colors'; // Import Colors
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -35,7 +36,8 @@ const TabNavigator: React.FC = () => {
       initialRouteName="Home"
       screenOptions={({route}) => ({
         tabBarShowLabel: true,
-        tabBarIcon: ({focused, size, color}) => {
+        tabBarIcon: ({focused, size}) => {
+          const color = focused ? Colors.primary : '#000000'; // Sử dụng Colors.primary cho icon khi focus
           switch (route.name) {
             case 'Home':
               return (
@@ -81,6 +83,12 @@ const TabNavigator: React.FC = () => {
               return <Home variant="Outline" size={size} color={color} />;
           }
         },
+        tabBarLabel: ({focused}) => (
+          <Text
+            style={{color: focused ? Colors.primary : '#000000', fontSize: 12}}>
+            {route.name}
+          </Text>
+        ),
         tabBarStyle: {
           height: Platform.OS === 'ios' ? 80 : 70,
           paddingBottom: Platform.OS === 'ios' ? 25 : 10,
