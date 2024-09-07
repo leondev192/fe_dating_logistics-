@@ -35,7 +35,7 @@ const CustomToast: React.FC<CustomToastProps> = ({
       <Text style={styles.subText}>{text2}</Text>
       <TouchableOpacity onPress={onPressOk} style={styles.okButton}>
         <LinearGradient
-          colors={Colors.gradientColors} // Sử dụng màu gradient từ Colors
+          colors={Colors.gradientColors}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 0}}
           style={styles.okButtonGradient}>

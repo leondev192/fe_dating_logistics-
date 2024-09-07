@@ -22,7 +22,6 @@ import Colors from '../constants/colors'; // Import Colors
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
-// Type the navigation prop correctly
 type TabNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList>,
   NativeStackNavigationProp<RootStackParamList>
@@ -83,12 +82,35 @@ const TabNavigator: React.FC = () => {
               return <Home variant="Outline" size={size} color={color} />;
           }
         },
-        tabBarLabel: ({focused}) => (
-          <Text
-            style={{color: focused ? Colors.primary : '#000000', fontSize: 12}}>
-            {route.name}
-          </Text>
-        ),
+        tabBarLabel: ({focused}) => {
+          let label = '';
+          switch (route.name) {
+            case 'Home':
+              label = 'Trang chủ';
+              break;
+            case 'ManagePosts':
+              label = 'Quản lý bài';
+              break;
+            case 'Messages':
+              label = 'Tin nhắn';
+              break;
+            case 'Notifications':
+              label = 'Thông báo';
+              break;
+            case 'Account':
+              label = 'Tài khoản';
+              break;
+          }
+          return (
+            <Text
+              style={{
+                color: focused ? Colors.primary : '#000000',
+                fontSize: 12,
+              }}>
+              {label}
+            </Text>
+          );
+        },
         tabBarStyle: {
           height: Platform.OS === 'ios' ? 80 : 70,
           paddingBottom: Platform.OS === 'ios' ? 25 : 10,
@@ -134,7 +156,7 @@ const TabNavigator: React.FC = () => {
       <Tab.Screen
         name="Account"
         component={AccountScreen}
-        options={{header: () => <CustomHeader title="Tài khoản" />}}
+        options={{headerShown: false}}
       />
     </Tab.Navigator>
   );

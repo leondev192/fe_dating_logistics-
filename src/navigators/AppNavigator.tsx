@@ -12,7 +12,7 @@ const Stack = createStackNavigator();
 const AppNavigator: React.FC<AppNavigatorProps> = ({isLoggedIn}) => {
   return (
     <Stack.Navigator
-      initialRouteName={isLoggedIn ? 'Main' : 'Auth'} // Chỉ định màn hình khởi đầu
+      initialRouteName={isLoggedIn ? 'Main' : 'Auth'}
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="Main" component={MainNavigator} />
       <Stack.Screen name="Auth" component={AuthNavigator} />

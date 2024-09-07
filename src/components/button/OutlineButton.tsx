@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     padding: 1.5,
     borderRadius: 30,
     width: '100%',
+    marginBottom: 10,
   },
   innerButtonContainer: {
     backgroundColor: '#fff',

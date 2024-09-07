@@ -69,8 +69,8 @@ const LoginScreen = () => {
         // Lưu thông tin người dùng vào Redux
         dispatch(loginSuccess(response.data));
 
-        // Lưu token và thông tin vào AsyncStorage
-        await AsyncStorage.setItem('@token', response.data.token);
+        // Lưu token vào AsyncStorage để xác định trạng thái đăng nhập
+        await AsyncStorage.setItem('userToken', response.data.token);
 
         Toast.show({
           type: 'success',
@@ -209,7 +209,6 @@ const LoginScreen = () => {
     </ImageBackground>
   );
 };
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

@@ -1,69 +1,159 @@
-import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {useSelector, useDispatch} from 'react-redux';
-import {RootState} from '../../redux/store';
-import {logout} from '../../redux/auth/authSlice';
+import React, {useState, useEffect} from 'react';
+import {View, Text, Image, StyleSheet, ScrollView} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
+import Colors from '../../constants/colors';
+import GradientButton from '../../components/button/GradientButton';
+import OutlineButton from '../../components/button/OutlineButton';
 import {useNavigation, CommonActions} from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+import {toastConfig} from '../../components/toast/ToastAuth';
 
-const HomeScreen = () => {
-  const dispatch = useDispatch();
+const ProfileScreen = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigation = useNavigation();
 
-  const user = useSelector((state: RootState) => state.auth.user);
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
+  const checkLoginStatus = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    setIsLoggedIn(!!token);
+  };
+
+  const handleLogin = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{name: 'Auth'}],
+      }),
+    );
+  };
 
   const handleLogout = async () => {
     try {
-      // Xóa token và thông tin user khỏi AsyncStorage
-      await AsyncStorage.removeItem('@token');
-      await AsyncStorage.removeItem('@user');
-
-      // Dispatch action để cập nhật trạng thái đăng nhập trong Redux
-      dispatch(logout());
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{name: 'Auth'}], // Điều hướng đến stack Auth, nơi chứa LoginScreen
-        }),
-      );
+      await AsyncStorage.removeItem('userToken');
+      setIsLoggedIn(false);
+      Toast.show({
+        type: 'success',
+        text1: 'Đăng xuất thành công',
+        text2: 'Bạn đã đăng xuất khỏi tài khoản.',
+        position: 'top',
+        topOffset: 300,
+        props: {
+          onPressOk: () => {
+            Toast.hide();
+          },
+        },
+      });
     } catch (error) {
-      console.error('Đăng xuất không thành công:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Đăng xuất thất bại',
+        text2: 'Có lỗi xảy ra, vui lòng thử lại.',
+        position: 'top',
+        topOffset: 300,
+        props: {
+          onPressOk: () => {
+            Toast.hide();
+          },
+        },
+      });
     }
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Đăng xuất</Text>
-      </TouchableOpacity>
-    </View>
+    <SafeAreaView style={styles.containerSafe}>
+      <ScrollView style={styles.container}>
+        <LinearGradient
+          colors={Colors.gradientColors}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 0}}
+          style={styles.header}>
+          <Image
+            source={{uri: 'https://via.placeholder.com/150'}}
+            style={styles.avatar}
+          />
+          <View style={styles.headerTextContainer}>
+            {isLoggedIn ? (
+              <>
+                <Text style={styles.name}>Nguyễn Văn A</Text>
+                <Text style={styles.email}>email@example.com</Text>
+                <OutlineButton title="Chỉnh sửa thông tin" onPress={() => {}} />
+              </>
+            ) : (
+              <OutlineButton title="Đăng nhập" onPress={handleLogin} />
+            )}
+          </View>
+        </LinearGradient>
+
+        <View style={styles.body}>
+          <OutlineButton title="Chính sách bảo mật" onPress={handleLogin} />
+          <OutlineButton title="Trợ giúp" onPress={handleLogin} />
+          <OutlineButton title="Đóng góp ý kiến" onPress={handleLogin} />
+          {isLoggedIn && (
+            <GradientButton title="Đăng xuất" onPress={handleLogout} />
+          )}
+        </View>
+
+        <Text style={styles.versionText}>Phiên bản 1.0</Text>
+      </ScrollView>
+      <Toast config={toastConfig} />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  containerSafe: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    backgroundColor: Colors.background,
   },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  header: {
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  avatar: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
+    borderColor: '#fff',
     marginBottom: 10,
   },
-  logoutButton: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#ff4d4d',
-    borderRadius: 5,
+  headerTextContainer: {
+    alignItems: 'center',
+    width: '100%',
   },
-  logoutButtonText: {
+  name: {
+    fontSize: 26,
     color: '#fff',
-    fontSize: 16,
     fontWeight: 'bold',
+  },
+  email: {
+    fontSize: 16,
+    color: '#ddd',
+    marginTop: 5,
+    marginBottom: 10,
+  },
+  body: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+  },
+  versionText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: Colors.textbody,
+    fontSize: 14,
   },
 });
 
-export default HomeScreen;
+export default ProfileScreen;

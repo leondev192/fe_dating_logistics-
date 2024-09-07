@@ -7,12 +7,13 @@ const Stack = createStackNavigator();
 
 const MainNavigator = () => {
   return (
-    <Stack.Navigator
-      screenOptions={{headerShown: false}} // Ẩn header mặc định, sử dụng custom header
-      initialRouteName="Tabs">
-      <Stack.Screen name="Tabs" component={TabNavigator} />
+    <Stack.Navigator initialRouteName="Tabs">
+      <Stack.Screen
+        name="Tabs"
+        component={TabNavigator}
+        options={{headerShown: false}}
+      />
       <Stack.Screen name="SearchScreen" component={SearchScreen} />
-      {/* Thêm các màn hình stack khác tại đây nếu cần */}
     </Stack.Navigator>
   );
 };
