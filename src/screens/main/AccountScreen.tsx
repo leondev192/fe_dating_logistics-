@@ -6,13 +6,23 @@ import LinearGradient from 'react-native-linear-gradient';
 import Colors from '../../constants/colors';
 import GradientButton from '../../components/button/GradientButton';
 import OutlineButton from '../../components/button/OutlineButton';
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {
+  useNavigation,
+  CommonActions,
+  NavigationProp,
+} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import {toastConfig} from '../../components/toast/ToastAuth';
+import {User} from 'iconsax-react-native';
+type RootStackParamList = {
+  Auth: undefined;
+  AddProfileCompanyScreen: undefined;
+  // Khai báo thêm các màn hình khác nếu có
+};
 
-const ProfileScreen = () => {
+const AccountScreen = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
     checkLoginStatus();
@@ -72,16 +82,25 @@ const ProfileScreen = () => {
           start={{x: 0, y: 0}}
           end={{x: 1, y: 0}}
           style={styles.header}>
-          <Image
-            source={{uri: 'https://via.placeholder.com/150'}}
-            style={styles.avatar}
-          />
+          {isLoggedIn ? (
+            <Image
+              source={{uri: 'https://via.placeholder.com/150'}}
+              style={styles.avatar}
+            />
+          ) : (
+            <View style={styles.avatar}>
+              <User size={100} color="#fff" />
+            </View>
+          )}
           <View style={styles.headerTextContainer}>
             {isLoggedIn ? (
               <>
                 <Text style={styles.name}>Nguyễn Văn A</Text>
                 <Text style={styles.email}>email@example.com</Text>
-                <OutlineButton title="Chỉnh sửa thông tin" onPress={() => {}} />
+                <OutlineButton
+                  title="Chỉnh sửa thông tin"
+                  onPress={() => navigation.navigate('AddProfileCompanyScreen')}
+                />
               </>
             ) : (
               <OutlineButton title="Đăng nhập" onPress={handleLogin} />
@@ -90,9 +109,9 @@ const ProfileScreen = () => {
         </LinearGradient>
 
         <View style={styles.body}>
-          <OutlineButton title="Chính sách bảo mật" onPress={handleLogin} />
-          <OutlineButton title="Trợ giúp" onPress={handleLogin} />
-          <OutlineButton title="Đóng góp ý kiến" onPress={handleLogin} />
+          <OutlineButton title="Chính sách bảo mật" onPress={() => {}} />
+          <OutlineButton title="Trợ giúp" onPress={() => {}} />
+          <OutlineButton title="Đóng góp ý kiến" onPress={() => {}} />
           {isLoggedIn && (
             <GradientButton title="Đăng xuất" onPress={handleLogout} />
           )}
@@ -117,8 +136,8 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     alignItems: 'center',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
   },
   avatar: {
     width: 120,
@@ -127,6 +146,8 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#fff',
     marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'center', // Center the icon
   },
   headerTextContainer: {
     alignItems: 'center',
@@ -156,4 +177,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;
+export default AccountScreen;

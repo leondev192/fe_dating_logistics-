@@ -71,18 +71,12 @@ export const register = async (
   data: RegisterRequest,
 ): Promise<RegisterResponse> => {
   try {
-    console.log('API Request Data:', data);
     const response = await apiClient.post<RegisterResponse>(
       '/auth/register',
       data,
     );
-    console.log('API Response:', response.data);
     return response.data;
-  } catch (error: any) {
-    console.error('API Error:', error);
-    if (error.response) {
-      console.error('API Error Response:', error.response.data);
-    }
+  } catch (error) {
     throw error;
   }
 };
@@ -91,26 +85,14 @@ export const verifyOtp = async (
   data: VerifyOtpRequest,
 ): Promise<VerifyOtpResponse> => {
   try {
-    // Log dữ liệu yêu cầu gửi lên API
-    console.log('Verify OTP API Request Data:', data);
-
     // Gọi API xác thực OTP
     const response = await apiClient.post<VerifyOtpResponse>(
       '/auth/verify-otp',
       data,
     );
 
-    // Log phản hồi từ API
-    console.log('Verify OTP API Response:', response.data);
     return response.data;
-  } catch (error: any) {
-    // Log lỗi xảy ra
-    console.error('Verify OTP API Error:', error);
-
-    // Log chi tiết phản hồi lỗi từ API nếu có
-    if (error.response) {
-      console.error('Verify OTP API Error Response:', error.response.data);
-    }
-    throw error; // Ném lỗi ra ngoài để xử lý tiếp
+  } catch (error) {
+    throw error;
   }
 };

@@ -1,3 +1,4 @@
+// RegisterScreen.tsx
 import React, {useState} from 'react';
 import InputAuth from '../../components/input/InputAuth';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
@@ -5,9 +6,9 @@ import {
   View,
   StyleSheet,
   ImageBackground,
+  Image,
   Text,
   TouchableOpacity,
-  Image,
   Platform,
   SafeAreaView,
   StatusBar,
@@ -16,6 +17,10 @@ import GradientButton from '../../components/button/GradientButton';
 import Colors from '../../constants/colors';
 import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import {register} from '../../apis/authService';
+import RolePicker from '../../components/input/RolePicker'; // Import RolePicker component
+import Toast from 'react-native-toast-message'; // Import Toast
+import {toastConfig} from '../../components/toast/ToastAuth'; // Import cấu hình Toast
+import BlurredToast from '../../components/toast/BlurredToast'; // Import BlurredToast
 
 type RootStackParamList = {
   VerifyOtp: {
@@ -30,22 +35,22 @@ const RegisterScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [roleError, setRoleError] = useState(''); // Trạng thái lỗi cho role
+  const [isToastVisible, setIsToastVisible] = useState(false); // Trạng thái hiển thị Toast
 
-  const validateEmail = (value: string) => {
-    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-    return isEmail;
-  };
+  const validateEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   const handleRegister = async () => {
     let hasError = false;
 
     // Kiểm tra email
     if (!email) {
-      console.log('Validation Error: Missing email');
       setEmailError('Vui lòng nhập email');
       hasError = true;
     } else if (!validateEmail(email)) {
@@ -57,7 +62,6 @@ const RegisterScreen = () => {
 
     // Kiểm tra mật khẩu
     if (!password) {
-      console.log('Validation Error: Missing password');
       setPasswordError('Vui lòng nhập mật khẩu');
       hasError = true;
     } else {
@@ -66,36 +70,61 @@ const RegisterScreen = () => {
 
     // Kiểm tra mật khẩu xác nhận
     if (password !== confirmPassword) {
-      console.log('Validation Error: Passwords do not match');
       setConfirmPasswordError('Mật khẩu không trùng khớp');
       hasError = true;
     } else {
       setConfirmPasswordError('');
     }
 
-    // Nếu có lỗi, dừng quá trình đăng ký
-    if (hasError) return;
+    // Kiểm tra role
+    if (!role) {
+      setRoleError('Vui lòng chọn vai trò');
+      hasError = true;
+    } else {
+      setRoleError('');
+    }
+
+    // Nếu có lỗi, hiển thị lỗi bằng Toast
+    if (hasError) {
+      Toast.show({
+        type: 'error',
+        text1: 'Đăng ký thất bại',
+        text2: 'Vui lòng kiểm tra lại thông tin.',
+        position: 'top',
+        topOffset: 300,
+        onHide: () => setIsToastVisible(false), // Ẩn Toast khi bấm nút
+      });
+      setIsToastVisible(true);
+      return;
+    }
 
     // Gọi API đăng ký nếu không có lỗi
     setLoading(true);
     try {
-      console.log('Payload being sent:', {email, password});
-      const response = await register({email, password});
-      console.log('Registration Response:', response);
-
-      setLoading(false);
-      // Điều hướng đến trang xác thực OTP
+      await register({email, password, role});
+      Toast.show({
+        type: 'success',
+        text1: 'Đăng ký thành công',
+        text2: 'Vui lòng kiểm tra email để xác nhận tài khoản.',
+        position: 'top',
+        topOffset: 300,
+        onHide: () => setIsToastVisible(false), // Ẩn Toast khi bấm nút
+      });
       navigation.navigate('VerifyOtp', {email});
     } catch (error: any) {
+      Toast.show({
+        type: 'error',
+        text1: 'Đăng ký thất bại',
+        text2:
+          error.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+        position: 'top',
+        topOffset: 300,
+        onHide: () => setIsToastVisible(false), // Ẩn Toast khi bấm nút
+      });
       setLoading(false);
-      console.error('Registration Error:', error);
-      if (error.response && error.response.data) {
-        setEmailError(
-          error.response.data.message || 'Đã xảy ra lỗi, vui lòng thử lại sau.',
-        );
-      } else {
-        setEmailError('Đã xảy ra lỗi, vui lòng thử lại sau.');
-      }
+      setIsToastVisible(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -155,6 +184,10 @@ const RegisterScreen = () => {
             errorMessage={confirmPasswordError}
           />
 
+          {/* Sử dụng RolePicker component */}
+          <RolePicker role={role} setRole={setRole} />
+          {roleError ? <Text style={styles.errorText}>{roleError}</Text> : null}
+
           <GradientButton title="Đăng ký" onPress={handleRegister} />
           <View style={styles.dividerContainer}>
             <View style={styles.dividerLine} />
@@ -193,6 +226,9 @@ const RegisterScreen = () => {
 
         <LoadingSpinner loading={loading} />
       </SafeAreaView>
+
+      {/* Sử dụng BlurredToast với cấu hình toastConfig */}
+      <BlurredToast config={toastConfig} />
     </ImageBackground>
   );
 };
@@ -218,6 +254,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
+  },
+  errorText: {
+    color: Colors.error, // Màu sắc lỗi từ Colors
+    fontSize: 14,
+    marginTop: 5,
+    textAlign: 'left',
+    width: '100%',
   },
   dividerContainer: {
     flexDirection: 'row',
