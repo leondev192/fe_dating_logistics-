@@ -1,23 +1,32 @@
 import React from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  ArrowRight,
+  Box,
+  TruckFast,
+  TruckRemove,
+  Building4,
+} from 'iconsax-react-native';
 
 interface PostItemProps {
   postType: string;
-  companyName: string;
+  companyName?: string;
+  hasVehicle?: boolean | null;
   cargoType?: string;
+  cargoWeight?: number | null;
+  cargoVolume?: number | null;
+  requiredVehicleType?: string;
   vehicleType?: string;
-  quantity?: number;
-  maxWeight?: number;
-  availableWeight?: number;
-  pricePerUnit?: number;
+  maxWeight?: number | null;
+  availableWeight?: number | null;
+  pricePerUnit?: number | null;
   origin?: string;
   destination?: string;
   transportTime?: string;
-  returnTrip?: boolean;
-  returnTime?: string;
+  returnTrip?: boolean | null;
+  returnTime?: string | null;
   status: string;
   specialRequirements?: string;
-  costEstimate?: number;
   image: any;
   onPress: () => void;
 }
@@ -25,9 +34,12 @@ interface PostItemProps {
 const PostItem: React.FC<PostItemProps> = ({
   postType,
   companyName,
+  hasVehicle,
   cargoType,
+  cargoWeight,
+  cargoVolume,
+  requiredVehicleType,
   vehicleType,
-  quantity,
   maxWeight,
   availableWeight,
   pricePerUnit,
@@ -38,109 +50,229 @@ const PostItem: React.FC<PostItemProps> = ({
   returnTime,
   status,
   specialRequirements,
-  costEstimate,
   image,
   onPress,
 }) => {
-  // Xử lý hiển thị tiêu đề bài đăng
   const renderTitle = () => {
+    let icon;
+    let title;
+
     switch (postType) {
-      case 'Ghép hàng':
-        return 'Ghép hàng';
-      case 'Tìm vận chuyển':
-        return 'Tìm vận chuyển';
-      case 'Cung cấp vận chuyển':
-        return 'Cung cấp vận chuyển';
+      case 'CargoMatching':
+        icon = <Box size="20" color="#555" />;
+        title = 'Ghép hàng';
+        break;
+      case 'LookingForTransport':
+        icon = <TruckFast size="20" color="#555" />;
+        title = 'Tìm vận chuyển';
+        break;
+      case 'OfferingTransport':
+        icon = <TruckRemove size="20" color="#555" />;
+        title = 'Cung cấp vận chuyển';
+        break;
       default:
-        return '';
+        title = 'Loại khác';
+        break;
     }
+
+    return (
+      <View style={styles.titleWrapper}>
+        <View style={styles.companyNameContainer}>
+          <Building4 size="20" color="#555" style={styles.companyIcon} />
+          <Text style={styles.companyName}>
+            {companyName || 'Tên công ty không xác định'}
+          </Text>
+        </View>
+        <View style={styles.titleContainer}>
+          {icon}
+          <Text style={styles.postType}>{title}</Text>
+        </View>
+      </View>
+    );
   };
 
-  // Hiển thị thông tin chi tiết với bố cục lưới
-  const renderDetails = () => (
-    <View style={styles.detailsContainer}>
-      <View style={styles.column}>
-        {cargoType && (
-          <View style={styles.rowInfo}>
-            <Text style={styles.label}>Loại hàng:</Text>
-            <Text style={styles.detail}>{cargoType}</Text>
+  const renderDetails = () => {
+    switch (postType) {
+      case 'CargoMatching':
+        return (
+          <View style={styles.detailsContainer}>
+            <View style={styles.column}>
+              {hasVehicle !== undefined && hasVehicle !== null && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Đã có xe:</Text>
+                  <Text style={styles.detail}>
+                    {hasVehicle ? 'Đã có' : 'Chưa có'}
+                  </Text>
+                </View>
+              )}
+              {cargoType && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Loại hàng:</Text>
+                  <Text style={styles.detail}>{cargoType}</Text>
+                </View>
+              )}
+              {cargoWeight !== undefined && cargoWeight !== null && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Khối lượng:</Text>
+                  <Text style={styles.detail}>{cargoWeight} tấn</Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.column}>
+              {origin && destination && (
+                <View style={styles.routeRow}>
+                  <Text style={styles.label}>Tuyến:</Text>
+                  <View style={styles.routeContainer}>
+                    <Text style={styles.detail}>{origin}</Text>
+                    <ArrowRight
+                      size="16"
+                      color="#888"
+                      style={styles.arrowIcon}
+                    />
+                    <Text style={styles.detail}>{destination}</Text>
+                  </View>
+                </View>
+              )}
+              {transportTime && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Thời gian:</Text>
+                  <Text style={styles.detail}>
+                    {new Date(transportTime).toLocaleDateString()}
+                  </Text>
+                </View>
+              )}
+              {specialRequirements && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Yêu cầu đặc biệt:</Text>
+                  <Text style={styles.detail}>{specialRequirements}</Text>
+                </View>
+              )}
+            </View>
           </View>
-        )}
-        {vehicleType && (
-          <View style={styles.rowInfo}>
-            <Text style={styles.label}>Loại xe:</Text>
-            <Text style={styles.detail}>{vehicleType}</Text>
+        );
+      case 'LookingForTransport':
+        return (
+          <View style={styles.detailsContainer}>
+            <View style={styles.column}>
+              {cargoType && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Loại hàng:</Text>
+                  <Text style={styles.detail}>{cargoType}</Text>
+                </View>
+              )}
+              {requiredVehicleType && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Loại xe:</Text>
+                  <Text style={styles.detail}>{requiredVehicleType}</Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.column}>
+              {origin && destination && (
+                <View style={styles.routeRow}>
+                  <Text style={styles.label}>Tuyến:</Text>
+                  <View style={styles.routeContainer}>
+                    <Text style={styles.detail}>{origin}</Text>
+                    <ArrowRight
+                      size="16"
+                      color="#888"
+                      style={styles.arrowIcon}
+                    />
+                    <Text style={styles.detail}>{destination}</Text>
+                  </View>
+                </View>
+              )}
+              {transportTime && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Thời gian:</Text>
+                  <Text style={styles.detail}>
+                    {new Date(transportTime).toLocaleDateString()}
+                  </Text>
+                </View>
+              )}
+            </View>
           </View>
-        )}
-        {maxWeight && (
-          <View style={styles.rowInfo}>
-            <Text style={styles.label}>Trọng tải tối đa:</Text>
-            <Text style={styles.detail}>{maxWeight} tấn</Text>
+        );
+      case 'OfferingTransport':
+        return (
+          <View style={styles.detailsContainer}>
+            <View style={styles.column}>
+              {vehicleType && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Loại xe:</Text>
+                  <Text style={styles.detail}>{vehicleType}</Text>
+                </View>
+              )}
+              {maxWeight !== undefined && maxWeight !== null && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Trọng tải tối đa:</Text>
+                  <Text style={styles.detail}>{maxWeight} tấn</Text>
+                </View>
+              )}
+              {availableWeight !== undefined && availableWeight !== null && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Trọng tải còn lại:</Text>
+                  <Text style={styles.detail}>{availableWeight} tấn</Text>
+                </View>
+              )}
+              {pricePerUnit !== undefined && pricePerUnit !== null && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Giá mỗi đơn vị:</Text>
+                  <Text style={styles.detail}>{pricePerUnit} VND</Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.column}>
+              {origin && destination && (
+                <View style={styles.routeRow}>
+                  <Text style={styles.label}>Tuyến:</Text>
+                  <View style={styles.routeContainer}>
+                    <Text style={styles.detail}>{origin}</Text>
+                    <ArrowRight
+                      size="16"
+                      color="#888"
+                      style={styles.arrowIcon}
+                    />
+                    <Text style={styles.detail}>{destination}</Text>
+                  </View>
+                </View>
+              )}
+              {transportTime && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Thời gian:</Text>
+                  <Text style={styles.detail}>
+                    {new Date(transportTime).toLocaleDateString()}
+                  </Text>
+                </View>
+              )}
+              {returnTrip && returnTime && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Khứ hồi:</Text>
+                  <Text style={styles.detail}>
+                    {new Date(returnTime).toLocaleDateString()}
+                  </Text>
+                </View>
+              )}
+            </View>
           </View>
-        )}
-        {availableWeight !== undefined && (
-          <View style={styles.rowInfo}>
-            <Text style={styles.label}>Trọng tải còn lại:</Text>
-            <Text style={styles.detail}>{availableWeight} tấn</Text>
-          </View>
-        )}
-        {quantity !== undefined && (
-          <View style={styles.rowInfo}>
-            <Text style={styles.label}>Khối lượng:</Text>
-            <Text style={styles.detail}>{quantity} tấn</Text>
-          </View>
-        )}
-      </View>
-      <View style={styles.column}>
-        {origin && destination && (
-          <View style={styles.rowInfo}>
-            <Text style={styles.label}>Tuyến:</Text>
-            <Text style={styles.detail}>
-              {origin} ➡ {destination}
-            </Text>
-          </View>
-        )}
-        {transportTime && (
-          <View style={styles.rowInfo}>
-            <Text style={styles.label}>Thời gian:</Text>
-            <Text style={styles.detail}>
-              {new Date(transportTime).toLocaleDateString()}
-            </Text>
-          </View>
-        )}
-        {returnTrip && returnTime && (
-          <View style={styles.rowInfo}>
-            <Text style={styles.label}>Khứ hồi:</Text>
-            <Text style={styles.detail}>
-              {new Date(returnTime).toLocaleDateString()}
-            </Text>
-          </View>
-        )}
-        {specialRequirements && (
-          <View style={styles.rowInfo}>
-            <Text style={styles.label}>Yêu cầu đặc biệt:</Text>
-            <Text style={styles.detail}>{specialRequirements}</Text>
-          </View>
-        )}
-      </View>
-    </View>
-  );
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <View style={styles.header}>
         <Image source={image} style={styles.avatar} />
-        <View style={styles.titleContainer}>
-          <Text style={styles.companyName}>{companyName}</Text>
-          <Text style={styles.postType}>{renderTitle()}</Text>
-        </View>
+        {renderTitle()}
         <View style={styles.statusContainer}>
           <Text
             style={[
               styles.status,
-              status === 'Hoàn tất' ? styles.completed : styles.active,
+              status === 'completed' ? styles.completed : styles.active,
             ]}>
-            {status}
+            {status === 'active' ? 'Hoạt động' : 'Hoàn tất'}
           </Text>
         </View>
       </View>
@@ -173,18 +305,30 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginRight: 10,
   },
-  titleContainer: {
+  titleWrapper: {
     flex: 1,
+  },
+  companyNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 7,
+  },
+  companyIcon: {
+    marginRight: 5,
   },
   companyName: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   postType: {
     fontSize: 14,
     color: '#555',
-    marginTop: 2,
+    marginLeft: 5,
   },
   detailsContainer: {
     flexDirection: 'row',
@@ -199,7 +343,20 @@ const styles = StyleSheet.create({
   },
   rowInfo: {
     flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 4,
+  },
+  routeRow: {
+    flexDirection: 'column',
+    marginBottom: 4,
+  },
+  routeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 5,
+  },
+  arrowIcon: {
+    marginHorizontal: 5,
   },
   label: {
     fontSize: 13,
@@ -210,6 +367,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#888',
     marginLeft: 5,
+    paddingVertical: 5,
   },
   statusContainer: {
     justifyContent: 'center',
