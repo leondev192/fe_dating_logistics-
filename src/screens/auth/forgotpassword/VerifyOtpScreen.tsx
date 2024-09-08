@@ -16,7 +16,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import LoadingSpinner from '../../../components/loading/LoadingSpinner';
-import {verifyOtpResetPassword} from '../../../apis/authService';
+import {verifyOtpResetPassword} from '../../../apis/services/authService';
 import OtpInputComponent from '../../../components/input/OtpInput';
 import Toast from 'react-native-toast-message';
 import BlurredToast from '../../../components/toast/BlurredToast';

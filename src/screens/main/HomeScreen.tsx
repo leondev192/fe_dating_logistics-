@@ -4,88 +4,135 @@ import {
   StyleSheet,
   FlatList,
   Image,
-  ScrollView,
   TouchableOpacity,
   Text,
+  ScrollView,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import PostItem from '../../components/items/PostItem';
-import {AddCircle} from 'iconsax-react-native';
+import {
+  Box,
+  TruckFast,
+  TruckRemove,
+  ArchiveTick,
+  Filter,
+} from 'iconsax-react-native';
 import Colors from '../../constants/colors';
+import {useNavigation} from '@react-navigation/native';
+
 interface Post {
   id: string;
   postType: string;
-  cargoType: string;
-  vehicleType: string;
-  quantity: number;
-  origin: string;
-  destination: string;
-  transportTime: string;
+  companyName: string; // Tên công ty đăng bài
+  cargoType?: string;
+  vehicleType?: string;
+  quantity?: number;
+  maxWeight?: number;
+  availableWeight?: number;
+  pricePerUnit?: number;
+  origin?: string;
+  destination?: string;
+  transportTime?: string;
+  returnTrip?: boolean;
+  returnTime?: string;
   status: string;
-  image: any; // Thay đổi theo kiểu chính xác của image
+  specialRequirements?: string;
+  costEstimate?: number;
+  image: any;
 }
-const samplePosts = [
+
+const samplePosts: Post[] = [
   {
     id: '1',
-    postType: 'Yêu cầu',
+    postType: 'Ghép hàng',
+    companyName: 'ABC Logistics',
     cargoType: 'Hàng khô',
     vehicleType: 'Xe tải',
-    quantity: 20,
+    maxWeight: 20,
+    availableWeight: 8,
     origin: 'Hà Nội',
     destination: 'Hồ Chí Minh',
     transportTime: '2024-09-10',
+    returnTrip: true,
+    returnTime: '2024-09-15',
     status: 'Hoạt động',
+    specialRequirements: 'Không được để ướt',
     image: require('../../assets/images/1.png'),
   },
   {
     id: '2',
-    postType: 'Cung cấp dịch vụ',
+    postType: 'Tìm vận chuyển',
+    companyName: 'DEF Transport',
     cargoType: 'Hàng lạnh',
     vehicleType: 'Xe container',
     quantity: 50,
     origin: 'Đà Nẵng',
     destination: 'Hải Phòng',
     transportTime: '2024-09-15',
-    status: 'Đã ghép đôi',
+    status: 'Hoạt động',
+    specialRequirements: 'Bảo quản dưới -2°C',
+    costEstimate: 5000000,
     image: require('../../assets/images/2.png'),
   },
   {
     id: '3',
-    postType: 'Yêu cầu',
-    cargoType: 'Hàng dễ vỡ',
-    vehicleType: 'Xe tải nhỏ',
-    quantity: 10,
-    origin: 'Hải Dương',
-    destination: 'Hà Nội',
-    transportTime: '2024-09-12',
+    postType: 'Cung cấp vận chuyển',
+    companyName: 'GHI Cargo',
+    vehicleType: 'Xe tải lớn',
+    maxWeight: 30,
+    availableWeight: 10,
+    pricePerUnit: 120000,
+    origin: 'Quảng Ninh',
+    destination: 'Nghệ An',
+    transportTime: '2024-09-18',
+    returnTrip: false,
     status: 'Hoạt động',
+    specialRequirements: 'Hàng nặng, cần xe cẩu hỗ trợ',
     image: require('../../assets/images/3.png'),
   },
   {
     id: '4',
-    postType: 'Cung cấp dịch vụ',
-    cargoType: 'Hàng nặng',
-    vehicleType: 'Xe cẩu',
-    quantity: 30,
+    postType: 'Cung cấp vận chuyển',
+    companyName: 'GHI Cargo',
+    vehicleType: 'Xe tải lớn',
+    maxWeight: 30,
+    availableWeight: 10,
+    pricePerUnit: 120000,
     origin: 'Quảng Ninh',
     destination: 'Nghệ An',
     transportTime: '2024-09-18',
-    status: 'Đã ghép đôi',
-    image: require('../../assets/images/1.png'),
+    returnTrip: false,
+    status: 'Hoạt động',
+    specialRequirements: 'Hàng nặng, cần xe cẩu hỗ trợ',
+    image: require('../../assets/images/3.png'),
   },
 ];
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
+
+  const handleNavigation = route => {
+    navigation.navigate(route);
+  };
+
   const renderItem = ({item}: {item: Post}) => (
     <PostItem
       postType={item.postType}
+      companyName={item.companyName}
       cargoType={item.cargoType}
       vehicleType={item.vehicleType}
       quantity={item.quantity}
+      maxWeight={item.maxWeight}
+      availableWeight={item.availableWeight}
+      pricePerUnit={item.pricePerUnit}
       origin={item.origin}
       destination={item.destination}
       transportTime={item.transportTime}
+      returnTrip={item.returnTrip}
+      returnTime={item.returnTime}
       status={item.status}
+      specialRequirements={item.specialRequirements}
+      costEstimate={item.costEstimate}
       image={item.image}
       onPress={() => console.log(`Pressed on post: ${item.id}`)}
     />
@@ -119,39 +166,42 @@ const HomeScreen = () => {
         </Swiper>
       </View>
 
-      <View style={styles.createPostContainer}>
-        <TouchableOpacity style={styles.createPostButton}>
-          <AddCircle size="28" color="#110088" variant="Bold" />
-          <Text style={styles.createPostText}>
-            Bạn đang nghĩ gì? Tạo bài đăng mới...
-          </Text>
+      <View style={styles.postContainer}>
+        <TouchableOpacity
+          style={styles.postButton}
+          onPress={() => handleNavigation('GhepHangScreen')}>
+          <Box size="32" color={Colors.primary} />
+          <Text style={styles.filterText}>Ghép hàng</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.postButton}
+          onPress={() => handleNavigation('TimVanChuyenScreen')}>
+          <TruckFast size="32" color={Colors.primary} />
+          <Text style={styles.filterText}>Tìm vận chuyển</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.postButton}
+          onPress={() => handleNavigation('CungCapVanChuyenScreen')}>
+          <TruckRemove size="32" color={Colors.primary} />
+          <Text style={styles.filterText}>Cung cấp vận chuyển</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.postButton}
+          onPress={() => handleNavigation('TheoDoiDonHangScreen')}>
+          <ArchiveTick size="32" color={Colors.primary} />
+          <Text style={styles.filterText}>Theo dõi đơn hàng</Text>
         </TouchableOpacity>
       </View>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.quickFilterContainer}>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Yêu cầu</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Cung cấp</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Đang hoạt động</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Đã ghép đôi</Text>
-        </TouchableOpacity>
-      </ScrollView>
 
       <View style={styles.postList}>
         <FlatList
           data={samplePosts}
           renderItem={renderItem}
           keyExtractor={item => item.id}
-          numColumns={2}
+          numColumns={1}
           scrollEnabled={false}
         />
       </View>
@@ -190,48 +240,45 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     marginBottom: -15,
   },
-  createPostContainer: {
-    marginVertical: 15,
+  companyInfoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: '#E6EAF4',
+    borderRadius: 8,
+    marginVertical: 8,
     marginHorizontal: 10,
-    backgroundColor: '#fff',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 15,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
   },
-  createPostButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  createPostText: {
+  companyName: {
     fontSize: 16,
-    color: '#333',
-    marginLeft: 12,
-    fontWeight: '500',
+    color: Colors.primary,
+    fontWeight: '600',
   },
-  quickFilterContainer: {
+
+  postContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 5,
-    paddingVertical: 5,
+    justifyContent: 'space-around',
+    paddingBottom: 5,
+    paddingTop: 10,
+    marginHorizontal: 5,
   },
-  filterButton: {
-    backgroundColor: Colors.bordercolor,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginHorizontal: 8,
-    elevation: 2,
+  postButton: {
+    backgroundColor: '#E6EAF4',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    marginHorizontal: 5,
   },
   filterText: {
     color: Colors.primary,
     fontSize: 14,
     fontWeight: '600',
+    marginTop: 5,
+    textAlign: 'center',
   },
   postList: {
     paddingBottom: 20,

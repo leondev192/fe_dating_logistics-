@@ -1,13 +1,12 @@
-// src/components/ImageUploader.js
+// src/components/image/ImageUploader.tsx
 import React, {useState} from 'react';
 import {
   View,
-  Button,
   Image,
-  Text,
   StyleSheet,
   ActivityIndicator,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import {
   launchImageLibrary,
@@ -18,33 +17,42 @@ import axios from 'axios';
 import {
   CLOUDINARY_UPLOAD_PRESET,
   CLOUDINARY_API_URL,
-} from '../../apis/cloudinary.config'; // Import cấu hình Cloudinary
+} from '../../apis/cloudinary.config';
+import {Add} from 'iconsax-react-native'; // Import icon Add từ iconsax-react-native
 
-const ImageUploader = () => {
-  const [selectedImage, setSelectedImage] = useState<Asset | null>(null);
+interface ImageUploaderProps {
+  onImageUpload: (url: string) => void; // Hàm callback để truyền URL về component cha
+  currentImageUrl?: string; // URL của ảnh hiện tại (nếu có)
+}
+
+const ImageUploader: React.FC<ImageUploaderProps> = ({
+  onImageUpload,
+  currentImageUrl,
+}) => {
   const [uploading, setUploading] = useState(false);
-  const [uploadedUrl, setUploadedUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState(currentImageUrl || ''); // Trạng thái để lưu URL ảnh hiện tại
 
+  // Chọn ảnh từ thư viện và tự động upload
   const handleChoosePhoto = () => {
     const options: ImageLibraryOptions = {
       mediaType: 'photo',
       quality: 1,
     };
 
-    launchImageLibrary(options, response => {
+    launchImageLibrary(options, async response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.errorCode) {
         console.error('ImagePicker Error: ', response.errorMessage);
       } else if (response.assets && response.assets.length > 0) {
         const asset = response.assets[0];
-        setSelectedImage(asset);
+        await handleUploadPhoto(asset); // Upload ảnh ngay sau khi chọn
       }
     });
   };
 
-  const handleUploadPhoto = async () => {
-    if (!selectedImage) return;
+  // Upload ảnh lên Cloudinary
+  const handleUploadPhoto = async (selectedImage: Asset) => {
     setUploading(true);
 
     const data = new FormData();
@@ -57,8 +65,10 @@ const ImageUploader = () => {
 
     try {
       const response = await axios.post(CLOUDINARY_API_URL, data);
-      setUploadedUrl(response.data.secure_url);
-      Alert.alert('Upload thành công!', `URL: ${response.data.secure_url}`);
+      const uploadedUrl = response.data.secure_url;
+      setImageUrl(uploadedUrl); // Cập nhật trạng thái URL ảnh mới
+      onImageUpload(uploadedUrl); // Gửi URL ảnh đã upload lên cho component cha
+      Alert.alert('Upload thành công!', `URL: ${uploadedUrl}`);
     } catch (error) {
       console.error('Error uploading photo:', error);
       Alert.alert('Upload thất bại!', 'Vui lòng thử lại.');
@@ -68,31 +78,44 @@ const ImageUploader = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {selectedImage && selectedImage.uri && (
-        <Image source={{uri: selectedImage.uri}} style={styles.image} />
+    <TouchableOpacity
+      style={styles.uploadContainer}
+      onPress={handleChoosePhoto}
+      disabled={uploading}>
+      {uploading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : imageUrl ? (
+        <Image source={{uri: imageUrl}} style={styles.image} /> // Hiển thị ảnh hiện tại
+      ) : (
+        <View style={styles.placeholder}>
+          <Add size={50} color="#ccc" />
+        </View>
       )}
-      <Button title="Chọn ảnh" onPress={handleChoosePhoto} />
-      <Button
-        title="Upload ảnh"
-        onPress={handleUploadPhoto}
-        disabled={uploading}
-      />
-      {uploading && <ActivityIndicator size="large" color="#0000ff" />}
-      {uploadedUrl && <Text>URL ảnh: {uploadedUrl}</Text>}
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  uploadContainer: {
+    width: '100%',
+    height: 200,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    overflow: 'hidden',
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    backgroundColor: '#f8f8f8',
   },
   image: {
-    width: 100,
-    height: 100,
-    marginBottom: 10,
+    width: '100%',
+    height: '100%',
+  },
+  placeholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
   },
 });
 

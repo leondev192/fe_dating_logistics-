@@ -13,7 +13,7 @@ import ButtonComponent from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
 import LoadingSpinner from '../../../components/loading/LoadingSpinner';
-import {forgotPassword} from '../../../apis/authService';
+import {forgotPassword} from '../../../apis/services/authService';
 import Toast from 'react-native-toast-message';
 import BlurredToast from '../../../components/toast/BlurredToast';
 import {toastConfig} from '../../../components/toast/ToastAuth';

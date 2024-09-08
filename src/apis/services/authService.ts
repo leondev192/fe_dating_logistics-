@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient from '../apiClient';
 import {
   LoginRequest,
   LoginResponse,
@@ -12,7 +12,7 @@ import {
   RegisterResponse,
   VerifyOtpRequest,
   VerifyOtpResponse,
-} from '../models/authModel';
+} from '../../models/authModel';
 
 export const loginVendor = async (
   data: LoginRequest,

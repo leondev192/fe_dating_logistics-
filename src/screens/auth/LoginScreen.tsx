@@ -16,7 +16,7 @@ import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import Colors from '../../constants/colors';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
-import {loginVendor} from '../../apis/authService';
+import {loginVendor} from '../../apis/services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {loginSuccess} from '../../redux/auth/authSlice';

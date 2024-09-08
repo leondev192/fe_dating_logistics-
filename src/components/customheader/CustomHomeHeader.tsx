@@ -8,15 +8,15 @@ import {
   Platform,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {SearchNormal, NotificationBing} from 'iconsax-react-native';
+import {SearchNormal, Filter} from 'iconsax-react-native';
+import Colors from '../../constants/colors';
 
 interface CustomHeaderProps {
   title?: string;
   showSearch?: boolean;
   showLogo?: boolean;
   onPressSearch?: () => void;
-  onPressMessage?: () => void;
-  onPressNotification?: () => void;
+  onPressFilter?: () => void; // Add filter button press function
 }
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({
@@ -24,8 +24,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
   showSearch,
   showLogo,
   onPressSearch,
-  onPressMessage,
-  onPressNotification,
+  onPressFilter, // Handle filter button press
 }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -42,7 +41,12 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
               style={styles.searchContainer}
               onPress={onPressSearch}>
               <Text style={styles.searchPlaceholder}>Tìm kiếm...</Text>
-              <SearchNormal size={25} color="#000" style={styles.searchIcon} />
+              <SearchNormal size={25} style={styles.searchIcon} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.filterButton}
+              onPress={onPressFilter}>
+              <Filter size={25} color={Colors.primary} />
             </TouchableOpacity>
           </View>
         )}
@@ -59,6 +63,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     height: 50,
     marginBottom: Platform.OS === 'ios' ? -30 : 5,
+    marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -82,7 +87,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: Colors.bordercolor,
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -90,13 +95,24 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     marginLeft: 5,
+    color: Colors.primary,
   },
   searchPlaceholder: {
     color: '#6a6a6a',
     flex: 1,
   },
-  notificationButton: {
+  filterButton: {
     marginLeft: 10,
+    padding: 5,
+    backgroundColor: Colors.bordercolor,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
 });
 

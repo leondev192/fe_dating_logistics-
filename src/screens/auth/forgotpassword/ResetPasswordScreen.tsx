@@ -13,7 +13,7 @@ import Colors from '../../../constants/colors';
 import {useNavigation, RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import LoadingSpinner from '../../../components/loading/LoadingSpinner';
-import {resetPassword} from '../../../apis/authService';
+import {resetPassword} from '../../../apis/services/authService';
 import Toast from 'react-native-toast-message';
 import BlurredToast from '../../../components/toast/BlurredToast';
 import {toastConfig} from '../../../components/toast/ToastAuth';

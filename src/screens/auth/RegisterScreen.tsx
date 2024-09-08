@@ -16,8 +16,7 @@ import {
 import GradientButton from '../../components/button/GradientButton';
 import Colors from '../../constants/colors';
 import LoadingSpinner from '../../components/loading/LoadingSpinner';
-import {register} from '../../apis/authService';
-import RolePicker from '../../components/input/RolePicker'; // Import RolePicker component
+import {register} from '../../apis/services/authService';
 import Toast from 'react-native-toast-message'; // Import Toast
 import {toastConfig} from '../../components/toast/ToastAuth'; // Import cấu hình Toast
 import BlurredToast from '../../components/toast/BlurredToast'; // Import BlurredToast
@@ -74,14 +73,6 @@ const RegisterScreen = () => {
       hasError = true;
     } else {
       setConfirmPasswordError('');
-    }
-
-    // Kiểm tra role
-    if (!role) {
-      setRoleError('Vui lòng chọn vai trò');
-      hasError = true;
-    } else {
-      setRoleError('');
     }
 
     // Nếu có lỗi, hiển thị lỗi bằng Toast
@@ -183,10 +174,6 @@ const RegisterScreen = () => {
             hasError={!!confirmPasswordError}
             errorMessage={confirmPasswordError}
           />
-
-          {/* Sử dụng RolePicker component */}
-          <RolePicker role={role} setRole={setRole} />
-          {roleError ? <Text style={styles.errorText}>{roleError}</Text> : null}
 
           <GradientButton title="Đăng ký" onPress={handleRegister} />
           <View style={styles.dividerContainer}>
