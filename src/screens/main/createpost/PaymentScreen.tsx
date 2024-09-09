@@ -1,11 +1,8 @@
 import React, {useState} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Card, Text, TextInput} from 'react-native-paper';
+import {View, StyleSheet, Alert} from 'react-native';
+import {Card, Text, TextInput, Divider} from 'react-native-paper';
 import Colors from '../../../constants/colors';
-import Toast from 'react-native-toast-message';
 import {createPost} from '../../../apis/services/postService';
-import {toastConfig} from '../../../components/toast/ToastAuth';
-import BlurredToast from '../../../components/toast/BlurredToast';
 import GradientButton from '../../../components/button/payment/GradientButton'; // Import GradientButton
 import LoadingSpinner from '../../../components/loading/LoadingSpinner'; // Import LoadingSpinner
 
@@ -15,7 +12,6 @@ const PaymentScreen = ({navigation, route}: any) => {
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isToastVisible, setIsToastVisible] = useState(false);
 
   const [errors, setErrors] = useState({
     cardNumber: '',
@@ -63,34 +59,32 @@ const PaymentScreen = ({navigation, route}: any) => {
         await createPost(formData);
 
         // Hiển thị thông báo thành công
-        Toast.show({
-          type: 'success',
-          text1: 'Thanh toán và đăng bài thành công',
-          position: 'top',
-          visibilityTime: 3000,
-          topOffset: 300,
-          autoHide: true,
-          onHide: () => {
-            // Điều hướng về trang chủ mà không cần set lại trạng thái toast
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'Tabs'}],
-            });
-          },
-        });
+        Alert.alert(
+          'Thành công',
+          'Thanh toán và đăng bài thành công',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                // Điều hướng về trang chủ mà không cần set lại trạng thái alert
+                navigation.reset({
+                  index: 0,
+                  routes: [{name: 'Tabs'}],
+                });
+              },
+            },
+          ],
+          {cancelable: false},
+        );
       } catch (error) {
         // Xử lý lỗi nếu có
         console.error('Error creating post:', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Lỗi khi tạo bài đăng',
-          position: 'top',
-          visibilityTime: 3000,
-          topOffset: 300,
-          autoHide: true,
-          onHide: () => setIsToastVisible(false),
-        });
-        setIsToastVisible(true);
+        Alert.alert(
+          'Lỗi',
+          'Lỗi khi tạo bài đăng',
+          [{text: 'OK', onPress: () => {}}],
+          {cancelable: true},
+        );
       } finally {
         setLoading(false);
       }
@@ -101,7 +95,18 @@ const PaymentScreen = ({navigation, route}: any) => {
     <View style={styles.container}>
       <Card style={styles.card}>
         <Card.Content>
-          <Text style={styles.title}>Thanh Toán</Text>
+          <Text style={styles.title}>Thông tin thanh toán</Text>
+          <Divider style={styles.divider} />
+          <View style={styles.paymentDetails}>
+            <Text style={styles.paymentLabel}>Tên dịch vụ:</Text>
+            <Text style={styles.paymentValue}>Đăng bài viết</Text>
+          </View>
+          <View style={styles.paymentDetails}>
+            <Text style={styles.paymentLabel}>Số tiền thanh toán:</Text>
+            <Text style={styles.paymentValue}>50.000 VND</Text>
+          </View>
+          <Divider style={styles.divider} />
+          <Text style={styles.sectionTitle}>Chi tiết thẻ</Text>
           <TextInput
             label="Số Thẻ"
             value={cardNumber}
@@ -150,7 +155,6 @@ const PaymentScreen = ({navigation, route}: any) => {
         </Card.Content>
       </Card>
       {loading && <LoadingSpinner loading={loading} />}
-      <BlurredToast config={toastConfig} />
     </View>
   );
 };
@@ -173,10 +177,18 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: Colors.primary,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 10,
+    marginBottom: 10,
+    color: Colors.textbody,
   },
   input: {
     marginBottom: 10,
@@ -191,6 +203,24 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 12,
     marginBottom: 10,
+  },
+  paymentDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 5,
+  },
+  paymentLabel: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
+  },
+  paymentValue: {
+    fontSize: 16,
+    color: Colors.primary,
+    fontWeight: 'bold',
+  },
+  divider: {
+    marginVertical: 10,
   },
 });
 

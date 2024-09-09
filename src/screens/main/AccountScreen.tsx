@@ -1,14 +1,6 @@
 // src/screens/AccountScreen.tsx
 import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {View, Text, Image, StyleSheet, ScrollView, Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import Colors from '../../constants/colors';
@@ -19,41 +11,50 @@ import {
   CommonActions,
   NavigationProp,
 } from '@react-navigation/native';
-import Toast from 'react-native-toast-message';
-import {toastConfig} from '../../components/toast/ToastAuth';
 import {User} from 'iconsax-react-native';
-import {getUserInfo} from '../../apis/services/userService'; // Import hàm getUserInfo
+import {getUserInfo} from '../../apis/services/userService';
+import LoadingSpinner from '../../components/loading/LoadingSpinner'; // Import LoadingSpinner
 
 type RootStackParamList = {
   Auth: undefined;
-  AddProfileCompanyScreen: undefined;
+  UserProfile: undefined;
 };
 
 const AccountScreen = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userInfo, setUserInfo] = useState<any>(null); // State để lưu thông tin người dùng
-  const [loading, setLoading] = useState<boolean>(true); // State để hiển thị loading khi đang lấy thông tin
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
     checkLoginStatus();
-  }, []);
+
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (isLoggedIn) {
+        fetchUserInfo();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, isLoggedIn]);
 
   const checkLoginStatus = async () => {
     const token = await AsyncStorage.getItem('userToken');
     if (token) {
       setIsLoggedIn(true);
-      await fetchUserInfo(token); // Gọi hàm lấy thông tin người dùng
+      await fetchUserInfo();
     } else {
       setIsLoggedIn(false);
       setLoading(false);
     }
   };
 
-  // Hàm lấy thông tin người dùng từ API
-  const fetchUserInfo = async (token: string) => {
+  const fetchUserInfo = async () => {
     try {
       setLoading(true);
+      const token = await AsyncStorage.getItem('userToken');
+      if (!token) return;
+
       const userData = await getUserInfo(token);
       setUserInfo(userData);
     } catch (error) {
@@ -77,40 +78,23 @@ const AccountScreen = () => {
       await AsyncStorage.removeItem('userToken');
       setIsLoggedIn(false);
       setUserInfo(null);
-      Toast.show({
-        type: 'success',
-        text1: 'Đăng xuất thành công',
-        text2: 'Bạn đã đăng xuất khỏi tài khoản.',
-        position: 'top',
-        topOffset: 300,
-        props: {
-          onPressOk: () => {
-            Toast.hide();
-          },
-        },
-      });
+      Alert.alert('Đăng xuất thành công', 'Bạn đã đăng xuất khỏi tài khoản.');
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Đăng xuất thất bại',
-        text2: 'Có lỗi xảy ra, vui lòng thử lại.',
-        position: 'top',
-        topOffset: 300,
-        props: {
-          onPressOk: () => {
-            Toast.hide();
-          },
-        },
-      });
+      Alert.alert('Đăng xuất thất bại', 'Có lỗi xảy ra, vui lòng thử lại.');
     }
   };
 
+  const handleEditPress = () => {
+    navigation.navigate('UserProfile');
+  };
+
+  // Hiển thị LoadingSpinner khi đang tải dữ liệu
   if (loading) {
-    return <ActivityIndicator size="large" color={Colors.primary} />;
+    return <LoadingSpinner loading={loading} />;
   }
 
   return (
-    <SafeAreaView style={styles.containerSafe}>
+    <View style={styles.containerSafe}>
       <ScrollView style={styles.container}>
         <LinearGradient
           colors={Colors.gradientColors}
@@ -121,7 +105,7 @@ const AccountScreen = () => {
             <Image
               source={{
                 uri:
-                  userInfo.profilePictureUrl ||
+                  `${userInfo.profilePictureUrl}?${new Date().getTime()}` ||
                   'https://via.placeholder.com/150',
               }}
               style={styles.avatar}
@@ -141,8 +125,8 @@ const AccountScreen = () => {
                   {userInfo.email || 'email@example.com'}
                 </Text>
                 <OutlineButton
-                  title="Chỉnh sửa thông tin"
-                  onPress={() => navigation.navigate('AddProfileCompanyScreen')}
+                  title="Thông tin doanh nghiệp"
+                  onPress={handleEditPress}
                 />
               </>
             ) : (
@@ -162,8 +146,7 @@ const AccountScreen = () => {
 
         <Text style={styles.versionText}>Phiên bản 1.0</Text>
       </ScrollView>
-      <Toast config={toastConfig} />
-    </SafeAreaView>
+    </View>
   );
 };
 

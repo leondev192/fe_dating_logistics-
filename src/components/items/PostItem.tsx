@@ -1,6 +1,13 @@
 // PostItem.tsx
 import React from 'react';
-import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Button,
+} from 'react-native';
 import {
   ArrowRight,
   Box,
@@ -8,8 +15,11 @@ import {
   TruckRemove,
   Building4,
 } from 'iconsax-react-native';
+import GradientButton from '../../components/button/payment/OutlineButton'; // Import GradientButton
 
 interface PostItemProps {
+  postId: string;
+  receiverId: string; // Thêm receiverId vào đây
   postType: string;
   companyName?: string;
   hasVehicle?: boolean | null;
@@ -32,9 +42,12 @@ interface PostItemProps {
   specialRequirements?: string;
   image: any;
   onPress: () => void;
+  onContactPress: (postId: string, receiverId: string) => void; // Định nghĩa hàm này nhận cả postId và receiverId
 }
 
 const PostItem: React.FC<PostItemProps> = ({
+  receiverId,
+
   postType,
   companyName,
   hasVehicle,
@@ -57,6 +70,8 @@ const PostItem: React.FC<PostItemProps> = ({
   specialRequirements,
   image,
   onPress,
+  postId,
+  onContactPress,
 }) => {
   const renderTitle = () => {
     let icon;
@@ -302,11 +317,26 @@ const PostItem: React.FC<PostItemProps> = ({
         </View>
       </View>
       {renderDetails()}
+      <View style={styles.contactContainer}>
+        <GradientButton
+          title="Liên hệ"
+          onPress={() => onContactPress(postId, receiverId)}
+        />
+      </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
+  contactButton: {
+    width: '30%',
+    marginBottom: 5,
+  },
+  contactContainer: {
+    marginTop: 10,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  },
   container: {
     backgroundColor: '#fff',
     margin: 5,

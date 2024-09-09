@@ -1,41 +1,133 @@
-import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {useSelector, useDispatch} from 'react-redux';
-import {RootState} from '../../redux/store';
-import {logout} from '../../redux/auth/authSlice';
+import React, {useEffect, useState, useCallback} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+  RefreshControl,
+} from 'react-native';
+import {
+  getUserConversations,
+  deleteConversation,
+} from '../../apis/services/chatService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {getUserInfo} from '../../apis/services/userService';
+import LoadingSpinner from '../../components/loading/LoadingSpinner'; // Import LoadingSpinner
 
-const HomeScreen = () => {
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
+const MessagesScreen = ({navigation}) => {
+  const [conversations, setConversations] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true); // State để quản lý trạng thái loading
 
-  const user = useSelector((state: RootState) => state.auth.user);
+  useEffect(() => {
+    fetchCurrentUser();
+    fetchConversations();
+  }, []);
 
-  const handleLogout = async () => {
+  const fetchCurrentUser = async () => {
     try {
-      // Xóa token và thông tin user khỏi AsyncStorage
-      await AsyncStorage.removeItem('@token');
-      await AsyncStorage.removeItem('@user');
-
-      // Dispatch action để cập nhật trạng thái đăng nhập trong Redux
-      dispatch(logout());
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{name: 'Auth'}], // Điều hướng đến stack Auth, nơi chứa LoginScreen
-        }),
-      );
+      const token = await AsyncStorage.getItem('userToken');
+      if (token) {
+        const userInfo = await getUserInfo(token);
+        setCurrentUser(userInfo);
+      }
     } catch (error) {
-      console.error('Đăng xuất không thành công:', error);
+      console.error('Không thể lấy thông tin người dùng:', error);
     }
+  };
+
+  const fetchConversations = async () => {
+    try {
+      setLoading(true); // Bắt đầu loading
+      const conversationsData = await getUserConversations();
+      setConversations(conversationsData);
+    } catch (error) {
+      console.warn('Không thể lấy danh sách cuộc hội thoại.', error);
+    } finally {
+      setLoading(false); // Kết thúc loading
+    }
+  };
+
+  const handleDeleteConversation = conversationId => {
+    Alert.alert(
+      'Xác nhận xóa',
+      'Bạn có chắc chắn muốn xóa cuộc trò chuyện này?',
+      [
+        {text: 'Hủy', style: 'cancel'},
+        {
+          text: 'Xóa',
+          onPress: async () => {
+            try {
+              await deleteConversation(conversationId);
+              fetchConversations();
+              Alert.alert('Thành công', 'Cuộc trò chuyện đã được xóa.');
+            } catch (error) {
+              Alert.alert('Lỗi', 'Không thể xóa cuộc trò chuyện.');
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const onRefresh = useCallback(() => {
+    fetchConversations();
+  }, []);
+
+  const renderConversationItem = ({item}) => {
+    if (!currentUser) return null;
+
+    const user =
+      item.sender.id !== currentUser.id ? item.sender : item.receiver;
+
+    return (
+      <TouchableOpacity
+        style={styles.conversationItem}
+        onPress={() =>
+          navigation.navigate('ChatDetail', {conversationId: item.id})
+        }
+        onLongPress={() => handleDeleteConversation(item.id)}>
+        <Image
+          source={{
+            uri: user.profilePictureUrl || 'https://via.placeholder.com/50',
+          }}
+          style={styles.avatar}
+        />
+        <View style={styles.conversationInfo}>
+          <Text style={styles.conversationTitle}>
+            {user.companyName || 'Tên công ty không xác định'}
+          </Text>
+          <Text style={styles.lastMessage}>
+            {item.messages && item.messages.length > 0
+              ? item.messages[0].content
+              : 'Chưa có tin nhắn nào'}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Đăng xuất</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <LoadingSpinner loading={loading} />
+      ) : (
+        <FlatList
+          data={conversations}
+          renderItem={renderConversationItem}
+          keyExtractor={item => item.id}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>Không có cuộc trò chuyện nào</Text>
+          }
+        />
+      )}
     </View>
   );
 };
@@ -43,27 +135,38 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  conversationItem: {
+    flexDirection: 'row',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
     alignItems: 'center',
-    padding: 20,
   },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
   },
-  logoutButton: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#ff4d4d',
-    borderRadius: 5,
+  conversationInfo: {
+    flex: 1,
   },
-  logoutButtonText: {
-    color: '#fff',
+  conversationTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    color: '#333',
+  },
+  lastMessage: {
+    fontSize: 14,
+    color: '#666',
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    color: '#888',
   },
 });
 
-export default HomeScreen;
+export default MessagesScreen;

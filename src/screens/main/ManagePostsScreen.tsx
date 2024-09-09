@@ -1,4 +1,3 @@
-// src/screens/UserPostsScreen.tsx
 import React, {useEffect, useState, useCallback} from 'react';
 import {
   View,
@@ -6,25 +5,33 @@ import {
   FlatList,
   Text,
   RefreshControl,
+  TouchableOpacity,
   Alert,
 } from 'react-native';
 import {getUserPosts, deletePost} from '../../apis/services/postService';
 import {Post} from '../../models/postModel';
 import PostItem from '../../components/items/PostItemManager';
 import {useNavigation} from '@react-navigation/native';
+import {Box, TruckFast, Truck, Archive} from 'iconsax-react-native';
+import Colors from '../../constants/colors';
+import LoadingSpinner from '../../components/loading/LoadingSpinner'; // Import LoadingSpinner
 
 const UserPostsScreen = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true); // Thêm state loading
   const navigation = useNavigation();
 
   // Hàm lấy dữ liệu bài đăng của user
   const fetchUserPosts = async () => {
+    setLoading(true); // Bắt đầu loading khi tải dữ liệu
     try {
       const userPosts = await getUserPosts();
       setPosts(userPosts);
     } catch (error) {
       console.error('Error fetching user posts:', error);
+    } finally {
+      setLoading(false); // Kết thúc loading sau khi tải dữ liệu
     }
   };
 
@@ -59,17 +66,15 @@ const UserPostsScreen = () => {
   };
 
   const handleEditPost = (post: Post) => {
-    console.log('Navigating to Edit with postId:', post.id); // Log kiểm tra postId
-    // Truyền đúng postId khi điều hướng đến EditOfferingTransportPost
     switch (post.postType) {
       case 'CargoMatching':
         navigation.navigate('EditCargoMatchingPost', {post});
         break;
       case 'LookingForTransport':
-        navigation.navigate('EditLookingForTransportPost', {postId: post.id}); // Đảm bảo truyền đúng postId
+        navigation.navigate('EditLookingForTransportPost', {postId: post.id});
         break;
       case 'OfferingTransport':
-        navigation.navigate('EditOfferingTransportPost', {postId: post.id}); // Sửa lại để truyền đúng postId
+        navigation.navigate('EditOfferingTransportPost', {postId: post.id});
         break;
       default:
         break;
@@ -107,18 +112,61 @@ const UserPostsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={posts}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        ListEmptyComponent={
-          <Text style={styles.noDataText}>Không có bài đăng nào</Text>
-        }
-        contentContainerStyle={styles.postList}
-      />
+      <View style={styles.postContainer}>
+        <TouchableOpacity
+          style={styles.postButton}
+          onPress={() => navigation.navigate('CreateCargoMatchingPost')}>
+          <Box size="24" color={Colors.primary} />
+          <Text style={styles.filterText} numberOfLines={1}>
+            Ghép hàng
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.postButton}
+          onPress={() => navigation.navigate('CreateLookingForTransportPost')}>
+          <TruckFast size="24" color={Colors.primary} />
+          <Text style={styles.filterText} numberOfLines={1}>
+            Tìm xe
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.postButton}
+          onPress={() => navigation.navigate('CreateOfferingTransportPost')}>
+          <Truck size="24" color={Colors.primary} />
+          <Text style={styles.filterText} numberOfLines={1}>
+            Cung cấp xe
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.postButton}
+          onPress={() => navigation.navigate('TheoDoiDonHangScreen')}>
+          <Archive size="24" color={Colors.primary} />
+          <Text style={styles.filterText} numberOfLines={1}>
+            Theo dõi
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {loading ? (
+        <View style={styles.loadingContainer}></View>
+      ) : (
+        <FlatList
+          data={posts}
+          renderItem={renderItem}
+          keyExtractor={item => item.id.toString()}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          ListEmptyComponent={
+            <Text style={styles.noDataText}>Không có bài đăng nào</Text>
+          }
+          contentContainerStyle={styles.postList}
+        />
+      )}
+      <LoadingSpinner loading={loading} />
     </View>
   );
 };
@@ -128,13 +176,44 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
+  postContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  postButton: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 4,
+    marginHorizontal: 5,
+    backgroundColor: '#E6EAF4',
+    borderRadius: 8,
+    height: 50,
+  },
+  filterText: {
+    color: Colors.primary,
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 5,
+    textAlign: 'center',
+  },
   postList: {
-    flexGrow: 1,
+    paddingBottom: 20,
   },
   noDataText: {
     textAlign: 'center',
     fontSize: 16,
     color: '#888',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
   },
 });
 

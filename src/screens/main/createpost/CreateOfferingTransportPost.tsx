@@ -1,14 +1,11 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, Switch, FlatList} from 'react-native';
+import {View, StyleSheet, Switch, FlatList, Alert} from 'react-native'; // Import Alert từ React Native
 import {TextInput, Card, Text} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
 import {createPost} from '../../../apis/services/postService';
-import Toast from 'react-native-toast-message';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {toastConfig} from '../../../components/toast/ToastAuth';
-import BlurredToast from '../../../components/toast/BlurredToast';
 
 // Định nghĩa kiểu dữ liệu cho formData
 interface FormData {
@@ -27,8 +24,6 @@ interface FormData {
 }
 
 const CreateOfferingTransportPost = ({route, navigation}: any) => {
-  const [isToastVisible, setIsToastVisible] = useState(false);
-
   // Khai báo state với kiểu dữ liệu
   const [formData, setFormData] = useState<FormData>({
     postType: 'OfferingTransport',
@@ -108,44 +103,24 @@ const CreateOfferingTransportPost = ({route, navigation}: any) => {
     if (validateForm()) {
       try {
         await createPost(formData); // Giả sử createPost là hàm tạo bài đăng
-        // Hiển thị toast thành công
-        Toast.show({
-          type: 'success',
-          text1: 'Tạo bài đăng thành công',
-          position: 'top',
-          topOffset: 300,
-          autoHide: true,
-          visibilityTime: 3000,
-          onHide: () => {
-            navigation.goBack();
-          },
-        });
-        setIsToastVisible(true);
+        // Hiển thị thông báo thành công
+        Alert.alert(
+          'Thành công',
+          'Tạo bài đăng thành công',
+          [{text: 'OK', onPress: () => navigation.goBack()}],
+          {cancelable: false},
+        );
       } catch (error) {
         // Hiển thị lỗi khi có vấn đề trong quá trình tạo bài đăng
-        Toast.show({
-          type: 'error',
-          text1: 'Lỗi khi tạo bài đăng',
-          position: 'top',
-          topOffset: 300,
-          autoHide: true,
-          visibilityTime: 3000,
-          onHide: () => setIsToastVisible(false),
+        Alert.alert('Lỗi', 'Lỗi khi tạo bài đăng', [{text: 'OK'}], {
+          cancelable: true,
         });
-        setIsToastVisible(true);
       }
     } else {
       // Hiển thị lỗi khi form không hợp lệ
-      Toast.show({
-        type: 'error',
-        text1: 'Vui lòng điền đầy đủ thông tin',
-        position: 'top',
-        topOffset: 300,
-        autoHide: true,
-        visibilityTime: 3000,
-        onHide: () => setIsToastVisible(false),
+      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin', [{text: 'OK'}], {
+        cancelable: true,
       });
-      setIsToastVisible(true);
     }
   };
 
@@ -334,7 +309,6 @@ const CreateOfferingTransportPost = ({route, navigation}: any) => {
         <Card.Actions style={styles.cardActions}>
           <GradientButton title="Tạo Bài Đăng" onPress={handleSubmit} />
         </Card.Actions>
-        <BlurredToast config={toastConfig} />
       </Card>
     );
   };

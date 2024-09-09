@@ -1,4 +1,3 @@
-// src/screens/UserEdit.tsx
 import React, {useState} from 'react';
 import {View, ScrollView, StyleSheet, Alert} from 'react-native';
 import {TextInput, Card, Text, Divider} from 'react-native-paper';
@@ -6,13 +5,9 @@ import ImageUploader from '../../components/image/ImageUploader';
 import {updateUser} from '../../apis/services/userService';
 import GradientButton from '../../components/button/GradientButton';
 import Colors from '../../constants/colors';
-import {toastConfig} from '../../components/toast/ToastAuth';
-import BlurredToast from '../../components/toast/BlurredToast';
-import Toast from 'react-native-toast-message';
 
 const UserEdit = ({route, navigation}: any) => {
   const userInfo = route.params?.userInfo;
-  const [isToastVisible, setIsToastVisible] = useState(false);
 
   if (!userInfo) {
     console.error('User info is missing from route params.');
@@ -46,31 +41,18 @@ const UserEdit = ({route, navigation}: any) => {
     try {
       await updateUser(user);
 
-      // Hiển thị toast và sau đó mới thực hiện điều hướng
-      Toast.show({
-        type: 'success',
-        text1: 'Cập nhật thông tin thành công',
-        position: 'top',
-        topOffset: 300,
-        autoHide: true, // Đảm bảo autoHide là true để tự động ẩn toast
-        visibilityTime: 3000, // Thời gian hiển thị toast lâu hơn
-        onHide: () => {
-          navigation.goBack();
+      // Hiển thị thông báo thành công và sau đó điều hướng quay lại
+      Alert.alert('Thành công', 'Cập nhật thông tin thành công', [
+        {
+          text: 'OK',
+          onPress: () => {
+            navigation.goBack();
+          },
         },
-      });
-
-      setIsToastVisible(true);
+      ]);
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Cập nhật thông tin thất bại',
-        position: 'top',
-        topOffset: 300,
-        autoHide: true,
-        visibilityTime: 3000,
-        onHide: () => setIsToastVisible(false),
-      });
-      setIsToastVisible(true);
+      // Hiển thị thông báo lỗi khi cập nhật thất bại
+      Alert.alert('Lỗi', 'Cập nhật thông tin thất bại', [{text: 'OK'}]);
     }
   };
 
@@ -155,7 +137,6 @@ const UserEdit = ({route, navigation}: any) => {
           <GradientButton title="Lưu thông tin" onPress={handleUpdate} />
         </Card.Actions>
       </Card>
-      <BlurredToast config={toastConfig} />
     </ScrollView>
   );
 };
@@ -171,11 +152,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#fff',
     elevation: 3,
-  },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.primary,
   },
   divider: {
     marginVertical: 10,

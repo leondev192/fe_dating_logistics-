@@ -1,12 +1,8 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, FlatList} from 'react-native';
+import {View, StyleSheet, FlatList, Alert} from 'react-native'; // Import Alert từ React Native
 import {TextInput, Card, Text} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
-import {createPost} from '../../../apis/services/postService';
-import Toast from 'react-native-toast-message';
-import {toastConfig} from '../../../components/toast/ToastAuth';
-import BlurredToast from '../../../components/toast/BlurredToast';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
 
@@ -22,8 +18,6 @@ interface FormData {
 }
 
 const CreateLookingForTransportPost = ({route, navigation}: any) => {
-  const [isToastVisible, setIsToastVisible] = useState(false);
-
   const [formData, setFormData] = useState<FormData>({
     postType: 'LookingForTransport',
     status: 'Active',
@@ -80,50 +74,25 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
     setErrors(prevErrors => ({...prevErrors, [name]: undefined}));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (validateForm()) {
-      try {
-        await createPost(formData); // Giả sử createPost là hàm tạo bài đăng
-        // Hiển thị toast thành công
-        Toast.show({
-          type: 'success',
-          text1: 'Tạo bài đăng thành công',
-          position: 'top',
-          topOffset: 300,
-          autoHide: true,
-          visibilityTime: 3000,
-          onHide: () => {
-            navigation.goBack();
-          },
-        });
-        setIsToastVisible(true);
-      } catch (error) {
-        // Hiển thị lỗi khi có vấn đề trong quá trình tạo bài đăng
-        Toast.show({
-          type: 'error',
-          text1: 'Lỗi khi tạo bài đăng',
-          position: 'top',
-          topOffset: 300,
-          autoHide: true,
-          visibilityTime: 3000,
-          onHide: () => setIsToastVisible(false),
-        });
-        setIsToastVisible(true);
-      }
+      // Chuyển đổi transportTime sang chuỗi ISO trước khi điều hướng
+      const formDataToSend = {
+        ...formData,
+        transportTime: formData.transportTime.toISOString(),
+      };
+      navigation.navigate('PaymentScreen', {formData: formDataToSend});
     } else {
       // Hiển thị lỗi khi form không hợp lệ
-      Toast.show({
-        type: 'error',
-        text1: 'Vui lòng điền đầy đủ thông tin',
-        position: 'top',
-        topOffset: 300,
-        autoHide: true,
-        visibilityTime: 3000,
-        onHide: () => setIsToastVisible(false),
-      });
-      setIsToastVisible(true);
+      Alert.alert(
+        'Thông báo',
+        'Vui lòng điền đầy đủ thông tin.',
+        [{text: 'OK'}],
+        {cancelable: true},
+      );
     }
   };
+
   const renderFormFields = () => {
     return (
       <Card style={styles.card}>
@@ -240,7 +209,6 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
         keyExtractor={item => item.key}
         contentContainerStyle={styles.container}
       />
-      <BlurredToast config={toastConfig} />
     </View>
   );
 };

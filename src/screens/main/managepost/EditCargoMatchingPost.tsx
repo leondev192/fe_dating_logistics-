@@ -1,15 +1,17 @@
-// EditCargoMatchingPost.tsx
 import React, {useState} from 'react';
-import {View, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+} from 'react-native'; // Import Alert từ React Native
 import {TextInput, Card, Text, RadioButton} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
 import {updatePost} from '../../../apis/services/postService';
-import Toast from 'react-native-toast-message';
-import BlurredToast from '../../../components/toast/BlurredToast';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {toastConfig} from '../../../components/toast/ToastAuth';
 
 // Định nghĩa kiểu dữ liệu cho formData
 interface FormData {
@@ -46,13 +48,6 @@ const EditCargoMatchingPost = ({route, navigation}: any) => {
   const [cargoTypes, setCargoTypes] = useState([
     {label: 'Hàng khô', value: 'Hàng khô'},
     {label: 'Hàng đông lạnh', value: 'Hàng đông lạnh'},
-  ]);
-
-  // Status options
-  const [openStatusPicker, setOpenStatusPicker] = useState(false);
-  const [statusOptions, setStatusOptions] = useState([
-    {label: 'Hoạt động', value: 'active'},
-    {label: 'Hoàn tất', value: 'completed'},
   ]);
 
   // Hàm kiểm tra tính hợp lệ của form
@@ -104,22 +99,24 @@ const EditCargoMatchingPost = ({route, navigation}: any) => {
           transportTime: formData.transportTime.toISOString(), // Đảm bảo chuyển đổi Date sang string
         });
 
-        Toast.show({
-          type: 'success',
-          text1: 'Cập nhật bài đăng thành công',
-          onHide: () => navigation.goBack(),
-        });
+        // Hiển thị thông báo thành công
+        Alert.alert(
+          'Thành công',
+          'Cập nhật bài đăng thành công',
+          [{text: 'OK', onPress: () => navigation.goBack()}],
+          {cancelable: false},
+        );
       } catch (error) {
         console.error('Error updating post:', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Lỗi khi cập nhật bài đăng',
+        // Hiển thị lỗi khi có vấn đề trong quá trình cập nhật
+        Alert.alert('Lỗi', 'Lỗi khi cập nhật bài đăng', [{text: 'OK'}], {
+          cancelable: true,
         });
       }
     } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Vui lòng điền đầy đủ thông tin',
+      // Hiển thị lỗi khi form không hợp lệ
+      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin', [{text: 'OK'}], {
+        cancelable: true,
       });
     }
   };
@@ -311,7 +308,6 @@ const EditCargoMatchingPost = ({route, navigation}: any) => {
         keyExtractor={item => item.key}
         contentContainerStyle={styles.container}
       />
-      <BlurredToast config={toastConfig} />
     </View>
   );
 };

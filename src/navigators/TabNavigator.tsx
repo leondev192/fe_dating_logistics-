@@ -1,3 +1,4 @@
+// src/navigations/TabNavigator.tsx
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Platform, Text} from 'react-native';
@@ -16,10 +17,10 @@ import ManagePostsScreen from '../screens/main/ManagePostsScreen';
 import MessagesScreen from '../screens/main/MessagesScreen';
 import NotificationScreen from '../screens/main/NotificationScreen';
 import AccountScreen from '../screens/main/AccountScreen';
-import AnimatedHeader from '../components/common/AnimatedHeader';
-import CustomHeader from '../components/customheader/CustomHomeHeader';
+import CustomHeader from '../components/customheader/CustomHomeHeader'; // Import CustomHeader
 import {RootStackParamList, TabParamList} from './navigationTypes';
 import Colors from '../constants/colors';
+import AuthGuard from '../components/checktoken/AuthChecker';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -118,32 +119,35 @@ const TabNavigator: React.FC = () => {
           backgroundColor: '#FFFFFF',
         },
       })}>
-      <Tab.Screen name="Home" options={{headerShown: false}}>
-        {() => (
-          <AnimatedHeader
-            children={
-              <CustomHeader
-                showLogo
-                showSearch
-                onPressSearch={() => console.log('Search')}
-                onPressFilter={() => console.log('Filter')}
-              />
-            }
-            scrollComponent={<HomeScreen />}
-          />
-        )}
-      </Tab.Screen>
       <Tab.Screen
-        name="ManagePosts"
-        component={ManagePostsScreen}
+        name="Home"
+        component={HomeScreen}
         options={{
-          headerTitle: 'Quản lý tin',
-          headerTitleAlign: 'center',
+          header: () => (
+            <CustomHeader
+              showLogo
+              showSearch
+              onPressSearch={() => console.log('Search')}
+              onPressFilter={() => console.log('Filter')}
+            />
+          ),
         }}
       />
       <Tab.Screen
+        name="ManagePosts"
+        options={{
+          headerTitle: 'Quản lý tin',
+          headerTitleAlign: 'center',
+        }}>
+        {() => (
+          <AuthGuard>
+            <ManagePostsScreen />
+          </AuthGuard>
+        )}
+      </Tab.Screen>
+      <Tab.Screen
         name="Messages"
-        component={MessagesScreen}
+        component={MessagesScreen} // Sử dụng đúng component
         options={{
           headerTitle: 'Tin nhắn',
           headerTitleAlign: 'center',
@@ -151,16 +155,23 @@ const TabNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Notifications"
-        component={NotificationScreen}
         options={{
           headerTitle: 'Thông báo',
           headerTitleAlign: 'center',
-        }}
-      />
+        }}>
+        {() => (
+          <AuthGuard>
+            <NotificationScreen />
+          </AuthGuard>
+        )}
+      </Tab.Screen>
       <Tab.Screen
         name="Account"
         component={AccountScreen}
-        options={{headerShown: false}}
+        options={{
+          headerTitle: 'Tài khoản',
+          headerTitleAlign: 'center',
+        }}
       />
     </Tab.Navigator>
   );

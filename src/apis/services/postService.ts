@@ -7,116 +7,113 @@ export const getAllPosts = async (): Promise<Post[]> => {
     const response = await apiClient.get<Post[]>('/posts');
     return response.data;
   } catch (error) {
-    console.error('Error fetching posts:', error);
-    throw error; // Re-throwing the error to handle it in the calling code
+    console.warn('Không thể lấy danh sách bài đăng. Vui lòng thử lại sau.');
+    return []; // Trả về danh sách rỗng hoặc xử lý phù hợp hơn nếu cần
   }
 };
 
-export const createPost = async (post: Post): Promise<Post> => {
+export const createPost = async (post: Post): Promise<Post | null> => {
   try {
-    // Lấy token từ AsyncStorage
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      console.error('Token không tồn tại, không thể tạo bài đăng.');
-      throw new Error('Token is missing.');
+      console.warn('Vui lòng đăng nhập lại.');
+      return null;
     }
 
-    console.log('Creating post with data:', post); // Log dữ liệu gửi đi để tạo bài đăng
-
-    // Gửi yêu cầu POST với token trong header
     const response = await apiClient.post<Post>('/posts', post, {
       headers: {
-        Authorization: `Bearer ${token}`, // Truyền token vào header của yêu cầu
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    console.log('Create post response:', response.data); // Log phản hồi thành công
-    return response.data; // Đảm bảo trả về dữ liệu
+    return response.data;
   } catch (error) {
-    console.error('Error creating post:', error);
-    throw error; // Re-throwing the error to handle it in the calling code
+    console.warn('Không thể tạo bài đăng. Vui lòng thử lại sau.');
+    return null; // Trả về null nếu lỗi
   }
 };
 
 export const getUserPosts = async (): Promise<Post[]> => {
   try {
-    // Lấy token từ AsyncStorage
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      console.error('Token không tồn tại, không thể lấy bài đăng của user.');
-      throw new Error('Token is missing.');
+      console.warn('Vui lòng đăng nhập lại.');
+      return [];
     }
 
-    // Gửi yêu cầu GET với token trong header
     const response = await apiClient.get<Post[]>('/posts/user/posts', {
       headers: {
-        Authorization: `Bearer ${token}`, // Truyền token vào header của yêu cầu
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    return response.data; // Trả về dữ liệu bài đăng
+    return response.data;
   } catch (error) {
-    console.error('Error fetching user posts:', error);
-    throw error; // Re-throwing the error to handle it in the calling code
+    console.warn(
+      'Không thể lấy danh sách bài đăng của bạn. Vui lòng thử lại sau.',
+    );
+    return [];
   }
 };
 
-// Hàm xóa bài đăng
-export const deletePost = async (postId: string): Promise<void> => {
+export const deletePost = async (postId: string): Promise<boolean> => {
   try {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      throw new Error('Token is missing.');
+      console.warn('Vui lòng đăng nhập lại.');
+      return false;
     }
+
     await apiClient.delete(`/posts/${postId}`, {
       headers: {Authorization: `Bearer ${token}`},
     });
+
+    return true;
   } catch (error) {
-    console.error('Error deleting post:', error);
-    throw error;
+    console.warn('Không thể xóa bài đăng. Vui lòng thử lại sau.');
+    return false;
   }
 };
 
-// Hàm cập nhật bài đăng
-export const updatePost = async (postId: string, post: Post): Promise<Post> => {
+export const updatePost = async (
+  postId: string,
+  post: Post,
+): Promise<Post | null> => {
   try {
-    // Lấy token từ AsyncStorage
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      throw new Error('Token is missing.');
+      console.warn('Vui lòng đăng nhập lại.');
+      return null;
     }
 
-    // Log chi tiết dữ liệu gửi đi để kiểm tra trước khi gửi
-    console.log('Updating post with ID:', postId, 'Data:', post);
-
-    // Gửi yêu cầu PATCH với token trong header
     const response = await apiClient.patch<Post>(`/posts/${postId}`, post, {
       headers: {
-        Authorization: `Bearer ${token}`, // Đảm bảo truyền đúng token
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    console.log('Update post response:', response.data); // Log phản hồi từ server
     return response.data;
   } catch (error) {
-    console.error('Error updating post:', error); // Log chi tiết lỗi
-    throw error;
+    console.warn('Không thể cập nhật bài đăng. Vui lòng thử lại sau.');
+    return null;
   }
 };
 
-// Trong postService.ts
-export const getPostById = async (id: string): Promise<Post> => {
+export const getPostById = async (id: string): Promise<Post | null> => {
   try {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      throw new Error('Token is missing.');
+      console.warn('Vui lòng đăng nhập lại.');
+      return null;
     }
+
     const response = await apiClient.get<Post>(`/posts/${id}`, {
       headers: {Authorization: `Bearer ${token}`},
     });
+
     return response.data;
   } catch (error) {
-    console.error('Error fetching post by ID:', error);
-    throw error;
+    console.warn('Không thể lấy chi tiết bài đăng. Vui lòng thử lại sau.');
+    return null;
   }
 };

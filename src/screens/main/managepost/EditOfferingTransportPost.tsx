@@ -1,14 +1,17 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import {TextInput, Card, Text, Switch} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
 import {updatePost, getPostById} from '../../../apis/services/postService';
-import Toast from 'react-native-toast-message';
-import BlurredToast from '../../../components/toast/BlurredToast';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
-import {toastConfig} from '../../../components/toast/ToastAuth';
 
 // Định nghĩa kiểu dữ liệu cho formData
 interface FormData {
@@ -94,10 +97,7 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
         });
       } catch (error) {
         console.error('Error fetching post by ID:', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Lỗi khi tải dữ liệu bài đăng',
-        });
+        Alert.alert('Lỗi', 'Lỗi khi tải dữ liệu bài đăng', [{text: 'OK'}]);
       }
     };
 
@@ -147,29 +147,22 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
       try {
         await updatePost(postId, {
           ...formData,
-          status: formData.status, // Đảm bảo gửi đúng trạng thái
+          status: formData.status,
           transportTime: formData.transportTime.toISOString(),
           returnTime: formData.returnTime.toISOString(),
         });
-        Toast.show({
-          type: 'success',
-          text1: 'Cập nhật bài đăng thành công',
-          onHide: () => navigation.goBack(),
-        });
+        Alert.alert('Thành công', 'Cập nhật bài đăng thành công', [
+          {text: 'OK', onPress: () => navigation.goBack()},
+        ]);
       } catch (error) {
         console.error('Error updating post:', error);
-        Toast.show({
-          type: 'error',
-          text1: 'Lỗi khi cập nhật bài đăng',
-        });
+        Alert.alert('Lỗi', 'Lỗi khi cập nhật bài đăng', [{text: 'OK'}]);
       }
     } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Vui lòng điền đầy đủ thông tin',
-      });
+      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin', [{text: 'OK'}]);
     }
   };
+
   const renderStatusButtons = () => (
     <View style={styles.statusButtonContainer}>
       <TouchableOpacity
@@ -194,6 +187,7 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
       </TouchableOpacity>
     </View>
   );
+
   const renderFormFields = () => (
     <Card style={styles.card}>
       <Card.Content>
@@ -413,7 +407,6 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
         keyExtractor={item => item.key}
         contentContainerStyle={styles.container}
       />
-      <BlurredToast config={toastConfig} />
     </View>
   );
 };

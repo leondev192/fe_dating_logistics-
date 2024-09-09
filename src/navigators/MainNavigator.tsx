@@ -3,7 +3,7 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import TabNavigator from './TabNavigator';
 import SearchScreen from '../screens/main/SearchScreen';
-import AddProfileCompanyScreen from '../screens/main/UserProfile';
+import UserProfile from '../screens/main/UserProfile';
 import UserEdit from '../screens/main/UserEdit';
 import BackButton from '../components/header/ArrowLeft';
 import TitleHeader from '../components/header/TitleHeader';
@@ -16,6 +16,8 @@ import EditCargoMatchingPost from '../screens/main/managepost/EditCargoMatchingP
 import EditLookingForTransportPost from '../screens/main/managepost/EditLookingForTransportPost';
 import EditOfferingTransportPost from '../screens/main/managepost/EditOfferingTransportPost';
 import PaymentScreen from '../screens/main/createpost/PaymentScreen';
+import ChatDetail from '../screens/main/ChatDetail';
+import MessagesScreen from '../screens/main/MessagesScreen';
 
 const Stack = createStackNavigator();
 
@@ -36,8 +38,8 @@ const MainNavigator = () => {
         }}
       />
       <Stack.Screen
-        name="AddProfileCompanyScreen"
-        component={AddProfileCompanyScreen}
+        name="UserProfile"
+        component={UserProfile}
         options={{
           title: '',
           headerBackTitleVisible: false,
@@ -139,6 +141,30 @@ const MainNavigator = () => {
           headerBackTitleVisible: false,
           headerBackImage: () => <BackButton />,
           headerTitle: () => <TitleHeader title="Chỉnh sửa bài đăng" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="ChatDetail"
+        component={ChatDetail}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Chi tiet tin nhan " />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="MessagesScreen"
+        component={MessagesScreen}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Chi tiet tin nhan " />,
           headerTransparent: false,
           headerTitleAlign: 'center',
         }}

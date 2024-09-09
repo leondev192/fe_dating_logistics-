@@ -1,6 +1,8 @@
 // models/postModel.ts
 
 export interface Post {
+  id: string; // Thêm id nếu chưa có
+  userId: string;
   postType: 'CargoMatching' | 'LookingForTransport' | 'OfferingTransport';
   status: 'active' | 'completed';
   companyImageUrl?: string;

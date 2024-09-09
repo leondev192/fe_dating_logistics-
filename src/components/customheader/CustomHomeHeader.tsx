@@ -16,7 +16,6 @@ interface CustomHeaderProps {
   showSearch?: boolean;
   showLogo?: boolean;
   onPressSearch?: () => void;
-  onPressFilter?: () => void; // Add filter button press function
 }
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({
@@ -24,7 +23,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
   showSearch,
   showLogo,
   onPressSearch,
-  onPressFilter, // Handle filter button press
 }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -42,11 +40,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
               onPress={onPressSearch}>
               <Text style={styles.searchPlaceholder}>Tìm kiếm...</Text>
               <SearchNormal size={25} style={styles.searchIcon} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.filterButton}
-              onPress={onPressFilter}>
-              <Filter size={25} color={Colors.primary} />
             </TouchableOpacity>
           </View>
         )}

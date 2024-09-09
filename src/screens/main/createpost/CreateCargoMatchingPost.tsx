@@ -1,11 +1,8 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, FlatList} from 'react-native';
-import {TextInput, Card, RadioButton, Text} from 'react-native-paper';
+import {View, StyleSheet, FlatList, Alert} from 'react-native'; // Import Alert từ React Native
+import {TextInput, Card, Text} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
-import Toast from 'react-native-toast-message';
-import {toastConfig} from '../../../components/toast/ToastAuth';
-import BlurredToast from '../../../components/toast/BlurredToast';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
 
@@ -83,7 +80,6 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
     setFormData(prevData => ({...prevData, [name]: value}));
     setErrors(prevErrors => ({...prevErrors, [name]: undefined}));
   };
-  const [isToastVisible, setIsToastVisible] = useState(false);
 
   const handleSubmit = () => {
     if (validateForm()) {
@@ -94,16 +90,12 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
       };
       navigation.navigate('PaymentScreen', {formData: formDataToSend});
     } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Vui lòng điền đầy đủ thông tin',
-        position: 'top',
-        topOffset: 300,
-        autoHide: true,
-        visibilityTime: 3000,
-        onHide: () => setIsToastVisible(false),
-      });
-      setIsToastVisible(true);
+      Alert.alert(
+        'Thông báo',
+        'Vui lòng điền đầy đủ thông tin.',
+        [{text: 'OK'}],
+        {cancelable: true},
+      );
     }
   };
 
@@ -252,7 +244,6 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
         keyExtractor={item => item.key}
         contentContainerStyle={styles.container}
       />
-      <BlurredToast config={toastConfig} />
     </View>
   );
 };
