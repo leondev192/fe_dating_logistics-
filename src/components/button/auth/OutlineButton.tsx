@@ -1,8 +1,8 @@
 import React from 'react';
 import {TouchableOpacity, View, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Colors from '../../constants/colors';
-import GradientText from '../text/GradientText';
+import Colors from '../../../constants/colors';
+import GradientText from '../../text/GradientText';
 
 interface OutlineButtonProps {
   title: string;
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 28,
     width: '100%',
-    height: 48,
+    height: 58,
     alignItems: 'center',
     justifyContent: 'center',
   },

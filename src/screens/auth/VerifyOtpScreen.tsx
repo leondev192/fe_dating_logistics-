@@ -7,7 +7,7 @@ import {
   Platform,
   ImageBackground,
 } from 'react-native';
-import ButtonComponent from '../../components/button/GradientButton';
+import ButtonComponent from '../../components/button/auth/GradientButton';
 import Colors from '../../constants/colors';
 import {
   useNavigation,

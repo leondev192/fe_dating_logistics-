@@ -1,14 +1,36 @@
 import React, {useState} from 'react';
-import {View, ScrollView, StyleSheet, Switch} from 'react-native';
-import {TextInput, Card} from 'react-native-paper';
+import {View, StyleSheet, Switch, FlatList} from 'react-native';
+import {TextInput, Card, Text} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
 import {createPost} from '../../../apis/services/postService';
 import Toast from 'react-native-toast-message';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import DropDownPicker from 'react-native-dropdown-picker';
+import {toastConfig} from '../../../components/toast/ToastAuth';
+import BlurredToast from '../../../components/toast/BlurredToast';
 
-const CreateOfferingTransportPost = () => {
-  const [formData, setFormData] = useState({
+// Định nghĩa kiểu dữ liệu cho formData
+interface FormData {
+  postType: 'OfferingTransport' | 'CargoMatching' | 'LookingForTransport';
+  status: 'Active' | 'Completed'; // Sửa status để phù hợp với yêu cầu của API
+  origin: string;
+  destination: string;
+  transportTime: Date;
+  returnTrip: boolean;
+  returnTime: Date;
+  vehicleType: string;
+  vehicleCapacity: number;
+  availableWeight: number;
+  pricePerUnit: number;
+  vehicleDetails: string;
+}
+
+const CreateOfferingTransportPost = ({route, navigation}: any) => {
+  const [isToastVisible, setIsToastVisible] = useState(false);
+
+  // Khai báo state với kiểu dữ liệu
+  const [formData, setFormData] = useState<FormData>({
     postType: 'OfferingTransport',
     status: 'Active',
     origin: '',
@@ -22,38 +44,113 @@ const CreateOfferingTransportPost = () => {
     pricePerUnit: 0,
     vehicleDetails: '',
   });
+
+  // State cho lỗi
+  const [errors, setErrors] = useState<{[key in keyof FormData]?: string}>({});
+
   const [showTransportTimePicker, setShowTransportTimePicker] = useState(false);
   const [showReturnTimePicker, setShowReturnTimePicker] = useState(false);
 
-  const handleChange = (name: string, value: any) => {
+  const [openVehicleType, setOpenVehicleType] = useState(false);
+  const [vehicleTypes, setVehicleTypes] = useState([
+    {label: 'Xe tải', value: 'Xe tải'},
+    {label: 'Xe container', value: 'Xe container'},
+  ]);
+
+  // Hàm kiểm tra tính hợp lệ của form
+  const validateForm = () => {
+    let valid = true;
+    const newErrors: {[key in keyof FormData]?: string} = {};
+
+    // Kiểm tra từng trường và cập nhật lỗi nếu có
+    if (!formData.origin) {
+      newErrors.origin = 'Vui lòng nhập nơi bắt đầu';
+      valid = false;
+    }
+
+    if (!formData.destination) {
+      newErrors.destination = 'Vui lòng nhập nơi kết thúc';
+      valid = false;
+    }
+
+    if (!formData.vehicleType) {
+      newErrors.vehicleType = 'Vui lòng chọn loại xe';
+      valid = false;
+    }
+
+    if (formData.vehicleCapacity <= 0) {
+      newErrors.vehicleCapacity = 'Sức chứa xe phải lớn hơn 0';
+      valid = false;
+    }
+
+    if (formData.availableWeight <= 0) {
+      newErrors.availableWeight = 'Khối lượng còn lại phải lớn hơn 0';
+      valid = false;
+    }
+
+    if (formData.pricePerUnit <= 0) {
+      newErrors.pricePerUnit = 'Giá mỗi đơn vị phải lớn hơn 0';
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  // Định nghĩa kiểu cho các tham số của handleChange
+  const handleChange = (name: keyof FormData, value: any) => {
     setFormData(prevData => ({...prevData, [name]: value}));
+    // Xóa lỗi khi người dùng nhập lại
+    setErrors(prevErrors => ({...prevErrors, [name]: undefined}));
   };
 
   const handleSubmit = async () => {
-    try {
-      await createPost(formData);
-      Toast.show({
-        type: 'success',
-        text1: 'Tạo bài đăng thành công',
-        position: 'top',
-        topOffset: 300,
-        autoHide: true,
-        visibilityTime: 3000,
-      });
-    } catch (error) {
+    if (validateForm()) {
+      try {
+        await createPost(formData); // Giả sử createPost là hàm tạo bài đăng
+        // Hiển thị toast thành công
+        Toast.show({
+          type: 'success',
+          text1: 'Tạo bài đăng thành công',
+          position: 'top',
+          topOffset: 300,
+          autoHide: true,
+          visibilityTime: 3000,
+          onHide: () => {
+            navigation.goBack();
+          },
+        });
+        setIsToastVisible(true);
+      } catch (error) {
+        // Hiển thị lỗi khi có vấn đề trong quá trình tạo bài đăng
+        Toast.show({
+          type: 'error',
+          text1: 'Lỗi khi tạo bài đăng',
+          position: 'top',
+          topOffset: 300,
+          autoHide: true,
+          visibilityTime: 3000,
+          onHide: () => setIsToastVisible(false),
+        });
+        setIsToastVisible(true);
+      }
+    } else {
+      // Hiển thị lỗi khi form không hợp lệ
       Toast.show({
         type: 'error',
-        text1: 'Lỗi khi tạo bài đăng',
+        text1: 'Vui lòng điền đầy đủ thông tin',
         position: 'top',
         topOffset: 300,
         autoHide: true,
         visibilityTime: 3000,
+        onHide: () => setIsToastVisible(false),
       });
+      setIsToastVisible(true);
     }
   };
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
+  const renderFormFields = () => {
+    return (
       <Card style={styles.card}>
         <Card.Content>
           <TextInput
@@ -64,7 +161,11 @@ const CreateOfferingTransportPost = () => {
             style={styles.input}
             outlineColor={Colors.bordercolor}
             activeOutlineColor={Colors.primary}
+            error={!!errors.origin}
           />
+          {errors.origin && (
+            <Text style={styles.errorText}>{errors.origin}</Text>
+          )}
           <TextInput
             label="Nơi kết thúc"
             mode="outlined"
@@ -73,7 +174,11 @@ const CreateOfferingTransportPost = () => {
             style={styles.input}
             outlineColor={Colors.bordercolor}
             activeOutlineColor={Colors.primary}
+            error={!!errors.destination}
           />
+          {errors.destination && (
+            <Text style={styles.errorText}>{errors.destination}</Text>
+          )}
           <View>
             <TextInput
               label="Thời gian vận chuyển"
@@ -110,6 +215,7 @@ const CreateOfferingTransportPost = () => {
             />
             <Switch
               value={formData.returnTrip}
+              style={styles.switch}
               onValueChange={value => handleChange('returnTrip', value)}
             />
           </View>
@@ -139,15 +245,34 @@ const CreateOfferingTransportPost = () => {
               )}
             </View>
           )}
-          <TextInput
-            label="Loại xe"
-            mode="outlined"
+          <DropDownPicker
+            open={openVehicleType}
             value={formData.vehicleType}
-            onChangeText={text => handleChange('vehicleType', text)}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
+            items={vehicleTypes}
+            setOpen={setOpenVehicleType}
+            setValue={callback =>
+              handleChange('vehicleType', callback(formData.vehicleType))
+            }
+            setItems={setVehicleTypes}
+            placeholder="Chọn loại xe"
+            style={[
+              styles.dropdown,
+              errors.vehicleType ? {borderColor: 'red'} : {},
+            ]}
+            dropDownContainerStyle={styles.dropdownContainer}
+            textStyle={{fontSize: 16}}
+            searchable={true}
+            searchPlaceholder="Tìm hoặc nhập loại xe..."
+            onChangeSearchText={text => {
+              if (!vehicleTypes.some(item => item.value === text)) {
+                setVehicleTypes(prev => [...prev, {label: text, value: text}]);
+              }
+            }}
+            onChangeValue={value => handleChange('vehicleType', value)}
           />
+          {errors.vehicleType && (
+            <Text style={styles.errorText}>{errors.vehicleType}</Text>
+          )}
           <TextInput
             label="Sức chứa xe"
             mode="outlined"
@@ -159,7 +284,11 @@ const CreateOfferingTransportPost = () => {
             style={styles.input}
             outlineColor={Colors.bordercolor}
             activeOutlineColor={Colors.primary}
+            error={!!errors.vehicleCapacity}
           />
+          {errors.vehicleCapacity && (
+            <Text style={styles.errorText}>{errors.vehicleCapacity}</Text>
+          )}
           <TextInput
             label="Khối lượng còn lại"
             mode="outlined"
@@ -171,7 +300,11 @@ const CreateOfferingTransportPost = () => {
             style={styles.input}
             outlineColor={Colors.bordercolor}
             activeOutlineColor={Colors.primary}
+            error={!!errors.availableWeight}
           />
+          {errors.availableWeight && (
+            <Text style={styles.errorText}>{errors.availableWeight}</Text>
+          )}
           <TextInput
             label="Giá mỗi đơn vị"
             mode="outlined"
@@ -183,7 +316,11 @@ const CreateOfferingTransportPost = () => {
             style={styles.input}
             outlineColor={Colors.bordercolor}
             activeOutlineColor={Colors.primary}
+            error={!!errors.pricePerUnit}
           />
+          {errors.pricePerUnit && (
+            <Text style={styles.errorText}>{errors.pricePerUnit}</Text>
+          )}
           <TextInput
             label="Chi tiết xe"
             mode="outlined"
@@ -197,9 +334,18 @@ const CreateOfferingTransportPost = () => {
         <Card.Actions style={styles.cardActions}>
           <GradientButton title="Tạo Bài Đăng" onPress={handleSubmit} />
         </Card.Actions>
+        <BlurredToast config={toastConfig} />
       </Card>
-      <Toast />
-    </ScrollView>
+    );
+  };
+
+  return (
+    <FlatList
+      data={[{key: 'form'}]}
+      renderItem={renderFormFields}
+      keyExtractor={item => item.key}
+      contentContainerStyle={styles.container}
+    />
   );
 };
 
@@ -216,8 +362,13 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   input: {
-    marginBottom: 15,
+    marginBottom: 5,
     backgroundColor: '#fff',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+    fontSize: 12,
   },
   cardActions: {
     justifyContent: 'center',
@@ -227,6 +378,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
+  },
+  switch: {marginStart: 'auto'},
+  dropdown: {
+    marginBottom: 15,
+    borderColor: Colors.bordercolor,
+  },
+  dropdownContainer: {
+    borderColor: Colors.bordercolor,
   },
 });
 

@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
-import GradientButton from '../../components/button/GradientButton';
-import OutlineButton from '../../components/button/OutlineButton';
+import GradientButton from '../../components/button/auth/GradientButton';
+import OutlineButton from '../../components/button/auth/OutlineButton';
 import {useAnimatedValue} from '../../hooks/useAnimatedValue';
 import Colors from '../../constants/colors';
 import {NavigationProp, useNavigation} from '@react-navigation/native';

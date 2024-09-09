@@ -11,7 +11,7 @@ import {
   Image,
 } from 'react-native';
 import InputAuth from '../../components/input/InputAuth';
-import GradientButton from '../../components/button/GradientButton';
+import GradientButton from '../../components/button/auth/GradientButton';
 import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import Colors from '../../constants/colors';
 import {NavigationProp, useNavigation} from '@react-navigation/native';

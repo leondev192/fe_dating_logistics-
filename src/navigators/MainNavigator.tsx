@@ -11,6 +11,11 @@ import CreateCargoMatchingPost from '../screens/main/createpost/CreateCargoMatch
 import CreateLookingForTransportPost from '../screens/main/createpost/CreateLookingForTransportPost';
 import CreateOfferingTransportPost from '../screens/main/createpost/CreateOfferingTransportPost';
 
+// Import các màn hình chỉnh sửa
+import EditCargoMatchingPost from '../screens/main/managepost/EditCargoMatchingPost';
+import EditLookingForTransportPost from '../screens/main/managepost/EditLookingForTransportPost';
+import EditOfferingTransportPost from '../screens/main/managepost/EditOfferingTransportPost';
+
 const Stack = createStackNavigator();
 
 const MainNavigator = () => {
@@ -50,7 +55,6 @@ const MainNavigator = () => {
           headerBackImage: () => <BackButton />,
           headerTitle: () => <TitleHeader title="Chỉnh sửa thông tin" />,
           headerTransparent: false,
-
           headerTitleAlign: 'center',
         }}
       />
@@ -63,7 +67,6 @@ const MainNavigator = () => {
           headerBackImage: () => <BackButton />,
           headerTitle: () => <TitleHeader title="Thêm thông tin" />,
           headerTransparent: false,
-
           headerTitleAlign: 'center',
         }}
       />
@@ -76,7 +79,6 @@ const MainNavigator = () => {
           headerBackImage: () => <BackButton />,
           headerTitle: () => <TitleHeader title="Thêm thông tin" />,
           headerTransparent: false,
-
           headerTitleAlign: 'center',
         }}
       />
@@ -89,7 +91,43 @@ const MainNavigator = () => {
           headerBackImage: () => <BackButton />,
           headerTitle: () => <TitleHeader title="Thêm thông tin" />,
           headerTransparent: false,
-
+          headerTitleAlign: 'center',
+        }}
+      />
+      {/* Thêm các màn hình chỉnh sửa */}
+      <Stack.Screen
+        name="EditCargoMatchingPost"
+        component={EditCargoMatchingPost}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Chỉnh sửa bài đăng" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="EditLookingForTransportPost"
+        component={EditLookingForTransportPost}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Chỉnh sửa bài đăng" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="EditOfferingTransportPost"
+        component={EditOfferingTransportPost}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Chỉnh sửa bài đăng" />,
+          headerTransparent: false,
           headerTitleAlign: 'center',
         }}
       />

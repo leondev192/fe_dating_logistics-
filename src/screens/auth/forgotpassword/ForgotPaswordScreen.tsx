@@ -9,7 +9,7 @@ import {
   ImageBackground,
 } from 'react-native';
 import InputAuth from '../../../components/input/InputAuth';
-import ButtonComponent from '../../../components/button/GradientButton';
+import ButtonComponent from '../../../components/button/auth/GradientButton';
 import Colors from '../../../constants/colors';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
 import LoadingSpinner from '../../../components/loading/LoadingSpinner';

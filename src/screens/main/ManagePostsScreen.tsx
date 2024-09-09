@@ -1,41 +1,124 @@
-import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {useSelector, useDispatch} from 'react-redux';
-import {RootState} from '../../redux/store';
-import {logout} from '../../redux/auth/authSlice';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation, CommonActions} from '@react-navigation/native';
+// src/screens/UserPostsScreen.tsx
+import React, {useEffect, useState, useCallback} from 'react';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Text,
+  RefreshControl,
+  Alert,
+} from 'react-native';
+import {getUserPosts, deletePost} from '../../apis/services/postService';
+import {Post} from '../../models/postModel';
+import PostItem from '../../components/items/PostItemManager';
+import {useNavigation} from '@react-navigation/native';
 
-const HomeScreen = () => {
-  const dispatch = useDispatch();
+const UserPostsScreen = () => {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
-  const user = useSelector((state: RootState) => state.auth.user);
-
-  const handleLogout = async () => {
+  // Hàm lấy dữ liệu bài đăng của user
+  const fetchUserPosts = async () => {
     try {
-      // Xóa token và thông tin user khỏi AsyncStorage
-      await AsyncStorage.removeItem('@token');
-      await AsyncStorage.removeItem('@user');
-
-      // Dispatch action để cập nhật trạng thái đăng nhập trong Redux
-      dispatch(logout());
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{name: 'Auth'}], // Điều hướng đến stack Auth, nơi chứa LoginScreen
-        }),
-      );
+      const userPosts = await getUserPosts();
+      setPosts(userPosts);
     } catch (error) {
-      console.error('Đăng xuất không thành công:', error);
+      console.error('Error fetching user posts:', error);
     }
   };
 
+  useEffect(() => {
+    fetchUserPosts();
+  }, []);
+
+  // Hàm làm mới danh sách bài đăng
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchUserPosts();
+    setRefreshing(false);
+  }, []);
+
+  // Hàm xử lý xóa bài đăng
+  const handleDeletePost = async (postId: string) => {
+    Alert.alert('Xác nhận', 'Bạn có chắc chắn muốn xóa bài đăng này không?', [
+      {text: 'Hủy', style: 'cancel'},
+      {
+        text: 'Xóa',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deletePost(postId);
+            fetchUserPosts();
+          } catch (error) {
+            console.error('Error deleting post:', error);
+          }
+        },
+      },
+    ]);
+  };
+
+  const handleEditPost = (post: Post) => {
+    console.log('Navigating to Edit with postId:', post.id); // Log kiểm tra postId
+    // Truyền đúng postId khi điều hướng đến EditOfferingTransportPost
+    switch (post.postType) {
+      case 'CargoMatching':
+        navigation.navigate('EditCargoMatchingPost', {post});
+        break;
+      case 'LookingForTransport':
+        navigation.navigate('EditLookingForTransportPost', {postId: post.id}); // Đảm bảo truyền đúng postId
+        break;
+      case 'OfferingTransport':
+        navigation.navigate('EditOfferingTransportPost', {postId: post.id}); // Sửa lại để truyền đúng postId
+        break;
+      default:
+        break;
+    }
+  };
+
+  const renderItem = ({item}: {item: Post}) => (
+    <PostItem
+      postType={item.postType}
+      companyName={item.companyName}
+      hasVehicle={item.hasVehicle}
+      cargoType={item.cargoType}
+      cargoWeight={item.cargoWeight}
+      cargoVolume={item.cargoVolume}
+      requiredVehicleType={item.requiredVehicleType}
+      cargoTypeRequest={item.cargoTypeRequest}
+      vehicleType={item.vehicleType}
+      maxWeight={item.vehicleCapacity}
+      availableWeight={item.availableWeight}
+      pricePerUnit={item.pricePerUnit}
+      vehicleDetails={item.vehicleDetails}
+      origin={item.origin}
+      destination={item.destination}
+      transportTime={item.transportTime}
+      returnTrip={item.returnTrip}
+      returnTime={item.returnTime}
+      status={item.status}
+      specialRequirements={item.specialRequirements}
+      image={{uri: item.companyImageUrl || 'https://via.placeholder.com/50'}}
+      onPress={() => console.log(`Pressed on post: ${item.id}`)}
+      onEdit={() => handleEditPost(item)}
+      onDelete={() => handleDeletePost(item.id)}
+    />
+  );
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Đăng xuất</Text>
-      </TouchableOpacity>
+      <FlatList
+        data={posts}
+        renderItem={renderItem}
+        keyExtractor={item => item.id.toString()}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        ListEmptyComponent={
+          <Text style={styles.noDataText}>Không có bài đăng nào</Text>
+        }
+        contentContainerStyle={styles.postList}
+      />
     </View>
   );
 };
@@ -43,27 +126,16 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    backgroundColor: '#f5f5f5',
   },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
+  postList: {
+    flexGrow: 1,
   },
-  logoutButton: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#ff4d4d',
-    borderRadius: 5,
-  },
-  logoutButtonText: {
-    color: '#fff',
+  noDataText: {
+    textAlign: 'center',
     fontSize: 16,
-    fontWeight: 'bold',
+    color: '#888',
   },
 });
 
-export default HomeScreen;
+export default UserPostsScreen;

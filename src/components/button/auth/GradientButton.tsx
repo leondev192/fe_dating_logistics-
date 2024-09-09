@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text, TouchableOpacity, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Colors from '../../constants/colors';
+import Colors from '../../../constants/colors';
 
 interface GradientButtonProps {
   title: string;
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 30,
     width: '100%',
-    height: 48,
+    height: 58,
     marginVertical: 10,
   },
   solidText: {

@@ -8,6 +8,8 @@ import {
   TruckRemove,
   Building4,
 } from 'iconsax-react-native';
+import GradientButton from '../../components/button/post/GradientButton';
+import OutlineButton from '../../components/button/post/OutlineButton';
 
 interface PostItemProps {
   postType: string;
@@ -31,7 +33,8 @@ interface PostItemProps {
   status: string;
   specialRequirements?: string;
   image: any;
-  onPress: () => void;
+  onEdit: () => void; // Hàm sửa
+  onDelete: () => void; // Hàm xóa
 }
 
 const PostItem: React.FC<PostItemProps> = ({
@@ -56,7 +59,8 @@ const PostItem: React.FC<PostItemProps> = ({
   status,
   specialRequirements,
   image,
-  onPress,
+  onEdit,
+  onDelete,
 }) => {
   const renderTitle = () => {
     let icon;
@@ -287,7 +291,7 @@ const PostItem: React.FC<PostItemProps> = ({
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity style={styles.container}>
       <View style={styles.header}>
         <Image source={image} style={styles.avatar} />
         {renderTitle()}
@@ -302,6 +306,10 @@ const PostItem: React.FC<PostItemProps> = ({
         </View>
       </View>
       {renderDetails()}
+      <View style={styles.buttonContainer}>
+        <GradientButton title="Sửa" onPress={onEdit} />
+        <OutlineButton title="Xóa" onPress={onDelete} />
+      </View>
     </TouchableOpacity>
   );
 };
@@ -414,6 +422,32 @@ const styles = StyleSheet.create({
   completed: {
     color: '#F44336',
     backgroundColor: '#FDECEA',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  editButton: {
+    backgroundColor: '#4CAF50',
+    padding: 8,
+    borderRadius: 5,
+    flex: 1,
+    alignItems: 'center',
+    marginRight: 5,
+  },
+  deleteButton: {
+    backgroundColor: '#F44336',
+    padding: 8,
+    borderRadius: 5,
+    flex: 1,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

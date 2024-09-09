@@ -2,7 +2,7 @@
 
 export interface Post {
   postType: 'CargoMatching' | 'LookingForTransport' | 'OfferingTransport';
-  status: 'Active' | 'Completed';
+  status: 'active' | 'completed';
   companyImageUrl?: string;
   companyName?: string;
   origin?: string;

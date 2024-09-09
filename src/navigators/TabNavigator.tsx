@@ -133,36 +133,30 @@ const TabNavigator: React.FC = () => {
           />
         )}
       </Tab.Screen>
-      <Tab.Screen name="ManagePosts" options={{headerShown: false}}>
-        {() => (
-          <AnimatedHeader
-            children={
-              <CustomHeader
-                title="Quản lý tin"
-                onPressSearch={() => console.log('Search')}
-                onPressFilter={() => console.log('Filter')}
-              />
-            }
-            scrollComponent={<ManagePostsScreen />}
-          />
-        )}
-      </Tab.Screen>
-      <Tab.Screen name="Messages" options={{headerShown: false}}>
-        {() => (
-          <AnimatedHeader
-            children={<CustomHeader title="Tin nhắn" />}
-            scrollComponent={<MessagesScreen />}
-          />
-        )}
-      </Tab.Screen>
-      <Tab.Screen name="Notifications" options={{headerShown: false}}>
-        {() => (
-          <AnimatedHeader
-            children={<CustomHeader title="Thông báo" />}
-            scrollComponent={<NotificationScreen />}
-          />
-        )}
-      </Tab.Screen>
+      <Tab.Screen
+        name="ManagePosts"
+        component={ManagePostsScreen}
+        options={{
+          headerTitle: 'Quản lý tin',
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Tab.Screen
+        name="Messages"
+        component={MessagesScreen}
+        options={{
+          headerTitle: 'Tin nhắn',
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Tab.Screen
+        name="Notifications"
+        component={NotificationScreen}
+        options={{
+          headerTitle: 'Thông báo',
+          headerTitleAlign: 'center',
+        }}
+      />
       <Tab.Screen
         name="Account"
         component={AccountScreen}

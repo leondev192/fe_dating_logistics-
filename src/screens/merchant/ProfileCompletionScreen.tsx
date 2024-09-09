@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import Colors from '../../constants/colors';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
-import GradientButton from '../../components/button/GradientButton';
+import GradientButton from '../../components/button/auth/GradientButton';
 
 type RootStackParamList = {
   Login: undefined;

@@ -13,7 +13,7 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import GradientButton from '../../components/button/GradientButton';
+import GradientButton from '../../components/button/auth/GradientButton';
 import Colors from '../../constants/colors';
 import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import {register} from '../../apis/services/authService';

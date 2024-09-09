@@ -1,5 +1,13 @@
+// src/screens/AccountScreen.tsx
 import React, {useState, useEffect} from 'react';
-import {View, Text, Image, StyleSheet, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
@@ -14,14 +22,17 @@ import {
 import Toast from 'react-native-toast-message';
 import {toastConfig} from '../../components/toast/ToastAuth';
 import {User} from 'iconsax-react-native';
+import {getUserInfo} from '../../apis/services/userService'; // Import hàm getUserInfo
+
 type RootStackParamList = {
   Auth: undefined;
   AddProfileCompanyScreen: undefined;
-  // Khai báo thêm các màn hình khác nếu có
 };
 
 const AccountScreen = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState<any>(null); // State để lưu thông tin người dùng
+  const [loading, setLoading] = useState<boolean>(true); // State để hiển thị loading khi đang lấy thông tin
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
@@ -30,7 +41,26 @@ const AccountScreen = () => {
 
   const checkLoginStatus = async () => {
     const token = await AsyncStorage.getItem('userToken');
-    setIsLoggedIn(!!token);
+    if (token) {
+      setIsLoggedIn(true);
+      await fetchUserInfo(token); // Gọi hàm lấy thông tin người dùng
+    } else {
+      setIsLoggedIn(false);
+      setLoading(false);
+    }
+  };
+
+  // Hàm lấy thông tin người dùng từ API
+  const fetchUserInfo = async (token: string) => {
+    try {
+      setLoading(true);
+      const userData = await getUserInfo(token);
+      setUserInfo(userData);
+    } catch (error) {
+      console.error('Error fetching user info:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogin = () => {
@@ -46,6 +76,7 @@ const AccountScreen = () => {
     try {
       await AsyncStorage.removeItem('userToken');
       setIsLoggedIn(false);
+      setUserInfo(null);
       Toast.show({
         type: 'success',
         text1: 'Đăng xuất thành công',
@@ -74,6 +105,10 @@ const AccountScreen = () => {
     }
   };
 
+  if (loading) {
+    return <ActivityIndicator size="large" color={Colors.primary} />;
+  }
+
   return (
     <SafeAreaView style={styles.containerSafe}>
       <ScrollView style={styles.container}>
@@ -82,9 +117,13 @@ const AccountScreen = () => {
           start={{x: 0, y: 0}}
           end={{x: 1, y: 0}}
           style={styles.header}>
-          {isLoggedIn ? (
+          {isLoggedIn && userInfo ? (
             <Image
-              source={{uri: 'https://via.placeholder.com/150'}}
+              source={{
+                uri:
+                  userInfo.profilePictureUrl ||
+                  'https://via.placeholder.com/150',
+              }}
               style={styles.avatar}
             />
           ) : (
@@ -93,10 +132,14 @@ const AccountScreen = () => {
             </View>
           )}
           <View style={styles.headerTextContainer}>
-            {isLoggedIn ? (
+            {isLoggedIn && userInfo ? (
               <>
-                <Text style={styles.name}>Nguyễn Văn A</Text>
-                <Text style={styles.email}>email@example.com</Text>
+                <Text style={styles.name}>
+                  {userInfo.companyName || 'Nguyễn Văn A'}
+                </Text>
+                <Text style={styles.email}>
+                  {userInfo.email || 'email@example.com'}
+                </Text>
                 <OutlineButton
                   title="Chỉnh sửa thông tin"
                   onPress={() => navigation.navigate('AddProfileCompanyScreen')}
@@ -147,7 +190,7 @@ const styles = StyleSheet.create({
     borderColor: '#fff',
     marginBottom: 10,
     justifyContent: 'center',
-    alignItems: 'center', // Center the icon
+    alignItems: 'center',
   },
   headerTextContainer: {
     alignItems: 'center',
