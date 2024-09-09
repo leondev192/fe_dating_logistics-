@@ -255,8 +255,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#E6EAF4',
     marginHorizontal: 5,
     borderRadius: 8,
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 5,
+    marginBottom: 5,
   },
   refreshText: {
     color: Colors.primary,

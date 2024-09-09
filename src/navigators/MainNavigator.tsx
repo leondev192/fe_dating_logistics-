@@ -15,6 +15,7 @@ import CreateOfferingTransportPost from '../screens/main/createpost/CreateOfferi
 import EditCargoMatchingPost from '../screens/main/managepost/EditCargoMatchingPost';
 import EditLookingForTransportPost from '../screens/main/managepost/EditLookingForTransportPost';
 import EditOfferingTransportPost from '../screens/main/managepost/EditOfferingTransportPost';
+import PaymentScreen from '../screens/main/createpost/PaymentScreen';
 
 const Stack = createStackNavigator();
 
@@ -94,7 +95,18 @@ const MainNavigator = () => {
           headerTitleAlign: 'center',
         }}
       />
-      {/* Thêm các màn hình chỉnh sửa */}
+      <Stack.Screen
+        name="PaymentScreen"
+        component={PaymentScreen}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
       <Stack.Screen
         name="EditCargoMatchingPost"
         component={EditCargoMatchingPost}

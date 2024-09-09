@@ -3,7 +3,6 @@ import {View, StyleSheet, FlatList} from 'react-native';
 import {TextInput, Card, RadioButton, Text} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
-import {createPost} from '../../../apis/services/postService';
 import Toast from 'react-native-toast-message';
 import {toastConfig} from '../../../components/toast/ToastAuth';
 import BlurredToast from '../../../components/toast/BlurredToast';
@@ -25,8 +24,6 @@ interface FormData {
 }
 
 const CreateCargoMatchingPost = ({route, navigation}: any) => {
-  const [isToastVisible, setIsToastVisible] = useState(false);
-
   const [formData, setFormData] = useState<FormData>({
     postType: 'CargoMatching',
     status: 'Active',
@@ -40,10 +37,7 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
     specialRequirements: '',
   });
   const [showTransportTimePicker, setShowTransportTimePicker] = useState(false);
-
-  // State cho lỗi
   const [errors, setErrors] = useState<{[key in keyof FormData]?: string}>({});
-
   const [openCargoType, setOpenCargoType] = useState(false);
   const [cargoTypes, setCargoTypes] = useState([
     {label: 'Hàng khô', value: 'Hàng khô'},
@@ -87,41 +81,19 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
 
   const handleChange = (name: keyof FormData, value: any) => {
     setFormData(prevData => ({...prevData, [name]: value}));
-    // Xóa lỗi khi người dùng nhập lại
     setErrors(prevErrors => ({...prevErrors, [name]: undefined}));
   };
+  const [isToastVisible, setIsToastVisible] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (validateForm()) {
-      try {
-        await createPost(formData); // Giả sử createPost là hàm tạo bài đăng
-        // Hiển thị toast thành công
-        Toast.show({
-          type: 'success',
-          text1: 'Tạo bài đăng thành công',
-          position: 'top',
-          topOffset: 300,
-          autoHide: true,
-          visibilityTime: 3000,
-          onHide: () => {
-            navigation.goBack();
-          },
-        });
-      } catch (error) {
-        // Hiển thị lỗi khi có vấn đề trong quá trình tạo bài đăng
-        Toast.show({
-          type: 'error',
-          text1: 'Lỗi khi tạo bài đăng',
-          position: 'top',
-          topOffset: 300,
-          autoHide: true,
-          visibilityTime: 3000,
-          onHide: () => setIsToastVisible(false),
-        });
-        setIsToastVisible(true);
-      }
+      // Chuyển đổi transportTime sang chuỗi ISO trước khi điều hướng
+      const formDataToSend = {
+        ...formData,
+        transportTime: formData.transportTime.toISOString(),
+      };
+      navigation.navigate('PaymentScreen', {formData: formDataToSend});
     } else {
-      // Hiển thị lỗi khi form không hợp lệ
       Toast.show({
         type: 'error',
         text1: 'Vui lòng điền đầy đủ thông tin',
@@ -190,26 +162,6 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
                 }}
               />
             )}
-          </View>
-
-          <View style={styles.radioButtonContainer}>
-            <Text style={styles.label}>Có xe vận tải:</Text>
-            <RadioButton.Group
-              onValueChange={newValue =>
-                handleChange('hasVehicle', newValue === 'true')
-              }
-              value={formData.hasVehicle ? 'true' : 'false'}>
-              <View style={styles.radioButtonRow}>
-                <View style={styles.radioButtonItem}>
-                  <RadioButton.Android value="true" color={Colors.primary} />
-                  <Text style={styles.radioLabel}>Đã có xe</Text>
-                </View>
-                <View style={styles.radioButtonItem}>
-                  <RadioButton.Android value="false" color={Colors.primary} />
-                  <Text style={styles.radioLabel}>Chưa có xe</Text>
-                </View>
-              </View>
-            </RadioButton.Group>
           </View>
 
           <DropDownPicker
@@ -329,27 +281,6 @@ const styles = StyleSheet.create({
   cardActions: {
     justifyContent: 'center',
     marginTop: 15,
-  },
-  radioButtonContainer: {
-    marginBottom: 15,
-  },
-  radioButtonRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  radioButtonItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  radioLabel: {
-    marginLeft: 5,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: Colors.text,
-    fontWeight: '600',
   },
   dropdown: {
     marginBottom: 15,
