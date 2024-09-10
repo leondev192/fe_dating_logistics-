@@ -2,36 +2,90 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {jwtDecode} from 'jwt-decode';
-import {Alert} from 'react-native'; // Import Alert từ React Native
+import {jwtDecode} from 'jwt-decode'; // Import jwtDecode để giải mã token JWT
+import {Alert} from 'react-native';
+import {getUserInfo} from '../../apis/services/userService'; // Import hàm lấy thông tin người dùng
 
-// Hàm kiểm tra token hết hạn
+// Hàm kiểm tra xem token có hết hạn hay không
 const isTokenExpired = (token: string) => {
   try {
     const decodedToken: any = jwtDecode(token);
-    if (decodedToken.exp && Date.now() >= decodedToken.exp * 1000) {
-      return true;
-    }
-    return false;
-  } catch (error) {
-    console.error('Lỗi khi kiểm tra token:', error);
+    return decodedToken.exp && Date.now() >= decodedToken.exp * 1000;
+  } catch {
     return true;
   }
 };
 
-// Component kiểm tra token
+// Hàm kiểm tra xem thông tin người dùng đã đầy đủ chưa
+const checkUserInfo = async (token: string, navigation: any) => {
+  try {
+    const userInfo = await getUserInfo(token);
+
+    // Kiểm tra các trường thông tin cần thiết
+    if (
+      !userInfo.companyName ||
+      !userInfo.address ||
+      !userInfo.representativeName ||
+      !userInfo.businessCode ||
+      !userInfo.taxCode
+    ) {
+      Alert.alert(
+        'Thông tin chưa đầy đủ',
+        'Vui lòng cập nhật thông tin tài khoản để sử dụng dịch vụ.',
+        [
+          {
+            text: 'Cập nhật ngay',
+            onPress: () => {
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{name: 'Account'}], // Chuyển hướng tới màn hình cập nhật thông tin
+                }),
+              );
+            },
+          },
+        ],
+        {cancelable: false},
+      );
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error checking user info:', error);
+    return false;
+  }
+};
+
 const AuthGuard: React.FC<{children: React.ReactNode}> = ({children}) => {
   const navigation = useNavigation();
-  const [isCheckingToken, setIsCheckingToken] = useState(true);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    const checkToken = async () => {
-      setIsCheckingToken(true);
+    const checkAuthentication = async () => {
       try {
         const token = await AsyncStorage.getItem('userToken');
 
-        if (!token || isTokenExpired(token)) {
-          // Hiển thị Alert trước khi điều hướng
+        if (!token) {
+          Alert.alert(
+            'Chưa đăng nhập',
+            'Vui lòng đăng nhập để sử dụng dịch vụ.',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  navigation.dispatch(
+                    CommonActions.reset({
+                      index: 0,
+                      routes: [{name: 'Auth'}],
+                    }),
+                  );
+                },
+              },
+            ],
+            {cancelable: false},
+          );
+        } else if (isTokenExpired(token)) {
           Alert.alert(
             'Phiên đăng nhập hết hạn',
             'Vui lòng đăng nhập lại.',
@@ -39,7 +93,6 @@ const AuthGuard: React.FC<{children: React.ReactNode}> = ({children}) => {
               {
                 text: 'OK',
                 onPress: async () => {
-                  // Xóa token và điều hướng về trang đăng nhập
                   await AsyncStorage.removeItem('userToken');
                   navigation.dispatch(
                     CommonActions.reset({
@@ -52,20 +105,20 @@ const AuthGuard: React.FC<{children: React.ReactNode}> = ({children}) => {
             ],
             {cancelable: false},
           );
+        } else {
+          const isUserInfoComplete = await checkUserInfo(token, navigation);
+          if (!isUserInfoComplete) return; // Ngừng kiểm tra và điều hướng nếu thông tin không đầy đủ
         }
-      } catch (error) {
-        console.error('Lỗi khi kiểm tra token:', error);
       } finally {
-        setIsCheckingToken(false);
+        setIsChecking(false);
       }
     };
 
-    checkToken();
+    checkAuthentication();
   }, [navigation]);
 
-  // Chỉ render con khi đã hoàn tất kiểm tra token
-  if (isCheckingToken) {
-    return null; // Hiển thị loading hoặc để trống trong khi chờ kiểm tra
+  if (isChecking) {
+    return null; // Trong lúc kiểm tra không render gì
   }
 
   return <>{children}</>;

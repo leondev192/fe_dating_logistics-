@@ -5,7 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
-} from 'react-native'; // Import Alert từ React Native
+} from 'react-native';
 import {TextInput, Card, Text, RadioButton} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
@@ -19,11 +19,12 @@ interface FormData {
   status: 'active' | 'completed';
   origin: string;
   destination: string;
-  transportTime: Date;
+  transportGoes: Date;
+  transportComes: Date;
   hasVehicle: boolean;
   cargoType: string;
-  cargoWeight: number;
-  cargoVolume: number;
+  cargoWeight: string; // Đổi từ number sang string
+  cargoVolume: string; // Đổi từ number sang string
   specialRequirements: string;
 }
 
@@ -31,18 +32,21 @@ const EditCargoMatchingPost = ({route, navigation}: any) => {
   const {post} = route.params;
   const [formData, setFormData] = useState<FormData>({
     postType: 'CargoMatching',
-    status: post.status || 'active', // Đảm bảo `status` có giá trị mặc định
+    status: post.status || 'active',
     origin: post.origin,
     destination: post.destination,
-    transportTime: new Date(post.transportTime),
+    transportGoes: new Date(post.transportGoes),
+    transportComes: new Date(post.transportComes),
     hasVehicle: post.hasVehicle,
     cargoType: post.cargoType,
-    cargoWeight: post.cargoWeight,
-    cargoVolume: post.cargoVolume,
+    cargoWeight: String(post.cargoWeight), // Chuyển sang chuỗi
+    cargoVolume: String(post.cargoVolume), // Chuyển sang chuỗi
     specialRequirements: post.specialRequirements,
   });
 
-  const [showTransportTimePicker, setShowTransportTimePicker] = useState(false);
+  const [showTransportGoesPicker, setShowTransportGoesPicker] = useState(false);
+  const [showTransportComesPicker, setShowTransportComesPicker] =
+    useState(false);
   const [errors, setErrors] = useState<{[key in keyof FormData]?: string}>({});
   const [openCargoType, setOpenCargoType] = useState(false);
   const [cargoTypes, setCargoTypes] = useState([
@@ -70,12 +74,12 @@ const EditCargoMatchingPost = ({route, navigation}: any) => {
       valid = false;
     }
 
-    if (formData.cargoWeight <= 0) {
+    if (!formData.cargoWeight) {
       newErrors.cargoWeight = 'Khối lượng hàng hóa phải lớn hơn 0';
       valid = false;
     }
 
-    if (formData.cargoVolume <= 0) {
+    if (!formData.cargoVolume) {
       newErrors.cargoVolume = 'Thể tích hàng hóa phải lớn hơn 0';
       valid = false;
     }
@@ -84,7 +88,7 @@ const EditCargoMatchingPost = ({route, navigation}: any) => {
     return valid;
   };
 
-  const handleChange = (name: keyof FormData, value: any) => {
+  const handleChange = (name: keyof FormData, value: string) => {
     setFormData(prevData => ({...prevData, [name]: value}));
     setErrors(prevErrors => ({...prevErrors, [name]: undefined}));
   };
@@ -92,14 +96,13 @@ const EditCargoMatchingPost = ({route, navigation}: any) => {
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
-        // Gọi hàm updatePost với ID bài đăng và dữ liệu cập nhật
         await updatePost(post.id, {
           ...formData,
-          status: formData.status, // Đảm bảo gửi đúng trạng thái
-          transportTime: formData.transportTime.toISOString(), // Đảm bảo chuyển đổi Date sang string
+          status: formData.status,
+          transportGoes: formData.transportGoes.toISOString(),
+          transportComes: formData.transportComes.toISOString(),
         });
 
-        // Hiển thị thông báo thành công
         Alert.alert(
           'Thành công',
           'Cập nhật bài đăng thành công',
@@ -108,13 +111,11 @@ const EditCargoMatchingPost = ({route, navigation}: any) => {
         );
       } catch (error) {
         console.error('Error updating post:', error);
-        // Hiển thị lỗi khi có vấn đề trong quá trình cập nhật
         Alert.alert('Lỗi', 'Lỗi khi cập nhật bài đăng', [{text: 'OK'}], {
           cancelable: true,
         });
       }
     } else {
-      // Hiển thị lỗi khi form không hợp lệ
       Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin', [{text: 'OK'}], {
         cancelable: true,
       });
@@ -175,36 +176,67 @@ const EditCargoMatchingPost = ({route, navigation}: any) => {
           <Text style={styles.errorText}>{errors.destination}</Text>
         )}
 
-        <View>
+        <View style={styles.timeRow}>
           <TextInput
-            label="Thời gian vận chuyển"
+            label="Thời gian đi"
             mode="outlined"
-            value={formData.transportTime.toLocaleDateString()}
-            style={styles.input}
+            value={formData.transportGoes.toLocaleDateString()}
+            style={[styles.timeInput, {marginRight: 5}]}
             outlineColor={Colors.bordercolor}
             activeOutlineColor={Colors.primary}
-            onFocus={() => setShowTransportTimePicker(true)}
+            onPressIn={() => {
+              setShowTransportGoesPicker(true);
+              setShowTransportComesPicker(false);
+            }}
           />
-          {showTransportTimePicker && (
-            <DateTimePicker
-              value={formData.transportTime}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                setShowTransportTimePicker(false);
-                if (selectedDate) {
-                  handleChange('transportTime', selectedDate);
-                }
-              }}
-            />
-          )}
+          <Text style={styles.dash}>-</Text>
+          <TextInput
+            label="Thời gian tới"
+            mode="outlined"
+            value={formData.transportComes.toLocaleDateString()}
+            style={[styles.timeInput, {marginLeft: 5}]}
+            outlineColor={Colors.bordercolor}
+            activeOutlineColor={Colors.primary}
+            onPressIn={() => {
+              setShowTransportComesPicker(true);
+              setShowTransportGoesPicker(false);
+            }}
+          />
         </View>
+
+        {showTransportGoesPicker && (
+          <DateTimePicker
+            value={formData.transportGoes}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowTransportGoesPicker(false);
+              if (selectedDate) {
+                handleChange('transportGoes', selectedDate.toISOString());
+              }
+            }}
+          />
+        )}
+
+        {showTransportComesPicker && (
+          <DateTimePicker
+            value={formData.transportComes}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowTransportComesPicker(false);
+              if (selectedDate) {
+                handleChange('transportComes', selectedDate.toISOString());
+              }
+            }}
+          />
+        )}
 
         <View style={styles.radioButtonContainer}>
           <Text style={styles.label}>Có xe vận tải:</Text>
           <RadioButton.Group
             onValueChange={newValue =>
-              handleChange('hasVehicle', newValue === 'true')
+              handleChange('hasVehicle', newValue === 'true' ? 'true' : 'false')
             }
             value={formData.hasVehicle ? 'true' : 'false'}>
             <View style={styles.radioButtonRow}>
@@ -252,15 +284,13 @@ const EditCargoMatchingPost = ({route, navigation}: any) => {
         <TextInput
           label="Khối lượng hàng hóa"
           mode="outlined"
-          keyboardType="numeric"
-          value={String(formData.cargoWeight)}
-          onChangeText={text =>
-            handleChange('cargoWeight', parseFloat(text) || 0)
-          }
+          value={formData.cargoWeight}
+          onChangeText={text => handleChange('cargoWeight', text)}
           style={styles.input}
           outlineColor={Colors.bordercolor}
           activeOutlineColor={Colors.primary}
           error={!!errors.cargoWeight}
+          keyboardType="default"
         />
         {errors.cargoWeight && (
           <Text style={styles.errorText}>{errors.cargoWeight}</Text>
@@ -269,15 +299,13 @@ const EditCargoMatchingPost = ({route, navigation}: any) => {
         <TextInput
           label="Thể tích hàng hóa"
           mode="outlined"
-          keyboardType="numeric"
-          value={String(formData.cargoVolume)}
-          onChangeText={text =>
-            handleChange('cargoVolume', parseFloat(text) || 0)
-          }
+          value={formData.cargoVolume}
+          onChangeText={text => handleChange('cargoVolume', text)}
           style={styles.input}
           outlineColor={Colors.bordercolor}
           activeOutlineColor={Colors.primary}
           error={!!errors.cargoVolume}
+          keyboardType="default"
         />
         {errors.cargoVolume && (
           <Text style={styles.errorText}>{errors.cargoVolume}</Text>
@@ -337,6 +365,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 15,
   },
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  timeInput: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  dash: {
+    fontSize: 20,
+    marginHorizontal: 5,
+  },
+  dropdown: {
+    marginBottom: 15,
+    borderColor: Colors.bordercolor,
+  },
+  dropdownContainer: {
+    borderColor: Colors.bordercolor,
+  },
   radioButtonContainer: {
     marginBottom: 15,
   },
@@ -357,13 +405,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: Colors.text,
     fontWeight: '600',
-  },
-  dropdown: {
-    marginBottom: 15,
-    borderColor: Colors.bordercolor,
-  },
-  dropdownContainer: {
-    borderColor: Colors.bordercolor,
   },
   statusButtonContainer: {
     flexDirection: 'row',

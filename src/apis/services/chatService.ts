@@ -23,7 +23,8 @@ export const getUserConversations = async () => {
 };
 
 // Lấy tin nhắn từ một cuộc hội thoại cụ thể
-export const getMessages = async (conversationId: string) => {
+// Lấy tin nhắn từ một cuộc hội thoại cụ thể
+export const getMessages = async conversationId => {
   try {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
@@ -36,9 +37,8 @@ export const getMessages = async (conversationId: string) => {
       },
     });
 
-    return response.data;
+    return response.data; // Đảm bảo API trả về dữ liệu sender cho mỗi message
   } catch (error) {
-    // Ẩn thông báo lỗi bằng cách không log ra console và trả về giá trị mặc định
     return [];
   }
 };

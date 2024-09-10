@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    marginTop: 'auto',
+    marginBottom: '8%',
   },
   termsText: {
     fontSize: 15,

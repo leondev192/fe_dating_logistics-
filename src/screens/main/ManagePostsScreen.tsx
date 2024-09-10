@@ -116,7 +116,7 @@ const UserPostsScreen = () => {
         <TouchableOpacity
           style={styles.postButton}
           onPress={() => navigation.navigate('CreateCargoMatchingPost')}>
-          <Box size="24" color={Colors.primary} />
+          <Box size="24" color={'#555'} />
           <Text style={styles.filterText} numberOfLines={1}>
             Ghép hàng
           </Text>
@@ -125,7 +125,7 @@ const UserPostsScreen = () => {
         <TouchableOpacity
           style={styles.postButton}
           onPress={() => navigation.navigate('CreateLookingForTransportPost')}>
-          <TruckFast size="24" color={Colors.primary} />
+          <TruckFast size="24" color={'#555'} />
           <Text style={styles.filterText} numberOfLines={1}>
             Tìm xe
           </Text>
@@ -134,7 +134,7 @@ const UserPostsScreen = () => {
         <TouchableOpacity
           style={styles.postButton}
           onPress={() => navigation.navigate('CreateOfferingTransportPost')}>
-          <Truck size="24" color={Colors.primary} />
+          <Truck size="24" color={'#555'} />
           <Text style={styles.filterText} numberOfLines={1}>
             Cung cấp xe
           </Text>
@@ -143,7 +143,7 @@ const UserPostsScreen = () => {
         <TouchableOpacity
           style={styles.postButton}
           onPress={() => navigation.navigate('TheoDoiDonHangScreen')}>
-          <Archive size="24" color={Colors.primary} />
+          <Archive size="24" color={'#555'} />
           <Text style={styles.filterText} numberOfLines={1}>
             Theo dõi
           </Text>
@@ -161,7 +161,7 @@ const UserPostsScreen = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           ListEmptyComponent={
-            <Text style={styles.noDataText}>Không có bài đăng nào</Text>
+            <Text style={styles.noDataText}>Bạn chưa có bài đăng nào</Text>
           }
           contentContainerStyle={styles.postList}
         />
@@ -179,23 +179,25 @@ const styles = StyleSheet.create({
   postContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
     paddingVertical: 10,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginHorizontal: 5,
+    marginTop: 5,
   },
   postButton: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: 4,
     marginHorizontal: 5,
-    backgroundColor: '#E6EAF4',
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     height: 50,
   },
   filterText: {
-    color: Colors.primary,
+    color: '#555',
     fontSize: 12,
     fontWeight: '600',
     marginTop: 5,
@@ -208,6 +210,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     color: '#888',
+    marginTop: 10,
   },
   loadingContainer: {
     flex: 1,

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, FlatList, Alert} from 'react-native'; // Import Alert từ React Native
+import {View, StyleSheet, FlatList, Alert} from 'react-native';
 import {TextInput, Card, Text} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
@@ -9,12 +9,14 @@ import DropDownPicker from 'react-native-dropdown-picker';
 // Định nghĩa kiểu dữ liệu cho formData
 interface FormData {
   postType: 'LookingForTransport';
-  status: 'Active' | 'Completed'; // Sửa kiểu status để phù hợp
+  status: 'Active' | 'Completed';
   origin: string;
   destination: string;
-  transportTime: Date;
+  transportGoes: Date;
+  transportComes: Date;
   requiredVehicleType: string;
   cargoTypeRequest: string;
+  cargoWeight: string; // Khối lượng hàng hóa
 }
 
 const CreateLookingForTransportPost = ({route, navigation}: any) => {
@@ -23,13 +25,16 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
     status: 'Active',
     origin: '',
     destination: '',
-    transportTime: new Date(),
+    transportGoes: new Date(),
+    transportComes: new Date(),
     requiredVehicleType: '',
     cargoTypeRequest: '',
+    cargoWeight: '', // Khối lượng hàng hóa
   });
-  const [showTransportTimePicker, setShowTransportTimePicker] = useState(false);
 
-  // State cho lỗi
+  const [showTransportGoesPicker, setShowTransportGoesPicker] = useState(false);
+  const [showTransportComesPicker, setShowTransportComesPicker] =
+    useState(false);
   const [errors, setErrors] = useState<{[key in keyof FormData]?: string}>({});
 
   const [openVehicleType, setOpenVehicleType] = useState(false);
@@ -43,7 +48,6 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
     let valid = true;
     const newErrors: {[key in keyof FormData]?: string} = {};
 
-    // Kiểm tra từng trường và cập nhật lỗi nếu có
     if (!formData.origin) {
       newErrors.origin = 'Vui lòng nhập nơi bắt đầu';
       valid = false;
@@ -64,26 +68,30 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
       valid = false;
     }
 
+    if (!formData.cargoWeight) {
+      newErrors.cargoWeight =
+        'Khối lượng hàng hóa phải lớn hơn 0 và là số hợp lệ';
+      valid = false;
+    }
+
     setErrors(newErrors);
     return valid;
   };
 
   const handleChange = (name: keyof FormData, value: any) => {
     setFormData(prevData => ({...prevData, [name]: value}));
-    // Xóa lỗi khi người dùng nhập lại
     setErrors(prevErrors => ({...prevErrors, [name]: undefined}));
   };
 
   const handleSubmit = () => {
     if (validateForm()) {
-      // Chuyển đổi transportTime sang chuỗi ISO trước khi điều hướng
       const formDataToSend = {
         ...formData,
-        transportTime: formData.transportTime.toISOString(),
+        transportGoes: formData.transportGoes.toISOString(),
+        transportComes: formData.transportComes.toISOString(),
       };
       navigation.navigate('PaymentScreen', {formData: formDataToSend});
     } else {
-      // Hiển thị lỗi khi form không hợp lệ
       Alert.alert(
         'Thông báo',
         'Vui lòng điền đầy đủ thông tin.',
@@ -125,6 +133,62 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
             <Text style={styles.errorText}>{errors.destination}</Text>
           )}
 
+          <View style={styles.timeRow}>
+            <TextInput
+              label="Thời gian đi"
+              mode="outlined"
+              value={formData.transportGoes.toLocaleDateString()}
+              style={[styles.timeInput, {marginRight: 5}]}
+              outlineColor={Colors.bordercolor}
+              activeOutlineColor={Colors.primary}
+              onPressIn={() => {
+                setShowTransportGoesPicker(true);
+                setShowTransportComesPicker(false);
+              }}
+            />
+            <Text style={styles.dash}>-</Text>
+            <TextInput
+              label="Thời gian tới"
+              mode="outlined"
+              value={formData.transportComes.toLocaleDateString()}
+              style={[styles.timeInput, {marginLeft: 5}]}
+              outlineColor={Colors.bordercolor}
+              activeOutlineColor={Colors.primary}
+              onPressIn={() => {
+                setShowTransportComesPicker(true);
+                setShowTransportGoesPicker(false);
+              }}
+            />
+          </View>
+
+          {showTransportGoesPicker && (
+            <DateTimePicker
+              value={formData.transportGoes}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                setShowTransportGoesPicker(false);
+                if (selectedDate) {
+                  handleChange('transportGoes', selectedDate);
+                }
+              }}
+            />
+          )}
+
+          {showTransportComesPicker && (
+            <DateTimePicker
+              value={formData.transportComes}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                setShowTransportComesPicker(false);
+                if (selectedDate) {
+                  handleChange('transportComes', selectedDate);
+                }
+              }}
+            />
+          )}
+
           <DropDownPicker
             open={openVehicleType}
             value={formData.requiredVehicleType}
@@ -156,30 +220,7 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
           {errors.requiredVehicleType && (
             <Text style={styles.errorText}>{errors.requiredVehicleType}</Text>
           )}
-          <View>
-            <TextInput
-              label="Thời gian vận chuyển"
-              mode="outlined"
-              value={formData.transportTime.toLocaleDateString()}
-              style={styles.input}
-              outlineColor={Colors.bordercolor}
-              activeOutlineColor={Colors.primary}
-              onFocus={() => setShowTransportTimePicker(true)}
-            />
-            {showTransportTimePicker && (
-              <DateTimePicker
-                value={formData.transportTime}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => {
-                  setShowTransportTimePicker(false);
-                  if (selectedDate) {
-                    handleChange('transportTime', selectedDate);
-                  }
-                }}
-              />
-            )}
-          </View>
+
           <TextInput
             label="Loại hàng hóa yêu cầu"
             mode="outlined"
@@ -192,6 +233,20 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
           />
           {errors.cargoTypeRequest && (
             <Text style={styles.errorText}>{errors.cargoTypeRequest}</Text>
+          )}
+
+          <TextInput
+            label="Khối lượng hàng hóa"
+            mode="outlined"
+            value={String(formData.cargoWeight)}
+            onChangeText={text => handleChange('cargoWeight', text)}
+            style={styles.input}
+            outlineColor={Colors.bordercolor}
+            activeOutlineColor={Colors.primary}
+            error={!!errors.cargoWeight}
+          />
+          {errors.cargoWeight && (
+            <Text style={styles.errorText}>{errors.cargoWeight}</Text>
           )}
         </Card.Content>
         <Card.Actions style={styles.cardActions}>
@@ -237,6 +292,19 @@ const styles = StyleSheet.create({
   cardActions: {
     justifyContent: 'center',
     marginTop: 15,
+  },
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  timeInput: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  dash: {
+    fontSize: 20,
+    marginHorizontal: 5,
   },
   dropdown: {
     marginBottom: 15,

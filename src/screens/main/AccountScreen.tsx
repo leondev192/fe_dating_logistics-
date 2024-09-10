@@ -119,7 +119,7 @@ const AccountScreen = () => {
             {isLoggedIn && userInfo ? (
               <>
                 <Text style={styles.name}>
-                  {userInfo.companyName || 'Nguyễn Văn A'}
+                  {userInfo.companyName || 'Tên Doanh nghiệp'}
                 </Text>
                 <Text style={styles.email}>
                   {userInfo.email || 'email@example.com'}

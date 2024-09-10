@@ -9,11 +9,13 @@ import {
   RefreshControl,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import {getMessages, sendMessage} from '../../apis/services/chatService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserInfo} from '../../apis/services/userService';
 import {Send} from 'iconsax-react-native';
+import Color from '../../constants/colors';
 
 const ChatDetail = ({route}) => {
   const {conversationId} = route.params;
@@ -26,9 +28,9 @@ const ChatDetail = ({route}) => {
   useEffect(() => {
     fetchCurrentUser();
     fetchMessages();
-    const interval = setInterval(fetchMessages, 5000); // Polling every 5 seconds to check for new messages
+    const interval = setInterval(fetchMessages, 5000); // Polling every 5 seconds
 
-    return () => clearInterval(interval); // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   const fetchCurrentUser = async () => {
@@ -47,7 +49,7 @@ const ChatDetail = ({route}) => {
     try {
       const messagesData = await getMessages(conversationId);
       setMessages(messagesData);
-      scrollToBottom(); // Tự động cuộn xuống dưới khi tải tin nhắn mới
+      scrollToBottom();
     } catch (error) {
       console.warn('Không thể lấy tin nhắn.');
     }
@@ -58,7 +60,7 @@ const ChatDetail = ({route}) => {
       try {
         await sendMessage(conversationId, {message: newMessage});
         setNewMessage('');
-        fetchMessages(); // Refresh messages after sending
+        fetchMessages();
       } catch (error) {
         console.warn('Không thể gửi tin nhắn.');
       }
@@ -75,17 +77,47 @@ const ChatDetail = ({route}) => {
     flatListRef.current?.scrollToEnd({animated: true});
   };
 
-  const renderMessageItem = ({item}) => (
-    <View
-      style={[
-        styles.messageContainer,
-        item.senderId === currentUser?.id
-          ? styles.myMessageContainer
-          : styles.theirMessageContainer,
-      ]}>
-      <Text style={styles.messageText}>{item.content}</Text>
-    </View>
-  );
+  const formatTime = dateString => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  };
+  const renderMessageItem = ({item}) => {
+    const isCurrentUser = item.sender.id === currentUser?.id;
+
+    return (
+      <View
+        style={[
+          styles.messageContainer,
+          isCurrentUser
+            ? styles.myMessageContainer
+            : styles.theirMessageContainer,
+        ]}>
+        {!isCurrentUser && (
+          <Image
+            source={{
+              uri:
+                item.sender.profilePictureUrl ||
+                'https://via.placeholder.com/40',
+            }}
+            style={styles.avatar}
+          />
+        )}
+        <View>
+          <View
+            style={[
+              styles.bubbleContainer,
+              isCurrentUser ? styles.myBubble : styles.theirBubble,
+            ]}>
+            <Text style={styles.messageText}>{item.content}</Text>
+            <Text style={styles.timestamp}>{formatTime(item.createdAt)}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <KeyboardAvoidingView
@@ -99,7 +131,7 @@ const ChatDetail = ({route}) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        onContentSizeChange={scrollToBottom} // Scroll to bottom when new messages arrive
+        onContentSizeChange={scrollToBottom}
       />
       <View style={styles.inputContainer}>
         <TextInput
@@ -110,37 +142,57 @@ const ChatDetail = ({route}) => {
           placeholderTextColor="#888"
         />
         <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-          <Send size={24} color="#007AFF" variant="Bold" />
+          <Send size={38} color="#007AFF" variant="Bold" />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F2F2F2',
   },
   messageContainer: {
+    flexDirection: 'row', // Sắp xếp các thành phần theo chiều ngang
     maxWidth: '80%',
-    padding: 10,
-    borderRadius: 20,
     marginVertical: 5,
+    alignItems: 'flex-end',
   },
   myMessageContainer: {
-    backgroundColor: '#DCF8C6',
     alignSelf: 'flex-end',
     marginRight: 10,
+    flexDirection: 'row-reverse', // Đảo vị trí avatar và tin nhắn cho người dùng hiện tại
   },
   theirMessageContainer: {
-    backgroundColor: '#E1E1E1',
     alignSelf: 'flex-start',
     marginLeft: 10,
   },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  bubbleContainer: {
+    borderRadius: 20,
+    padding: 10,
+  },
+  myBubble: {
+    backgroundColor: '#0884fc', // Màu nền cho tin nhắn của người dùng hiện tại
+  },
+  theirBubble: {
+    backgroundColor: '#B1B1B1', // Màu nền cho tin nhắn của người nhận
+  },
   messageText: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
+  },
+  timestamp: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    marginTop: 2,
+    alignSelf: 'flex-end',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -155,8 +207,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 20,
+    height: 50,
     paddingHorizontal: 15,
-    paddingVertical: 5,
     fontSize: 16,
     marginRight: 10,
     backgroundColor: '#F9F9F9',

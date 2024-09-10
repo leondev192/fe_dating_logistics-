@@ -17,10 +17,10 @@ import ManagePostsScreen from '../screens/main/ManagePostsScreen';
 import MessagesScreen from '../screens/main/MessagesScreen';
 import NotificationScreen from '../screens/main/NotificationScreen';
 import AccountScreen from '../screens/main/AccountScreen';
-import CustomHeader from '../components/customheader/CustomHomeHeader'; // Import CustomHeader
+import CustomHeader from '../components/customheader/CustomHomeHeader';
 import {RootStackParamList, TabParamList} from './navigationTypes';
 import Colors from '../constants/colors';
-import AuthGuard from '../components/checktoken/AuthChecker';
+import AuthGuard from '../components/checktoken/AuthChecker'; // Import AuthGuard
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -128,7 +128,6 @@ const TabNavigator: React.FC = () => {
               showLogo
               showSearch
               onPressSearch={() => console.log('Search')}
-              onPressFilter={() => console.log('Filter')}
             />
           ),
         }}
@@ -147,24 +146,17 @@ const TabNavigator: React.FC = () => {
       </Tab.Screen>
       <Tab.Screen
         name="Messages"
-        component={MessagesScreen} // Sử dụng đúng component
         options={{
           headerTitle: 'Tin nhắn',
-          headerTitleAlign: 'center',
-        }}
-      />
-      <Tab.Screen
-        name="Notifications"
-        options={{
-          headerTitle: 'Thông báo',
           headerTitleAlign: 'center',
         }}>
         {() => (
           <AuthGuard>
-            <NotificationScreen />
+            <MessagesScreen />
           </AuthGuard>
         )}
       </Tab.Screen>
+
       <Tab.Screen
         name="Account"
         component={AccountScreen}

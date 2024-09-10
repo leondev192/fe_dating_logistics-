@@ -19,13 +19,13 @@ interface FormData {
   status: 'active' | 'completed';
   origin: string;
   destination: string;
-  transportTime: Date;
+  transportGoes: Date;
+  transportComes: Date;
   returnTrip: boolean;
-  returnTime: Date;
   vehicleType: string;
-  vehicleCapacity: number;
-  availableWeight: number;
-  pricePerUnit: number;
+  vehicleCapacity: string;
+  availableWeight: string;
+  pricePerUnit: string;
   vehicleDetails: string;
 }
 
@@ -36,18 +36,20 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
     status: 'active',
     origin: '',
     destination: '',
-    transportTime: new Date(),
+    transportGoes: new Date(),
+    transportComes: new Date(),
     returnTrip: false,
-    returnTime: new Date(),
     vehicleType: '',
-    vehicleCapacity: 0,
-    availableWeight: 0,
-    pricePerUnit: 0,
+    vehicleCapacity: '',
+    availableWeight: '',
+    pricePerUnit: '',
     vehicleDetails: '',
   });
 
   const [errors, setErrors] = useState<{[key in keyof FormData]?: string}>({});
-  const [showTransportTimePicker, setShowTransportTimePicker] = useState(false);
+  const [showTransportGoesPicker, setShowTransportGoesPicker] = useState(false);
+  const [showTransportComesPicker, setShowTransportComesPicker] =
+    useState(false);
   const [showReturnTimePicker, setShowReturnTimePicker] = useState(false);
   const [openVehicleType, setOpenVehicleType] = useState(false);
   const [vehicleTypes, setVehicleTypes] = useState([
@@ -55,12 +57,11 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
     {label: 'Xe container', value: 'Xe container'},
   ]);
 
-  // Status options
-  const [openStatusPicker, setOpenStatusPicker] = useState(false);
-  const [statusOptions, setStatusOptions] = useState([
-    {label: 'Hoạt động', value: 'active'},
-    {label: 'Hoàn tất', value: 'completed'},
-  ]);
+  // Trạng thái của bài đăng
+  const statusOptions = [
+    {label: 'Hoạt động', value: 'Active'},
+    {label: 'Hoàn tất', value: 'Completed'},
+  ];
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -72,27 +73,22 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
           );
         }
 
-        // Chuyển đổi `transportTime` và `returnTime` thành `Date`
-        const transportTime = post.transportTime
-          ? new Date(post.transportTime)
-          : new Date();
-        const returnTime = post.returnTime
-          ? new Date(post.returnTime)
-          : new Date();
-
-        // Cập nhật formData với dữ liệu từ API
         setFormData({
-          postType: post.postType || 'OfferingTransport',
+          postType: 'OfferingTransport',
           status: post.status || 'active',
           origin: post.origin || '',
           destination: post.destination || '',
-          transportTime,
+          transportGoes: post.transportGoes
+            ? new Date(post.transportGoes)
+            : new Date(),
+          transportComes: post.transportComes
+            ? new Date(post.transportComes)
+            : new Date(),
           returnTrip: post.returnTrip || false,
-          returnTime,
           vehicleType: post.vehicleType || '',
-          vehicleCapacity: post.vehicleCapacity || 0,
-          availableWeight: post.availableWeight || 0,
-          pricePerUnit: post.pricePerUnit || 0,
+          vehicleCapacity: post.vehicleCapacity?.toString() || '',
+          availableWeight: post.availableWeight?.toString() || '',
+          pricePerUnit: post.pricePerUnit?.toString() || '',
           vehicleDetails: post.vehicleDetails || '',
         });
       } catch (error) {
@@ -120,16 +116,19 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
       newErrors.vehicleType = 'Vui lòng chọn loại xe';
       valid = false;
     }
-    if (formData.vehicleCapacity <= 0) {
-      newErrors.vehicleCapacity = 'Sức chứa xe phải lớn hơn 0';
+    if (!formData.vehicleCapacity) {
+      newErrors.vehicleCapacity =
+        'Vui lòng nhập sức chứa hợp lệ (số và lớn hơn 0)';
       valid = false;
     }
-    if (formData.availableWeight <= 0) {
-      newErrors.availableWeight = 'Khối lượng còn lại phải lớn hơn 0';
+    if (!formData.availableWeight) {
+      newErrors.availableWeight =
+        'Vui lòng nhập khối lượng còn lại hợp lệ (số và lớn hơn 0)';
       valid = false;
     }
-    if (formData.pricePerUnit <= 0) {
-      newErrors.pricePerUnit = 'Giá mỗi đơn vị phải lớn hơn 0';
+    if (!formData.pricePerUnit) {
+      newErrors.pricePerUnit =
+        'Vui lòng nhập giá mỗi đơn vị hợp lệ (số và lớn hơn 0)';
       valid = false;
     }
 
@@ -145,24 +144,27 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
-        await updatePost(postId, {
+        const updatedData = {
           ...formData,
-          status: formData.status,
-          transportTime: formData.transportTime.toISOString(),
-          returnTime: formData.returnTime.toISOString(),
-        });
+          transportGoes: formData.transportGoes.toISOString(),
+          transportComes: formData.transportComes.toISOString(),
+        };
+
+        await updatePost(postId, updatedData);
         Alert.alert('Thành công', 'Cập nhật bài đăng thành công', [
           {text: 'OK', onPress: () => navigation.goBack()},
         ]);
       } catch (error) {
-        console.error('Error updating post:', error);
-        Alert.alert('Lỗi', 'Lỗi khi cập nhật bài đăng', [{text: 'OK'}]);
+        Alert.alert('Lỗi', 'Lỗi khi cập nhật bài đăng', [
+          {text: 'OK', onPress: () => console.log('Alert closed')},
+        ]);
       }
     } else {
-      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin', [{text: 'OK'}]);
+      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin', [
+        {text: 'OK', onPress: () => console.log('Alert closed')},
+      ]);
     }
   };
-
   const renderStatusButtons = () => (
     <View style={styles.statusButtonContainer}>
       <TouchableOpacity
@@ -187,7 +189,6 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
       </TouchableOpacity>
     </View>
   );
-
   const renderFormFields = () => (
     <Card style={styles.card}>
       <Card.Content>
@@ -215,91 +216,6 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
         />
         {errors.destination && (
           <Text style={styles.errorText}>{errors.destination}</Text>
-        )}
-
-        <DropDownPicker
-          open={openStatusPicker}
-          value={formData.status}
-          items={statusOptions}
-          setOpen={setOpenStatusPicker}
-          setValue={callback =>
-            handleChange('status', callback(formData.status))
-          }
-          setItems={setStatusOptions}
-          placeholder="Chọn trạng thái bài đăng"
-          style={[styles.dropdown, errors.status ? {borderColor: 'red'} : {}]}
-          dropDownContainerStyle={styles.dropdownContainer}
-          textStyle={{fontSize: 16}}
-        />
-        {errors.status && <Text style={styles.errorText}>{errors.status}</Text>}
-
-        <View>
-          <TextInput
-            label="Thời gian vận chuyển"
-            mode="outlined"
-            value={formData.transportTime.toLocaleDateString()}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-            onFocus={() => setShowTransportTimePicker(true)}
-          />
-          {showTransportTimePicker && (
-            <DateTimePicker
-              value={formData.transportTime}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                setShowTransportTimePicker(false);
-                if (selectedDate) {
-                  handleChange('transportTime', selectedDate);
-                }
-              }}
-            />
-          )}
-        </View>
-
-        <View style={styles.switchContainer}>
-          <TextInput
-            label="Khứ hồi"
-            mode="outlined"
-            editable={false}
-            value={formData.returnTrip ? 'Có' : 'Không'}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-          />
-          <Switch
-            value={formData.returnTrip}
-            style={styles.switch}
-            onValueChange={value => handleChange('returnTrip', value)}
-          />
-        </View>
-
-        {formData.returnTrip && (
-          <View>
-            <TextInput
-              label="Thời gian trở về"
-              mode="outlined"
-              value={formData.returnTime.toLocaleDateString()}
-              style={styles.input}
-              outlineColor={Colors.bordercolor}
-              activeOutlineColor={Colors.primary}
-              onFocus={() => setShowReturnTimePicker(true)}
-            />
-            {showReturnTimePicker && (
-              <DateTimePicker
-                value={formData.returnTime}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => {
-                  setShowReturnTimePicker(false);
-                  if (selectedDate) {
-                    handleChange('returnTime', selectedDate);
-                  }
-                }}
-              />
-            )}
-          </View>
         )}
 
         <DropDownPicker
@@ -331,14 +247,76 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
           <Text style={styles.errorText}>{errors.vehicleType}</Text>
         )}
 
+        <View style={styles.timeRow}>
+          <TextInput
+            label="Thời gian đi"
+            mode="outlined"
+            value={formData.transportGoes.toLocaleDateString()}
+            style={[styles.timeInput, {marginRight: 5}]}
+            outlineColor={Colors.bordercolor}
+            activeOutlineColor={Colors.primary}
+            onPressIn={() => {
+              setShowTransportGoesPicker(true);
+              setShowTransportComesPicker(false);
+            }}
+          />
+          <Text style={styles.dash}>-</Text>
+          <TextInput
+            label="Thời gian tới"
+            mode="outlined"
+            value={formData.transportComes.toLocaleDateString()}
+            style={[styles.timeInput, {marginLeft: 5}]}
+            outlineColor={Colors.bordercolor}
+            activeOutlineColor={Colors.primary}
+            onPressIn={() => {
+              setShowTransportComesPicker(true);
+              setShowTransportGoesPicker(false);
+            }}
+          />
+        </View>
+
+        {showTransportGoesPicker && (
+          <DateTimePicker
+            value={formData.transportGoes}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowTransportGoesPicker(false);
+              if (selectedDate) {
+                handleChange('transportGoes', selectedDate);
+              }
+            }}
+          />
+        )}
+
+        {showTransportComesPicker && (
+          <DateTimePicker
+            value={formData.transportComes}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowTransportComesPicker(false);
+              if (selectedDate) {
+                handleChange('transportComes', selectedDate);
+              }
+            }}
+          />
+        )}
+
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Khứ hồi:</Text>
+          <Switch
+            value={formData.returnTrip}
+            style={styles.switch}
+            onValueChange={value => handleChange('returnTrip', value)}
+          />
+        </View>
+
         <TextInput
           label="Sức chứa xe"
           mode="outlined"
-          keyboardType="numeric"
           value={String(formData.vehicleCapacity)}
-          onChangeText={text =>
-            handleChange('vehicleCapacity', parseFloat(text) || 0)
-          }
+          onChangeText={text => handleChange('vehicleCapacity', text)}
           style={styles.input}
           outlineColor={Colors.bordercolor}
           activeOutlineColor={Colors.primary}
@@ -351,11 +329,8 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
         <TextInput
           label="Khối lượng còn lại"
           mode="outlined"
-          keyboardType="numeric"
           value={String(formData.availableWeight)}
-          onChangeText={text =>
-            handleChange('availableWeight', parseFloat(text) || 0)
-          }
+          onChangeText={text => handleChange('availableWeight', text)}
           style={styles.input}
           outlineColor={Colors.bordercolor}
           activeOutlineColor={Colors.primary}
@@ -368,11 +343,8 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
         <TextInput
           label="Giá mỗi đơn vị"
           mode="outlined"
-          keyboardType="numeric"
           value={String(formData.pricePerUnit)}
-          onChangeText={text =>
-            handleChange('pricePerUnit', parseFloat(text) || 0)
-          }
+          onChangeText={text => handleChange('pricePerUnit', text)}
           style={styles.input}
           outlineColor={Colors.bordercolor}
           activeOutlineColor={Colors.primary}
@@ -391,6 +363,7 @@ const EditOfferingTransportPost = ({route, navigation}: any) => {
           outlineColor={Colors.bordercolor}
           activeOutlineColor={Colors.primary}
         />
+
         {renderStatusButtons()}
       </Card.Content>
       <Card.Actions style={styles.cardActions}>
@@ -442,12 +415,31 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   switch: {marginStart: 'auto'},
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  timeInput: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  dash: {
+    fontSize: 20,
+    marginHorizontal: 5,
+  },
   dropdown: {
     marginBottom: 15,
     borderColor: Colors.bordercolor,
   },
   dropdownContainer: {
     borderColor: Colors.bordercolor,
+  },
+
+  label: {
+    fontSize: 16,
+    color: Colors.text,
+    fontWeight: '600',
   },
   statusButtonContainer: {
     flexDirection: 'row',

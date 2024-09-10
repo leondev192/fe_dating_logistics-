@@ -1,13 +1,6 @@
 // PostItem.tsx
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Button,
-} from 'react-native';
+import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {
   ArrowRight,
   Box,
@@ -24,18 +17,19 @@ interface PostItemProps {
   companyName?: string;
   hasVehicle?: boolean | null;
   cargoType?: string;
-  cargoWeight?: number | null;
-  cargoVolume?: number | null;
+  cargoWeight?: string | null;
+  cargoVolume?: string | null;
   requiredVehicleType?: string;
   cargoTypeRequest?: string;
   vehicleType?: string;
-  maxWeight?: number | null;
-  availableWeight?: number | null;
-  pricePerUnit?: number | null;
+  maxWeight?: string | null;
+  availableWeight?: string | null;
+  pricePerUnit?: string | null;
   vehicleDetails?: string;
   origin?: string;
   destination?: string;
-  transportTime?: string;
+  transportGoes?: string;
+  transportComes?: string;
   returnTrip?: boolean | null;
   returnTime?: string | null;
   status: string;
@@ -46,8 +40,8 @@ interface PostItemProps {
 }
 
 const PostItem: React.FC<PostItemProps> = ({
+  postId,
   receiverId,
-
   postType,
   companyName,
   hasVehicle,
@@ -63,14 +57,14 @@ const PostItem: React.FC<PostItemProps> = ({
   vehicleDetails,
   origin,
   destination,
-  transportTime,
+  transportGoes,
+  transportComes,
   returnTrip,
   returnTime,
   status,
   specialRequirements,
   image,
   onPress,
-  postId,
   onContactPress,
 }) => {
   const renderTitle = () => {
@@ -128,21 +122,19 @@ const PostItem: React.FC<PostItemProps> = ({
               {cargoType && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Loại hàng:</Text>
-                  <Text style={styles.detail} numberOfLines={1}>
-                    {cargoType}
-                  </Text>
+                  <Text style={styles.detail}>{cargoType}</Text>
                 </View>
               )}
-              {cargoWeight !== undefined && cargoWeight !== null && (
+              {cargoWeight && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Khối lượng:</Text>
-                  <Text style={styles.detail}>{cargoWeight} tấn</Text>
+                  <Text style={styles.detail}>{cargoWeight}</Text>
                 </View>
               )}
-              {cargoVolume !== undefined && cargoVolume !== null && (
+              {cargoVolume && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Thể tích:</Text>
-                  <Text style={styles.detail}>{cargoVolume} m³</Text>
+                  <Text style={styles.detail}>{cargoVolume} </Text>
                 </View>
               )}
             </View>
@@ -161,20 +153,26 @@ const PostItem: React.FC<PostItemProps> = ({
                   </View>
                 </View>
               )}
-              {transportTime && (
+              {transportGoes && (
                 <View style={styles.rowInfo}>
-                  <Text style={styles.label}>Thời gian:</Text>
+                  <Text style={styles.label}>Thời gian đi:</Text>
                   <Text style={styles.detail}>
-                    {new Date(transportTime).toLocaleDateString()}
+                    {new Date(transportGoes).toLocaleDateString()}
+                  </Text>
+                </View>
+              )}
+              {transportComes && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Thời gian đến:</Text>
+                  <Text style={styles.detail}>
+                    {new Date(transportComes).toLocaleDateString()}
                   </Text>
                 </View>
               )}
               {specialRequirements && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Yêu cầu đặc biệt:</Text>
-                  <Text style={styles.detail} numberOfLines={1}>
-                    {specialRequirements}
-                  </Text>
+                  <Text style={styles.detail}>{specialRequirements}</Text>
                 </View>
               )}
             </View>
@@ -187,15 +185,19 @@ const PostItem: React.FC<PostItemProps> = ({
               {cargoTypeRequest && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Loại hàng yêu cầu:</Text>
-                  <Text style={styles.detail} numberOfLines={1}>
-                    {cargoTypeRequest}
-                  </Text>
+                  <Text style={styles.detail}>{cargoTypeRequest}</Text>
                 </View>
               )}
               {requiredVehicleType && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Loại xe:</Text>
                   <Text style={styles.detail}>{requiredVehicleType}</Text>
+                </View>
+              )}
+              {cargoWeight && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Trọng lượng:</Text>
+                  <Text style={styles.detail}>{cargoWeight}</Text>
                 </View>
               )}
             </View>
@@ -214,11 +216,19 @@ const PostItem: React.FC<PostItemProps> = ({
                   </View>
                 </View>
               )}
-              {transportTime && (
+              {transportGoes && (
                 <View style={styles.rowInfo}>
-                  <Text style={styles.label}>Thời gian:</Text>
+                  <Text style={styles.label}>Thời gian đi:</Text>
                   <Text style={styles.detail}>
-                    {new Date(transportTime).toLocaleDateString()}
+                    {new Date(transportGoes).toLocaleDateString()}
+                  </Text>
+                </View>
+              )}
+              {transportComes && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Thời gian đến:</Text>
+                  <Text style={styles.detail}>
+                    {new Date(transportComes).toLocaleDateString()}
                   </Text>
                 </View>
               )}
@@ -235,19 +245,19 @@ const PostItem: React.FC<PostItemProps> = ({
                   <Text style={styles.detail}>{vehicleType}</Text>
                 </View>
               )}
-              {maxWeight !== undefined && maxWeight !== null && (
+              {maxWeight && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Trọng tải tối đa:</Text>
                   <Text style={styles.detail}>{maxWeight} tấn</Text>
                 </View>
               )}
-              {availableWeight !== undefined && availableWeight !== null && (
+              {availableWeight && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Trọng tải còn lại:</Text>
                   <Text style={styles.detail}>{availableWeight} tấn</Text>
                 </View>
               )}
-              {pricePerUnit !== undefined && pricePerUnit !== null && (
+              {pricePerUnit && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Giá mỗi đơn vị:</Text>
                   <Text style={styles.detail}>{pricePerUnit} VND</Text>
@@ -269,11 +279,19 @@ const PostItem: React.FC<PostItemProps> = ({
                   </View>
                 </View>
               )}
-              {transportTime && (
+              {transportGoes && (
                 <View style={styles.rowInfo}>
-                  <Text style={styles.label}>Thời gian:</Text>
+                  <Text style={styles.label}>Thời gian đi:</Text>
                   <Text style={styles.detail}>
-                    {new Date(transportTime).toLocaleDateString()}
+                    {new Date(transportGoes).toLocaleDateString()}
+                  </Text>
+                </View>
+              )}
+              {transportComes && (
+                <View style={styles.rowInfo}>
+                  <Text style={styles.label}>Thời gian đến:</Text>
+                  <Text style={styles.detail}>
+                    {new Date(transportComes).toLocaleDateString()}
                   </Text>
                 </View>
               )}
@@ -288,9 +306,7 @@ const PostItem: React.FC<PostItemProps> = ({
               {vehicleDetails && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Chi tiết xe:</Text>
-                  <Text style={styles.detail} numberOfLines={1}>
-                    {vehicleDetails}
-                  </Text>
+                  <Text style={styles.detail}>{vehicleDetails}</Text>
                 </View>
               )}
             </View>
@@ -328,10 +344,6 @@ const PostItem: React.FC<PostItemProps> = ({
 };
 
 const styles = StyleSheet.create({
-  contactButton: {
-    width: '30%',
-    marginBottom: 5,
-  },
   contactContainer: {
     marginTop: 10,
     paddingHorizontal: 10,

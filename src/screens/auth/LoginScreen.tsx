@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    marginTop: 'auto',
+    marginBottom: 'auto',
   },
   termsText: {
     color: '#1E232C',

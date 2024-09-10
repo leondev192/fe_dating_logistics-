@@ -19,10 +19,10 @@ const PaymentScreen = ({navigation, route}: any) => {
     cvv: '',
   });
 
-  // Chuyển đổi transportTime từ chuỗi sang Date trước khi gửi API
   const formData = {
     ...route.params.formData,
-    transportTime: new Date(route.params.formData.transportTime),
+    transportGoes: new Date(route.params.formData.transportGoes),
+    transportComes: new Date(route.params.formData.transportComes),
   };
 
   const validateInputs = () => {
@@ -111,7 +111,6 @@ const PaymentScreen = ({navigation, route}: any) => {
             label="Số Thẻ"
             value={cardNumber}
             onChangeText={text => setCardNumber(text)}
-            keyboardType="numeric"
             style={styles.input}
             error={!!errors.cardNumber}
           />
@@ -124,7 +123,6 @@ const PaymentScreen = ({navigation, route}: any) => {
             value={expiryDate}
             onChangeText={text => setExpiryDate(text)}
             placeholder="MM/YY"
-            keyboardType="numeric"
             style={styles.input}
             error={!!errors.expiryDate}
           />
@@ -136,7 +134,6 @@ const PaymentScreen = ({navigation, route}: any) => {
             label="CVV"
             value={cvv}
             onChangeText={text => setCvv(text)}
-            keyboardType="numeric"
             secureTextEntry
             style={styles.input}
             error={!!errors.cvv}
@@ -166,8 +163,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 20,
+    padding: 5,
     backgroundColor: Colors.background,
   },
   card: {
@@ -195,7 +191,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   button: {
-    marginTop: 20,
     alignSelf: 'center',
     width: '80%',
   },

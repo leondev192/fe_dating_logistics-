@@ -152,7 +152,7 @@ const MainNavigator = () => {
           title: '',
           headerBackTitleVisible: false,
           headerBackImage: () => <BackButton />,
-          headerTitle: () => <TitleHeader title="Chi tiet tin nhan " />,
+          headerTitle: () => <TitleHeader title="Cuộc trò chuyện" />,
           headerTransparent: false,
           headerTitleAlign: 'center',
         }}
@@ -164,7 +164,7 @@ const MainNavigator = () => {
           title: '',
           headerBackTitleVisible: false,
           headerBackImage: () => <BackButton />,
-          headerTitle: () => <TitleHeader title="Chi tiet tin nhan " />,
+          headerTitle: () => <TitleHeader title="Tin nhắn" />,
           headerTransparent: false,
           headerTitleAlign: 'center',
         }}

@@ -18,9 +18,11 @@ interface FormData {
   status: 'active' | 'completed';
   origin: string;
   destination: string;
-  transportTime: Date;
+  transportGoes: Date;
+  transportComes: Date;
   requiredVehicleType: string;
   cargoTypeRequest: string;
+  cargoWeight: string;
 }
 
 const EditLookingForTransportPost = ({route, navigation}: any) => {
@@ -30,12 +32,16 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
     status: 'active',
     origin: '',
     destination: '',
-    transportTime: new Date(),
+    transportGoes: new Date(),
+    transportComes: new Date(),
     requiredVehicleType: '',
     cargoTypeRequest: '',
+    cargoWeight: '',
   });
 
-  const [showTransportTimePicker, setShowTransportTimePicker] = useState(false);
+  const [showTransportGoesPicker, setShowTransportGoesPicker] = useState(false);
+  const [showTransportComesPicker, setShowTransportComesPicker] =
+    useState(false);
   const [errors, setErrors] = useState<{[key in keyof FormData]?: string}>({});
   const [openVehicleType, setOpenVehicleType] = useState(false);
   const [vehicleTypes, setVehicleTypes] = useState([
@@ -43,35 +49,33 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
     {label: 'Xe container', value: 'Xe container'},
   ]);
 
-  // Status options
-  const [openStatusPicker, setOpenStatusPicker] = useState(false);
-  const [statusOptions, setStatusOptions] = useState([
-    {label: 'Hoạt động', value: 'active'},
-    {label: 'Hoàn tất', value: 'completed'},
-  ]);
-
   useEffect(() => {
     const fetchPostData = async () => {
       try {
-        console.log('Fetching post with ID:', postId);
         const post = await getPostById(postId);
 
         if (!post) {
           throw new Error('Không tìm thấy bài đăng hoặc dữ liệu không hợp lệ.');
         }
 
-        const transportTime = post.transportTime
-          ? new Date(post.transportTime)
+        const transportGoes = post.transportGoes
+          ? new Date(post.transportGoes)
+          : new Date();
+        const transportComes = post.transportComes
+          ? new Date(post.transportComes)
           : new Date();
 
+        // Cập nhật formData với status từ dữ liệu của bài đăng
         setFormData({
-          postType: post.postType || 'LookingForTransport',
-          status: post.status || 'active',
+          postType: 'LookingForTransport',
+          status: post.status || 'active', // Cập nhật status từ dữ liệu bài đăng
           origin: post.origin || '',
           destination: post.destination || '',
-          transportTime,
+          transportGoes,
+          transportComes,
           requiredVehicleType: post.requiredVehicleType || '',
           cargoTypeRequest: post.cargoTypeRequest || '',
+          cargoWeight: post.cargoWeight || '',
         });
       } catch (error) {
         console.error('Error fetching post by ID:', error);
@@ -92,16 +96,25 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
       newErrors.origin = 'Vui lòng nhập nơi bắt đầu';
       valid = false;
     }
+
     if (!formData.destination) {
       newErrors.destination = 'Vui lòng nhập nơi kết thúc';
       valid = false;
     }
+
     if (!formData.requiredVehicleType) {
       newErrors.requiredVehicleType = 'Vui lòng chọn loại xe yêu cầu';
       valid = false;
     }
+
     if (!formData.cargoTypeRequest) {
       newErrors.cargoTypeRequest = 'Vui lòng nhập loại hàng hóa yêu cầu';
+      valid = false;
+    }
+
+    if (!formData.cargoWeight) {
+      newErrors.cargoWeight =
+        'Khối lượng hàng hóa phải lớn hơn 0 và là số hợp lệ';
       valid = false;
     }
 
@@ -119,8 +132,8 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
       try {
         const updatedData = {
           ...formData,
-          status: formData.status, // Đảm bảo gửi đúng trạng thái
-          transportTime: formData.transportTime.toISOString(),
+          transportGoes: formData.transportGoes.toISOString(),
+          transportComes: formData.transportComes.toISOString(),
         };
 
         await updatePost(postId, updatedData);
@@ -193,6 +206,62 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
           <Text style={styles.errorText}>{errors.destination}</Text>
         )}
 
+        <View style={styles.timeRow}>
+          <TextInput
+            label="Thời gian đi"
+            mode="outlined"
+            value={formData.transportGoes.toLocaleDateString()}
+            style={[styles.timeInput, {marginRight: 5}]}
+            outlineColor={Colors.bordercolor}
+            activeOutlineColor={Colors.primary}
+            onPressIn={() => {
+              setShowTransportGoesPicker(true);
+              setShowTransportComesPicker(false);
+            }}
+          />
+          <Text style={styles.dash}>-</Text>
+          <TextInput
+            label="Thời gian tới"
+            mode="outlined"
+            value={formData.transportComes.toLocaleDateString()}
+            style={[styles.timeInput, {marginLeft: 5}]}
+            outlineColor={Colors.bordercolor}
+            activeOutlineColor={Colors.primary}
+            onPressIn={() => {
+              setShowTransportComesPicker(true);
+              setShowTransportGoesPicker(false);
+            }}
+          />
+        </View>
+
+        {showTransportGoesPicker && (
+          <DateTimePicker
+            value={formData.transportGoes}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowTransportGoesPicker(false);
+              if (selectedDate) {
+                handleChange('transportGoes', selectedDate);
+              }
+            }}
+          />
+        )}
+
+        {showTransportComesPicker && (
+          <DateTimePicker
+            value={formData.transportComes}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowTransportComesPicker(false);
+              if (selectedDate) {
+                handleChange('transportComes', selectedDate);
+              }
+            }}
+          />
+        )}
+
         <DropDownPicker
           open={openVehicleType}
           value={formData.requiredVehicleType}
@@ -225,31 +294,6 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
           <Text style={styles.errorText}>{errors.requiredVehicleType}</Text>
         )}
 
-        <View>
-          <TextInput
-            label="Thời gian vận chuyển"
-            mode="outlined"
-            value={formData.transportTime.toLocaleDateString()}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-            onFocus={() => setShowTransportTimePicker(true)}
-          />
-          {showTransportTimePicker && (
-            <DateTimePicker
-              value={formData.transportTime}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                setShowTransportTimePicker(false);
-                if (selectedDate) {
-                  handleChange('transportTime', selectedDate);
-                }
-              }}
-            />
-          )}
-        </View>
-
         <TextInput
           label="Loại hàng hóa yêu cầu"
           mode="outlined"
@@ -262,6 +306,21 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
         />
         {errors.cargoTypeRequest && (
           <Text style={styles.errorText}>{errors.cargoTypeRequest}</Text>
+        )}
+
+        <TextInput
+          label="Khối lượng hàng hóa"
+          mode="outlined"
+          keyboardType="numeric"
+          value={String(formData.cargoWeight)}
+          onChangeText={text => handleChange('cargoWeight', text)}
+          style={styles.input}
+          outlineColor={Colors.bordercolor}
+          activeOutlineColor={Colors.primary}
+          error={!!errors.cargoWeight}
+        />
+        {errors.cargoWeight && (
+          <Text style={styles.errorText}>{errors.cargoWeight}</Text>
         )}
         {renderStatusButtons()}
       </Card.Content>
@@ -308,6 +367,19 @@ const styles = StyleSheet.create({
   cardActions: {
     justifyContent: 'center',
     marginTop: 15,
+  },
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  timeInput: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  dash: {
+    fontSize: 20,
+    marginHorizontal: 5,
   },
   dropdown: {
     marginBottom: 15,

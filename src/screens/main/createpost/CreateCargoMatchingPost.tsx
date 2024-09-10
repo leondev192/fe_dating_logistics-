@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, FlatList, Alert} from 'react-native'; // Import Alert từ React Native
-import {TextInput, Card, Text} from 'react-native-paper';
+import {View, StyleSheet, FlatList, Alert} from 'react-native';
+import {TextInput, Card, Text, RadioButton} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -9,14 +9,15 @@ import DropDownPicker from 'react-native-dropdown-picker';
 // Định nghĩa kiểu dữ liệu cho formData
 interface FormData {
   postType: 'CargoMatching';
-  status: 'Active' | 'Completed'; // Sửa kiểu status để phù hợp
+  status: 'Active' | 'Completed';
   origin: string;
   destination: string;
-  transportTime: Date;
+  transportGoes: Date;
+  transportComes: Date;
   hasVehicle: boolean;
   cargoType: string;
-  cargoWeight: number;
-  cargoVolume: number;
+  cargoWeight: string;
+  cargoVolume: string;
   specialRequirements: string;
 }
 
@@ -26,14 +27,17 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
     status: 'Active',
     origin: '',
     destination: '',
-    transportTime: new Date(),
+    transportGoes: new Date(),
+    transportComes: new Date(),
     hasVehicle: false,
     cargoType: '',
-    cargoWeight: 0,
-    cargoVolume: 0,
+    cargoWeight: '',
+    cargoVolume: '',
     specialRequirements: '',
   });
-  const [showTransportTimePicker, setShowTransportTimePicker] = useState(false);
+  const [showTransportGoesPicker, setShowTransportGoesPicker] = useState(false);
+  const [showTransportComesPicker, setShowTransportComesPicker] =
+    useState(false);
   const [errors, setErrors] = useState<{[key in keyof FormData]?: string}>({});
   const [openCargoType, setOpenCargoType] = useState(false);
   const [cargoTypes, setCargoTypes] = useState([
@@ -62,13 +66,15 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
       valid = false;
     }
 
-    if (formData.cargoWeight <= 0) {
-      newErrors.cargoWeight = 'Khối lượng hàng hóa phải lớn hơn 0';
+    if (!formData.cargoWeight) {
+      newErrors.cargoWeight =
+        'Khối lượng hàng hóa phải lớn hơn 0 và là số hợp lệ';
       valid = false;
     }
 
-    if (formData.cargoVolume <= 0) {
-      newErrors.cargoVolume = 'Thể tích hàng hóa phải lớn hơn 0';
+    if (!formData.cargoVolume) {
+      newErrors.cargoVolume =
+        'Thể tích hàng hóa phải lớn hơn 0 và là số hợp lệ';
       valid = false;
     }
 
@@ -83,10 +89,10 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
 
   const handleSubmit = () => {
     if (validateForm()) {
-      // Chuyển đổi transportTime sang chuỗi ISO trước khi điều hướng
       const formDataToSend = {
         ...formData,
-        transportTime: formData.transportTime.toISOString(),
+        transportGoes: formData.transportGoes.toISOString(),
+        transportComes: formData.transportComes.toISOString(),
       };
       navigation.navigate('PaymentScreen', {formData: formDataToSend});
     } else {
@@ -131,29 +137,81 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
             <Text style={styles.errorText}>{errors.destination}</Text>
           )}
 
-          <View>
+          <View style={styles.timeRow}>
             <TextInput
-              label="Thời gian vận chuyển"
+              label="Thời gian đi"
               mode="outlined"
-              value={formData.transportTime.toLocaleDateString()}
-              style={styles.input}
+              value={formData.transportGoes.toLocaleDateString()}
+              style={[styles.timeInput, {marginRight: 5}]}
               outlineColor={Colors.bordercolor}
               activeOutlineColor={Colors.primary}
-              onFocus={() => setShowTransportTimePicker(true)}
+              onPressIn={() => {
+                setShowTransportGoesPicker(true);
+                setShowTransportComesPicker(false);
+              }}
             />
-            {showTransportTimePicker && (
-              <DateTimePicker
-                value={formData.transportTime}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => {
-                  setShowTransportTimePicker(false);
-                  if (selectedDate) {
-                    handleChange('transportTime', selectedDate);
-                  }
-                }}
-              />
-            )}
+            <Text style={styles.dash}>-</Text>
+            <TextInput
+              label="Thời gian tới"
+              mode="outlined"
+              value={formData.transportComes.toLocaleDateString()}
+              style={[styles.timeInput, {marginLeft: 5}]}
+              outlineColor={Colors.bordercolor}
+              activeOutlineColor={Colors.primary}
+              onPressIn={() => {
+                setShowTransportComesPicker(true);
+                setShowTransportGoesPicker(false);
+              }}
+            />
+          </View>
+
+          {showTransportGoesPicker && (
+            <DateTimePicker
+              value={formData.transportGoes}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                setShowTransportGoesPicker(false);
+                if (selectedDate) {
+                  handleChange('transportGoes', selectedDate);
+                }
+              }}
+            />
+          )}
+
+          {showTransportComesPicker && (
+            <DateTimePicker
+              value={formData.transportComes}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                setShowTransportComesPicker(false);
+                if (selectedDate) {
+                  handleChange('transportComes', selectedDate);
+                }
+              }}
+            />
+          )}
+
+          {/* Bổ sung lựa chọn đã có xe hoặc chưa có xe */}
+          <View style={styles.radioButtonContainer}>
+            <Text style={styles.label}>Có xe vận tải:</Text>
+            <RadioButton.Group
+              onValueChange={newValue =>
+                handleChange('hasVehicle', newValue === 'true')
+              }
+              value={formData.hasVehicle ? 'true' : 'false'}>
+              <View style={styles.radioButtonRow}>
+                <View style={styles.radioButtonItem}>
+                  <RadioButton.Android value="true" color={Colors.primary} />
+                  <Text style={styles.radioLabel}>Đã có xe</Text>
+                </View>
+                <View style={styles.radioButtonItem}>
+                  <RadioButton.Android value="false" color={Colors.primary} />
+                  <Text style={styles.radioLabel}>Chưa có xe</Text>
+                </View>
+              </View>
+            </RadioButton.Group>
           </View>
 
           <DropDownPicker
@@ -188,11 +246,8 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
           <TextInput
             label="Khối lượng hàng hóa"
             mode="outlined"
-            keyboardType="numeric"
             value={String(formData.cargoWeight)}
-            onChangeText={text =>
-              handleChange('cargoWeight', parseFloat(text) || 0)
-            }
+            onChangeText={text => handleChange('cargoWeight', text)}
             style={styles.input}
             outlineColor={Colors.bordercolor}
             activeOutlineColor={Colors.primary}
@@ -205,11 +260,8 @@ const CreateCargoMatchingPost = ({route, navigation}: any) => {
           <TextInput
             label="Thể tích hàng hóa"
             mode="outlined"
-            keyboardType="numeric"
             value={String(formData.cargoVolume)}
-            onChangeText={text =>
-              handleChange('cargoVolume', parseFloat(text) || 0)
-            }
+            onChangeText={text => handleChange('cargoVolume', text)}
             style={styles.input}
             outlineColor={Colors.bordercolor}
             activeOutlineColor={Colors.primary}
@@ -273,12 +325,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 15,
   },
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  timeInput: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  dash: {
+    fontSize: 20,
+    marginHorizontal: 5,
+  },
   dropdown: {
     marginBottom: 15,
     borderColor: Colors.bordercolor,
   },
   dropdownContainer: {
     borderColor: Colors.bordercolor,
+  },
+  radioButtonContainer: {
+    marginBottom: 15,
+  },
+  radioButtonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  radioButtonItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  radioLabel: {
+    marginLeft: 5,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: Colors.text,
+    fontWeight: '600',
   },
 });
 

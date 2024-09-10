@@ -6,9 +6,8 @@ export const getAllPosts = async (): Promise<Post[]> => {
   try {
     const response = await apiClient.get<Post[]>('/posts');
     return response.data;
-  } catch (error) {
-    console.warn('Không thể lấy danh sách bài đăng. Vui lòng thử lại sau.');
-    return []; // Trả về danh sách rỗng hoặc xử lý phù hợp hơn nếu cần
+  } catch {
+    return [];
   }
 };
 
@@ -16,7 +15,6 @@ export const createPost = async (post: Post): Promise<Post | null> => {
   try {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      console.warn('Vui lòng đăng nhập lại.');
       return null;
     }
 
@@ -27,9 +25,8 @@ export const createPost = async (post: Post): Promise<Post | null> => {
     });
 
     return response.data;
-  } catch (error) {
-    console.warn('Không thể tạo bài đăng. Vui lòng thử lại sau.');
-    return null; // Trả về null nếu lỗi
+  } catch {
+    return null;
   }
 };
 
@@ -37,7 +34,6 @@ export const getUserPosts = async (): Promise<Post[]> => {
   try {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      console.warn('Vui lòng đăng nhập lại.');
       return [];
     }
 
@@ -48,10 +44,7 @@ export const getUserPosts = async (): Promise<Post[]> => {
     });
 
     return response.data;
-  } catch (error) {
-    console.warn(
-      'Không thể lấy danh sách bài đăng của bạn. Vui lòng thử lại sau.',
-    );
+  } catch {
     return [];
   }
 };
@@ -60,7 +53,6 @@ export const deletePost = async (postId: string): Promise<boolean> => {
   try {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      console.warn('Vui lòng đăng nhập lại.');
       return false;
     }
 
@@ -69,8 +61,7 @@ export const deletePost = async (postId: string): Promise<boolean> => {
     });
 
     return true;
-  } catch (error) {
-    console.warn('Không thể xóa bài đăng. Vui lòng thử lại sau.');
+  } catch {
     return false;
   }
 };
@@ -82,7 +73,6 @@ export const updatePost = async (
   try {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      console.warn('Vui lòng đăng nhập lại.');
       return null;
     }
 
@@ -93,8 +83,7 @@ export const updatePost = async (
     });
 
     return response.data;
-  } catch (error) {
-    console.warn('Không thể cập nhật bài đăng. Vui lòng thử lại sau.');
+  } catch {
     return null;
   }
 };
@@ -103,7 +92,6 @@ export const getPostById = async (id: string): Promise<Post | null> => {
   try {
     const token = await AsyncStorage.getItem('userToken');
     if (!token) {
-      console.warn('Vui lòng đăng nhập lại.');
       return null;
     }
 
@@ -112,8 +100,7 @@ export const getPostById = async (id: string): Promise<Post | null> => {
     });
 
     return response.data;
-  } catch (error) {
-    console.warn('Không thể lấy chi tiết bài đăng. Vui lòng thử lại sau.');
+  } catch {
     return null;
   }
 };

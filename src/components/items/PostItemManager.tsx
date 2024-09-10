@@ -1,4 +1,4 @@
-// PostItem.tsx
+// PostManagerItem.tsx
 import React from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {
@@ -11,7 +11,7 @@ import {
 import GradientButton from '../../components/button/post/GradientButton';
 import OutlineButton from '../../components/button/post/OutlineButton';
 
-interface PostItemProps {
+interface PostManagerItemProps {
   postType: string;
   companyName?: string;
   hasVehicle?: boolean | null;
@@ -37,7 +37,7 @@ interface PostItemProps {
   onDelete: () => void; // Hàm xóa
 }
 
-const PostItem: React.FC<PostItemProps> = ({
+const PostManagerItem: React.FC<PostManagerItemProps> = ({
   postType,
   companyName,
   hasVehicle,
@@ -451,4 +451,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PostItem;
+export default PostManagerItem;

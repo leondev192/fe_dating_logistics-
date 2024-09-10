@@ -91,7 +91,10 @@ const HomeScreen = () => {
 
   const handleContactPress = async (postId: string, receiverId: string) => {
     if (currentUser && currentUser.id === receiverId) {
-      Alert.alert('Lỗi', 'Bạn không thể liên hệ với chính mình.');
+      Alert.alert(
+        'Bài viết của bạn mà 🥲 ',
+        'Bạn không thể liên hệ với chính mình.',
+      );
       return;
     }
 
@@ -101,8 +104,8 @@ const HomeScreen = () => {
       navigation.navigate('Messages');
     } catch (error) {
       Alert.alert(
-        'Thất bại',
-        'Không thể tạo cuộc trò chuyện. Vui lòng thử lại sau.',
+        'Bạn chưa đăng nhập',
+        'Vui lòng đăng nhập để sử dụng dịch vụ ',
       );
     }
   };
@@ -118,6 +121,7 @@ const HomeScreen = () => {
       receiverId={item.userId}
       postType={item.postType}
       companyName={item.companyName}
+      cargoTypeRequest={item.cargoTypeRequest}
       hasVehicle={item.hasVehicle}
       cargoType={item.cargoType}
       cargoWeight={item.cargoWeight}
@@ -129,7 +133,8 @@ const HomeScreen = () => {
       pricePerUnit={item.pricePerUnit}
       origin={item.origin}
       destination={item.destination}
-      transportTime={item.transportTime}
+      transportGoes={item.transportGoes} // Truyền giá trị này chính xác
+      transportComes={item.transportComes} // Truyền giá trị này chính xác
       returnTrip={item.returnTrip}
       returnTime={item.returnTime}
       status={item.status}
@@ -156,6 +161,10 @@ const HomeScreen = () => {
           />
           <Image
             source={require('../../assets/images/2.png')}
+            style={styles.bannerImage}
+          />
+          <Image
+            source={require('../../assets/images/3.png')}
             style={styles.bannerImage}
           />
         </Swiper>
@@ -300,13 +309,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginHorizontal: 5,
+    marginTop: 5,
   },
   filterButton: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: 4,
     marginHorizontal: 5,
-    backgroundColor: '#E6EAF4',
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     height: 50,
   },

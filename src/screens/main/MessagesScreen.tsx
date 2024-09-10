@@ -16,8 +16,10 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserInfo} from '../../apis/services/userService';
 import LoadingSpinner from '../../components/loading/LoadingSpinner'; // Import LoadingSpinner
+import {useNavigation} from '@react-navigation/native';
 
-const MessagesScreen = ({navigation}) => {
+const MessagesScreen = ({}) => {
+  const navigation = useNavigation();
   const [conversations, setConversations] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -101,7 +103,10 @@ const MessagesScreen = ({navigation}) => {
           <Text style={styles.conversationTitle}>
             {user.companyName || 'Tên công ty không xác định'}
           </Text>
-          <Text style={styles.lastMessage}>
+          <Text
+            style={styles.lastMessage}
+            numberOfLines={1}
+            ellipsizeMode="tail">
             {item.messages && item.messages.length > 0
               ? item.messages[0].content
               : 'Chưa có tin nhắn nào'}
@@ -140,9 +145,13 @@ const styles = StyleSheet.create({
   conversationItem: {
     flexDirection: 'row',
     padding: 15,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     borderBottomColor: '#ccc',
     alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 50,
+    marginHorizontal: 10,
+    marginTop: 10,
   },
   avatar: {
     width: 40,
@@ -160,6 +169,7 @@ const styles = StyleSheet.create({
   lastMessage: {
     fontSize: 14,
     color: '#666',
+    maxWidth: '90%', // Đảm bảo văn bản không vượt quá chiều rộng của container
   },
   emptyText: {
     textAlign: 'center',

@@ -6,6 +6,7 @@ import {
   ScrollView,
   Platform,
   ImageBackground,
+  Alert,
 } from 'react-native';
 import ButtonComponent from '../../components/button/auth/GradientButton';
 import Colors from '../../constants/colors';
@@ -46,14 +47,16 @@ const VerifyOtpScreen = () => {
     try {
       const response = await verifyOtp({email, otp});
       setLoading(false);
-      Toast.show({
-        type: 'success',
-        text1: 'Xác minh thành công',
-        onHide: () => setIsToastVisible(false),
-        position: 'top',
-        topOffset: 300,
-      });
-      navigation.navigate('Login');
+      Alert.alert(
+        'Xác minh thành công',
+        'OTP của bạn đã được xác minh thành công!',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('Login'),
+          },
+        ],
+      );
     } catch (error: any) {
       setLoading(false);
       Toast.show({

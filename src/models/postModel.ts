@@ -9,15 +9,16 @@ export interface Post {
   companyName?: string;
   origin?: string;
   destination?: string;
-  transportTime?: string;
+  transportGoes?: string;
+  transportComes?: string;
   returnTrip?: boolean | null;
   returnTime?: string | null;
 
   // Fields specific to CargoMatching
   hasVehicle?: boolean | null;
   cargoType?: string;
-  cargoWeight?: number | null;
-  cargoVolume?: number | null;
+  cargoWeight?: string | null;
+  cargoVolume?: string | null;
   specialRequirements?: string;
 
   // Fields specific to LookingForTransport
@@ -26,8 +27,8 @@ export interface Post {
 
   // Fields specific to OfferingTransport
   vehicleType?: string;
-  vehicleCapacity?: number | null;
-  availableWeight?: number | null;
-  pricePerUnit?: number | null;
+  vehicleCapacity?: string | null;
+  availableWeight?: string | null;
+  pricePerUnit?: string | null;
   vehicleDetails?: string;
 }
