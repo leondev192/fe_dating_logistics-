@@ -11,6 +11,7 @@ import OutlineButton from '../../components/button/auth/OutlineButton';
 import {useAnimatedValue} from '../../hooks/useAnimatedValue';
 import Colors from '../../constants/colors';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {useAuth} from '../../contexts/AuthContext';
 type RootStackParamList = {
   Login: undefined;
   Register: undefined;
@@ -19,6 +20,7 @@ type RootStackParamList = {
 const WelcomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const animatedValue = useAnimatedValue(0);
+  const {continueWithoutLogin} = useAuth();
 
   return (
     <ImageBackground
@@ -37,7 +39,7 @@ const WelcomeScreen: React.FC = () => {
         />
         <TouchableOpacity
           style={styles.termsButton}
-          onPress={() => navigation.navigate('Main')}>
+          onPress={continueWithoutLogin}>
           <Text style={styles.termsButtonText}>
             Tiếp tục mà không cần tài khoản!
           </Text>

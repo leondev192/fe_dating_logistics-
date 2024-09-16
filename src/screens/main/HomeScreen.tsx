@@ -19,7 +19,7 @@ import {Post} from '../../models/postModel';
 import {createChat} from '../../apis/services/chatService';
 import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getUserInfo} from '../../apis/services/userService'; // Thêm hàm getUserInfo để lấy thông tin người dùng hiện tại
+import {getUserInfo} from '../../apis/services/userService';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -28,7 +28,7 @@ const HomeScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentUser, setCurrentUser] = useState<any>(null); // State để lưu thông tin người dùng hiện tại
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   // Fetch current user info
   const fetchCurrentUser = async () => {
@@ -71,9 +71,6 @@ const HomeScreen = () => {
   const applyFilter = (filter: string, posts: Post[]) => {
     let filtered = [...posts];
     switch (filter) {
-      case 'cargoMatching':
-        filtered = posts.filter(post => post.postType === 'CargoMatching');
-        break;
       case 'lookingForTransport':
         filtered = posts.filter(
           post => post.postType === 'LookingForTransport',
@@ -92,7 +89,7 @@ const HomeScreen = () => {
   const handleContactPress = async (postId: string, receiverId: string) => {
     if (currentUser && currentUser.id === receiverId) {
       Alert.alert(
-        'Bài viết của bạn mà 🥲 ',
+        'Đây là bài viết của bạn',
         'Bạn không thể liên hệ với chính mình.',
       );
       return;
@@ -133,8 +130,8 @@ const HomeScreen = () => {
       pricePerUnit={item.pricePerUnit}
       origin={item.origin}
       destination={item.destination}
-      transportGoes={item.transportGoes} // Truyền giá trị này chính xác
-      transportComes={item.transportComes} // Truyền giá trị này chính xác
+      transportGoes={item.transportGoes}
+      transportComes={item.transportComes}
       returnTrip={item.returnTrip}
       returnTime={item.returnTime}
       status={item.status}
@@ -186,25 +183,7 @@ const HomeScreen = () => {
             Tất cả tin
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            filter === 'cargoMatching' && styles.activeFilterButton,
-          ]}
-          onPress={() => handleFilterChange('cargoMatching')}>
-          <Box
-            size="24"
-            color={filter === 'cargoMatching' ? '#FFFFFF' : '#555'}
-          />
-          <Text
-            style={[
-              styles.filterText,
-              filter === 'cargoMatching' && styles.activeFilterText,
-            ]}
-            numberOfLines={1}>
-            Ghép đôi
-          </Text>
-        </TouchableOpacity>
+
         <TouchableOpacity
           style={[
             styles.filterButton,

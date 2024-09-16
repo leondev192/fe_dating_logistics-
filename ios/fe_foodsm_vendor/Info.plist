@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>We need your location to provide the best service.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>We need your location to provide the best service.</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>We need your location to provide the best service.</string>
+
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -48,5 +56,29 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+
+	 <!-- Bổ sung phần này để đăng nhập Google hoạt động -->
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+            <string>com.googleusercontent.apps.193742166494-8rmrlkofcs88ejiirsemjl8s7hrn3k7h</string>
+            </array>
+        </dict>
+    </array>
+
+    <!-- Thêm các URL Schemes để Google Sign-In có thể hoạt động -->
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>google</string>
+        <string>com.googleusercontent.apps</string>
+    </array>
+
+    <!-- Thêm GIDClientID để xác định Web Client ID -->
+    <key>GIDClientID</key>
+    <string>193742166494-vhvkbi0atp26iu8m0tlnph4js6nu32lu.apps.googleusercontent.com</string> <!-- Thay bằng Web Client ID từ Google Cloud Console -->
 </dict>
 </plist>

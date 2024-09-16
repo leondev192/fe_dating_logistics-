@@ -39,7 +39,7 @@ const checkUserInfo = async (token: string, navigation: any) => {
               navigation.dispatch(
                 CommonActions.reset({
                   index: 0,
-                  routes: [{name: 'Account'}], // Chuyển hướng tới màn hình cập nhật thông tin
+                  routes: [{name: 'Account'}],
                 }),
               );
             },

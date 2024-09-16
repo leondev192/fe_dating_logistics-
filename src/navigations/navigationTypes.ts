@@ -24,4 +24,5 @@ export type TabParamList = {
   Notifications: undefined;
   Account: undefined;
   SearchScreen: undefined;
+  Notification: undefined;
 };

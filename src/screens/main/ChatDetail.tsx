@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  Keyboard,
 } from 'react-native';
 import {getMessages, sendMessage} from '../../apis/services/chatService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,7 +28,7 @@ const ChatDetail = ({route}) => {
 
   useEffect(() => {
     fetchCurrentUser();
-    fetchMessages();
+    fetchMessages(); // Gọi để cập nhật tin nhắn và trạng thái đã đọc
     const interval = setInterval(fetchMessages, 5000); // Polling every 5 seconds
 
     return () => clearInterval(interval);
@@ -84,6 +85,7 @@ const ChatDetail = ({route}) => {
       minute: '2-digit',
     }).format(date);
   };
+
   const renderMessageItem = ({item}) => {
     const isCurrentUser = item.sender.id === currentUser?.id;
 
@@ -122,7 +124,8 @@ const ChatDetail = ({route}) => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.select({ios: 90, android: 80})}>
       <FlatList
         ref={flatListRef}
         data={messages}
@@ -140,21 +143,23 @@ const ChatDetail = ({route}) => {
           onChangeText={setNewMessage}
           placeholder="Nhập tin nhắn..."
           placeholderTextColor="#888"
+          onFocus={() => scrollToBottom()} // Cuộn xuống khi người dùng nhập tin nhắn
         />
         <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-          <Send size={38} color="#007AFF" variant="Bold" />
+          <Send size={30} color="#007AFF" variant="Bold" />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F2F2F2',
   },
   messageContainer: {
-    flexDirection: 'row', // Sắp xếp các thành phần theo chiều ngang
+    flexDirection: 'row',
     maxWidth: '80%',
     marginVertical: 5,
     alignItems: 'flex-end',
@@ -162,7 +167,7 @@ const styles = StyleSheet.create({
   myMessageContainer: {
     alignSelf: 'flex-end',
     marginRight: 10,
-    flexDirection: 'row-reverse', // Đảo vị trí avatar và tin nhắn cho người dùng hiện tại
+    flexDirection: 'row-reverse',
   },
   theirMessageContainer: {
     alignSelf: 'flex-start',
@@ -179,10 +184,10 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   myBubble: {
-    backgroundColor: '#0884fc', // Màu nền cho tin nhắn của người dùng hiện tại
+    backgroundColor: '#0884fc',
   },
   theirBubble: {
-    backgroundColor: '#B1B1B1', // Màu nền cho tin nhắn của người nhận
+    backgroundColor: '#B1B1B1',
   },
   messageText: {
     fontSize: 16,
@@ -196,25 +201,28 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'row',
+    borderRadius: 50,
+    marginBottom: 30,
     padding: 10,
     borderTopWidth: 1,
     borderTopColor: '#ddd',
     backgroundColor: '#FFF',
     alignItems: 'center',
+    height: 60,
   },
   input: {
     flex: 1,
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 20,
-    height: 50,
+    borderRadius: 50,
+    height: 40,
     paddingHorizontal: 15,
     fontSize: 16,
     marginRight: 10,
     backgroundColor: '#F9F9F9',
   },
   sendButton: {
-    padding: 10,
+    padding: 5,
   },
 });
 

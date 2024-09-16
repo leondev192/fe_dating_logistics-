@@ -15,15 +15,36 @@ import {
 } from '../../apis/services/chatService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserInfo} from '../../apis/services/userService';
-import LoadingSpinner from '../../components/loading/LoadingSpinner'; // Import LoadingSpinner
+import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import {useNavigation} from '@react-navigation/native';
 
-const MessagesScreen = ({}) => {
+// Định nghĩa các kiểu dữ liệu
+interface UserType {
+  id: string;
+  companyName?: string;
+  profilePictureUrl?: string;
+}
+
+interface MessageType {
+  content: string;
+  createdAt: string;
+  isRead: boolean;
+  senderId: string;
+}
+
+interface ConversationType {
+  id: string;
+  sender: UserType;
+  receiver: UserType;
+  messages: MessageType[];
+}
+
+const MessagesScreen = () => {
   const navigation = useNavigation();
-  const [conversations, setConversations] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [conversations, setConversations] = useState<ConversationType[]>([]);
+  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(true); // State để quản lý trạng thái loading
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchCurrentUser();
@@ -44,17 +65,38 @@ const MessagesScreen = ({}) => {
 
   const fetchConversations = async () => {
     try {
-      setLoading(true); // Bắt đầu loading
+      setLoading(true);
       const conversationsData = await getUserConversations();
-      setConversations(conversationsData);
+      if (!currentUser) return;
+
+      // Sắp xếp các cuộc trò chuyện: đưa những cuộc có tin nhắn chưa đọc lên đầu
+      const sortedConversations = conversationsData.sort(
+        (a: ConversationType, b: ConversationType) => {
+          const aUnread =
+            a.messages[0]?.isRead === false &&
+            a.messages[0]?.senderId !== currentUser.id;
+          const bUnread =
+            b.messages[0]?.isRead === false &&
+            b.messages[0]?.senderId !== currentUser.id;
+
+          if (aUnread && !bUnread) return -1; // Cuộc trò chuyện `a` có tin nhắn chưa đọc
+          if (!aUnread && bUnread) return 1; // Cuộc trò chuyện `b` có tin nhắn chưa đọc
+          return (
+            new Date(b.messages[0]?.createdAt).getTime() -
+            new Date(a.messages[0]?.createdAt).getTime()
+          ); // Sắp xếp theo thời gian tin nhắn mới nhất
+        },
+      );
+
+      setConversations(sortedConversations);
     } catch (error) {
       console.warn('Không thể lấy danh sách cuộc hội thoại.', error);
     } finally {
-      setLoading(false); // Kết thúc loading
+      setLoading(false);
     }
   };
 
-  const handleDeleteConversation = conversationId => {
+  const handleDeleteConversation = (conversationId: string) => {
     Alert.alert(
       'Xác nhận xóa',
       'Bạn có chắc chắn muốn xóa cuộc trò chuyện này?',
@@ -78,9 +120,9 @@ const MessagesScreen = ({}) => {
 
   const onRefresh = useCallback(() => {
     fetchConversations();
-  }, []);
+  }, [currentUser]);
 
-  const renderConversationItem = ({item}) => {
+  const renderConversationItem = ({item}: {item: ConversationType}) => {
     if (!currentUser) return null;
 
     const user =
@@ -88,7 +130,16 @@ const MessagesScreen = ({}) => {
 
     return (
       <TouchableOpacity
-        style={styles.conversationItem}
+        style={[
+          styles.conversationItem,
+          {
+            backgroundColor:
+              item.messages[0]?.isRead === false &&
+              item.messages[0]?.senderId !== currentUser.id
+                ? '#E8F0FE' // Màu nền khi có tin nhắn chưa đọc
+                : '#FFFFFF',
+          },
+        ]}
         onPress={() =>
           navigation.navigate('ChatDetail', {conversationId: item.id})
         }
@@ -144,14 +195,13 @@ const styles = StyleSheet.create({
   },
   conversationItem: {
     flexDirection: 'row',
-    padding: 15,
+    padding: 5,
     borderBottomWidth: 0.5,
     borderBottomColor: '#ccc',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 50,
+    borderRadius: 10,
     marginHorizontal: 10,
-    marginTop: 10,
+    marginTop: 5,
   },
   avatar: {
     width: 40,
@@ -163,18 +213,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   conversationTitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#333',
   },
   lastMessage: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#666',
-    maxWidth: '90%', // Đảm bảo văn bản không vượt quá chiều rộng của container
+    maxWidth: '90%',
   },
   emptyText: {
     textAlign: 'center',
     marginTop: 20,
-    fontSize: 16,
+    fontSize: 12,
     color: '#888',
   },
 });

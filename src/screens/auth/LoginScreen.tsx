@@ -18,11 +18,10 @@ import {NavigationProp, useNavigation} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import {loginVendor} from '../../apis/services/authService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useDispatch} from 'react-redux';
-import {loginSuccess} from '../../redux/auth/authSlice';
 import {CommonActions} from '@react-navigation/native';
 import {toastConfig} from '../../components/toast/ToastAuth';
 import BlurredToast from '../../components/toast/BlurredToast';
+import {useAuth} from '../../contexts/AuthContext';
 
 type RootStackParamList = {
   ForgotPassword: undefined;
@@ -32,18 +31,19 @@ type RootStackParamList = {
 
 const LoginScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({email: '', password: ''});
   const [isToastVisible, setIsToastVisible] = useState(false);
+  const {login} = useAuth();
 
   const resetAction = CommonActions.reset({
     index: 0,
     routes: [{name: 'Main'}],
   });
 
+  // LoginScreen.tsx
   const handleLogin = async () => {
     const errors = {email: '', password: ''};
 
@@ -66,11 +66,11 @@ const LoginScreen = () => {
       const response = await loginVendor({email, password});
 
       if (response.status === 'success') {
-        // Lưu thông tin người dùng vào Redux
-        dispatch(loginSuccess(response.data));
-
-        // Lưu token vào AsyncStorage để xác định trạng thái đăng nhập
+        // Save the token and user ID to AsyncStorage
         await AsyncStorage.setItem('userToken', response.data.token);
+        await AsyncStorage.setItem('userId', response.data.user.id);
+
+        await login(response.data.token);
 
         Toast.show({
           type: 'success',
@@ -79,8 +79,6 @@ const LoginScreen = () => {
           position: 'top',
           topOffset: 300,
         });
-
-        navigation.dispatch(resetAction);
       } else {
         Toast.show({
           onHide: () => setIsToastVisible(false),
@@ -94,28 +92,15 @@ const LoginScreen = () => {
         setIsToastVisible(true);
       }
     } catch (error: any) {
-      if (error.response && error.response.data) {
-        Toast.show({
-          onHide: () => setIsToastVisible(false),
-          type: 'error',
-          text1: 'Đăng nhập thất bại',
-          text2:
-            error.response.data.message || 'Có lỗi xảy ra, vui lòng thử lại.',
-          position: 'top',
-          topOffset: 300,
-        });
-        setIsToastVisible(true);
-      } else {
-        Toast.show({
-          onHide: () => setIsToastVisible(false),
-          type: 'error',
-          text1: 'Đăng nhập không thành công',
-          text2: 'Có lỗi xảy ra, vui lòng thử lại.',
-          position: 'top',
-          topOffset: 300,
-        });
-        setIsToastVisible(true);
-      }
+      Toast.show({
+        onHide: () => setIsToastVisible(false),
+        type: 'error',
+        text1: 'Đăng nhập không thành công',
+        text2: 'Có lỗi xảy ra, vui lòng thử lại.',
+        position: 'top',
+        topOffset: 300,
+      });
+      setIsToastVisible(true);
     } finally {
       setLoading(false);
     }

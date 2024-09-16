@@ -138,11 +138,7 @@ const TabNavigator: React.FC = () => {
           headerTitle: 'Quản lý tin',
           headerTitleAlign: 'center',
         }}>
-        {() => (
-          <AuthGuard>
-            <ManagePostsScreen />
-          </AuthGuard>
-        )}
+        {() => <ManagePostsScreen />}
       </Tab.Screen>
       <Tab.Screen
         name="Messages"
@@ -150,11 +146,15 @@ const TabNavigator: React.FC = () => {
           headerTitle: 'Tin nhắn',
           headerTitleAlign: 'center',
         }}>
-        {() => (
-          <AuthGuard>
-            <MessagesScreen />
-          </AuthGuard>
-        )}
+        {() => <MessagesScreen />}
+      </Tab.Screen>
+      <Tab.Screen
+        name="Notifications"
+        options={{
+          headerTitle: 'Thông báo',
+          headerTitleAlign: 'center',
+        }}>
+        {() => <NotificationScreen />}
       </Tab.Screen>
 
       <Tab.Screen

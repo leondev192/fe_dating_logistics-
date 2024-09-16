@@ -120,3 +120,32 @@ export const deleteConversation = async conversationId => {
     throw error; // Hoặc có thể return null hoặc giá trị khác nếu muốn xử lý khác
   }
 };
+
+// chatService.ts
+export const markMessagesAsRead = async conversationId => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      throw new Error('Vui lòng đăng nhập lại.');
+    }
+
+    console.log(
+      `Sending request to mark messages as read for conversation: ${conversationId}`,
+    );
+
+    // Gọi API backend để đánh dấu tin nhắn là đã đọc
+    const response = await apiClient.post(
+      `/chats/${conversationId}/mark-as-read`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    console.log('Messages marked as read successfully:', response.data);
+  } catch (error) {
+    console.warn('Không thể đánh dấu tin nhắn là đã đọc.', error);
+  }
+};

@@ -115,15 +115,6 @@ const UserPostsScreen = () => {
       <View style={styles.postContainer}>
         <TouchableOpacity
           style={styles.postButton}
-          onPress={() => navigation.navigate('CreateCargoMatchingPost')}>
-          <Box size="24" color={'#555'} />
-          <Text style={styles.filterText} numberOfLines={1}>
-            Ghép hàng
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.postButton}
           onPress={() => navigation.navigate('CreateLookingForTransportPost')}>
           <TruckFast size="24" color={'#555'} />
           <Text style={styles.filterText} numberOfLines={1}>
