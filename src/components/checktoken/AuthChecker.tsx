@@ -1,12 +1,12 @@
-// src/components/AuthGuard.tsx
 import React, {useEffect, useState} from 'react';
-import {useNavigation, CommonActions} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {jwtDecode} from 'jwt-decode'; // Import jwtDecode để giải mã token JWT
+import {jwtDecode} from 'jwt-decode';
 import {Alert} from 'react-native';
-import {getUserInfo} from '../../apis/services/userService'; // Import hàm lấy thông tin người dùng
+import {getUserInfo} from '../../apis/services/userService';
+import {useAuth} from '../../contexts/AuthContext';
 
-// Hàm kiểm tra xem token có hết hạn hay không
+// Function to check if the token is expired
 const isTokenExpired = (token: string) => {
   try {
     const decodedToken: any = jwtDecode(token);
@@ -16,12 +16,12 @@ const isTokenExpired = (token: string) => {
   }
 };
 
-// Hàm kiểm tra xem thông tin người dùng đã đầy đủ chưa
+// Function to check if the user's information is complete
 const checkUserInfo = async (token: string, navigation: any) => {
   try {
     const userInfo = await getUserInfo(token);
 
-    // Kiểm tra các trường thông tin cần thiết
+    // Check required user information fields
     if (
       !userInfo.companyName ||
       !userInfo.address ||
@@ -36,12 +36,7 @@ const checkUserInfo = async (token: string, navigation: any) => {
           {
             text: 'Cập nhật ngay',
             onPress: () => {
-              navigation.dispatch(
-                CommonActions.reset({
-                  index: 0,
-                  routes: [{name: 'Account'}],
-                }),
-              );
+              navigation.navigate('Account'); // Navigate to the Account screen
             },
           },
         ],
@@ -60,6 +55,7 @@ const checkUserInfo = async (token: string, navigation: any) => {
 const AuthGuard: React.FC<{children: React.ReactNode}> = ({children}) => {
   const navigation = useNavigation();
   const [isChecking, setIsChecking] = useState(true);
+  const {logout} = useAuth();
 
   useEffect(() => {
     const checkAuthentication = async () => {
@@ -74,12 +70,7 @@ const AuthGuard: React.FC<{children: React.ReactNode}> = ({children}) => {
               {
                 text: 'OK',
                 onPress: () => {
-                  navigation.dispatch(
-                    CommonActions.reset({
-                      index: 0,
-                      routes: [{name: 'Auth'}],
-                    }),
-                  );
+                  logout();
                 },
               },
             ],
@@ -92,14 +83,8 @@ const AuthGuard: React.FC<{children: React.ReactNode}> = ({children}) => {
             [
               {
                 text: 'OK',
-                onPress: async () => {
-                  await AsyncStorage.removeItem('userToken');
-                  navigation.dispatch(
-                    CommonActions.reset({
-                      index: 0,
-                      routes: [{name: 'Auth'}],
-                    }),
-                  );
+                onPress: () => {
+                  logout();
                 },
               },
             ],
@@ -107,10 +92,10 @@ const AuthGuard: React.FC<{children: React.ReactNode}> = ({children}) => {
           );
         } else {
           const isUserInfoComplete = await checkUserInfo(token, navigation);
-          if (!isUserInfoComplete) return; // Ngừng kiểm tra và điều hướng nếu thông tin không đầy đủ
+          if (!isUserInfoComplete) return; // Stop if user info is incomplete
         }
       } finally {
-        setIsChecking(false);
+        setIsChecking(false); // Set checking state to false when done
       }
     };
 
@@ -118,7 +103,7 @@ const AuthGuard: React.FC<{children: React.ReactNode}> = ({children}) => {
   }, [navigation]);
 
   if (isChecking) {
-    return null; // Trong lúc kiểm tra không render gì
+    return null; // Render nothing while checking
   }
 
   return <>{children}</>;

@@ -13,16 +13,17 @@ import Swiper from 'react-native-swiper';
 import PostItem from '../../components/items/PostItem';
 import {Box, TruckFast, Truck, Archive} from 'iconsax-react-native';
 import Colors from '../../constants/colors';
-import {useNavigation} from '@react-navigation/native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {getAllPosts} from '../../apis/services/postService';
 import {Post} from '../../models/postModel';
 import {createChat} from '../../apis/services/chatService';
 import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserInfo} from '../../apis/services/userService';
+import RootStackParamList from '../../navigations/RootStackParamList';
 
 const HomeScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -98,7 +99,7 @@ const HomeScreen = () => {
     try {
       await createChat({postId, receiverId});
       Alert.alert('Thành công', 'Liên hệ thành công.');
-      navigation.navigate('Messages');
+      navigation.navigate('Message');
     } catch (error) {
       Alert.alert(
         'Bạn chưa đăng nhập',
@@ -253,7 +254,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFFFFF',
   },
   createSliderContainer: {
     marginHorizontal: 5,

@@ -10,25 +10,35 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  Keyboard,
 } from 'react-native';
 import {getMessages, sendMessage} from '../../apis/services/chatService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserInfo} from '../../apis/services/userService';
 import {Send} from 'iconsax-react-native';
 import Color from '../../constants/colors';
+import {RouteProp} from '@react-navigation/native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack'; // Use NativeStackScreenProps for proper typing
 
-const ChatDetail = ({route}) => {
+// Define the root stack params including ChatDetail with the expected route params
+type RootStackParamList = {
+  ChatDetail: {conversationId: string};
+};
+
+// Define the props for the ChatDetail screen using NativeStackScreenProps
+type ChatDetailProps = NativeStackScreenProps<RootStackParamList, 'ChatDetail'>;
+
+const ChatDetail: React.FC<ChatDetailProps> = ({route}) => {
   const {conversationId} = route.params;
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [currentUser, setCurrentUser] = useState(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const flatListRef = useRef(null);
+
+  const [messages, setMessages] = useState<any[]>([]);
+  const [newMessage, setNewMessage] = useState<string>('');
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const flatListRef = useRef<FlatList<any>>(null);
 
   useEffect(() => {
     fetchCurrentUser();
-    fetchMessages(); // Gọi để cập nhật tin nhắn và trạng thái đã đọc
+    fetchMessages();
     const interval = setInterval(fetchMessages, 5000); // Polling every 5 seconds
 
     return () => clearInterval(interval);
@@ -42,7 +52,7 @@ const ChatDetail = ({route}) => {
         setCurrentUser(userInfo);
       }
     } catch (error) {
-      console.error('Không thể lấy thông tin người dùng:', error);
+      console.error('Cannot fetch user information:', error);
     }
   };
 
@@ -52,7 +62,7 @@ const ChatDetail = ({route}) => {
       setMessages(messagesData);
       scrollToBottom();
     } catch (error) {
-      console.warn('Không thể lấy tin nhắn.');
+      console.warn('Failed to fetch messages.');
     }
   };
 
@@ -63,7 +73,7 @@ const ChatDetail = ({route}) => {
         setNewMessage('');
         fetchMessages();
       } catch (error) {
-        console.warn('Không thể gửi tin nhắn.');
+        console.warn('Failed to send message.');
       }
     }
   };
@@ -78,7 +88,7 @@ const ChatDetail = ({route}) => {
     flatListRef.current?.scrollToEnd({animated: true});
   };
 
-  const formatTime = dateString => {
+  const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('vi-VN', {
       hour: '2-digit',
@@ -86,8 +96,8 @@ const ChatDetail = ({route}) => {
     }).format(date);
   };
 
-  const renderMessageItem = ({item}) => {
-    const isCurrentUser = item.sender.id === currentUser?.id;
+  const renderMessageItem = ({item}: {item: any}) => {
+    const isCurrentUser = item.sender?.id === currentUser?.id;
 
     return (
       <View
@@ -101,7 +111,7 @@ const ChatDetail = ({route}) => {
           <Image
             source={{
               uri:
-                item.sender.profilePictureUrl ||
+                item.sender?.profilePictureUrl ||
                 'https://via.placeholder.com/40',
             }}
             style={styles.avatar}
@@ -130,7 +140,7 @@ const ChatDetail = ({route}) => {
         ref={flatListRef}
         data={messages}
         renderItem={renderMessageItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.id.toString()}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -143,7 +153,6 @@ const ChatDetail = ({route}) => {
           onChangeText={setNewMessage}
           placeholder="Nhập tin nhắn..."
           placeholderTextColor="#888"
-          onFocus={() => scrollToBottom()} // Cuộn xuống khi người dùng nhập tin nhắn
         />
         <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
           <Send size={30} color="#007AFF" variant="Bold" />

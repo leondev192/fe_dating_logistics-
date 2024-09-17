@@ -1,10 +1,17 @@
-import React, {useState} from 'react';
-import {View, StyleSheet, FlatList, Alert} from 'react-native';
+import React, {useState, useCallback} from 'react';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import {TextInput, Card, Text} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 // Định nghĩa kiểu dữ liệu cho formData
 interface FormData {
@@ -19,7 +26,8 @@ interface FormData {
   cargoWeight: string; // Khối lượng hàng hóa
 }
 
-const CreateLookingForTransportPost = ({route, navigation}: any) => {
+const CreateLookingForTransportPost = ({route}: any) => {
+  const navigation = useNavigation();
   const [formData, setFormData] = useState<FormData>({
     postType: 'LookingForTransport',
     status: 'Active',
@@ -40,6 +48,7 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
   const [openVehicleType, setOpenVehicleType] = useState(false);
   const [vehicleTypes, setVehicleTypes] = useState([
     {label: 'Xe tải', value: 'Xe tải'},
+    {label: 'Xe tải lạnh ', value: 'Xe tải lạnh'},
     {label: 'Xe container', value: 'Xe container'},
   ]);
 
@@ -83,6 +92,10 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
     setErrors(prevErrors => ({...prevErrors, [name]: undefined}));
   };
 
+  const navigateToMap = (field: 'origin' | 'destination') => {
+    navigation.navigate('MapScreen', {field});
+  };
+
   const handleSubmit = () => {
     if (validateForm()) {
       const formDataToSend = {
@@ -101,41 +114,47 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      const handleFocus = () => {
+        if (route.params?.selectedLocation) {
+          const {field, locationName} = route.params.selectedLocation;
+          handleChange(field, locationName);
+          navigation.setParams({selectedLocation: null});
+        }
+      };
+
+      navigation.addListener('focus', handleFocus);
+
+      return () => {
+        navigation.removeListener('focus', handleFocus);
+      };
+    }, [route.params?.selectedLocation]),
+  );
+
   const renderFormFields = () => {
     return (
       <Card style={styles.card}>
         <Card.Content>
-          <TextInput
-            label="Nơi bắt đầu"
-            mode="outlined"
-            value={formData.origin}
-            onChangeText={text => handleChange('origin', text)}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-            error={!!errors.origin}
-          />
-          {errors.origin && (
-            <Text style={styles.errorText}>{errors.origin}</Text>
-          )}
+          <TouchableOpacity
+            onPress={() => navigateToMap('origin')}
+            style={styles.inputContainer}>
+            <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">
+              {formData.origin || 'Nơi bắt đầu'}
+            </Text>
+          </TouchableOpacity>
 
-          <TextInput
-            label="Nơi kết thúc"
-            mode="outlined"
-            value={formData.destination}
-            onChangeText={text => handleChange('destination', text)}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-            error={!!errors.destination}
-          />
-          {errors.destination && (
-            <Text style={styles.errorText}>{errors.destination}</Text>
-          )}
+          <TouchableOpacity
+            onPress={() => navigateToMap('destination')}
+            style={styles.inputContainer}>
+            <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">
+              {formData.destination || 'Nơi kết thúc'}
+            </Text>
+          </TouchableOpacity>
 
           <View style={styles.timeRow}>
             <TextInput
-              label="Thời gian đi"
+              label="Thời gian dự kiến"
               mode="outlined"
               value={formData.transportGoes.toLocaleDateString()}
               style={[styles.timeInput, {marginRight: 5}]}
@@ -144,19 +163,6 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
               onPressIn={() => {
                 setShowTransportGoesPicker(true);
                 setShowTransportComesPicker(false);
-              }}
-            />
-            <Text style={styles.dash}>-</Text>
-            <TextInput
-              label="Thời gian tới"
-              mode="outlined"
-              value={formData.transportComes.toLocaleDateString()}
-              style={[styles.timeInput, {marginLeft: 5}]}
-              outlineColor={Colors.bordercolor}
-              activeOutlineColor={Colors.primary}
-              onPressIn={() => {
-                setShowTransportComesPicker(true);
-                setShowTransportGoesPicker(false);
               }}
             />
           </View>
@@ -222,7 +228,7 @@ const CreateLookingForTransportPost = ({route, navigation}: any) => {
           )}
 
           <TextInput
-            label="Loại hàng hóa yêu cầu"
+            label="Loại hàng hóa"
             mode="outlined"
             value={formData.cargoTypeRequest}
             onChangeText={text => handleChange('cargoTypeRequest', text)}
@@ -302,16 +308,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  dash: {
-    fontSize: 20,
-    marginHorizontal: 5,
-  },
   dropdown: {
     marginBottom: 15,
     borderColor: Colors.bordercolor,
   },
   dropdownContainer: {
     borderColor: Colors.bordercolor,
+  },
+  inputContainer: {
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 5,
+    borderColor: Colors.bordercolor,
+    borderWidth: 1,
+  },
+  text: {
+    fontSize: 16,
+    color: Colors.text,
   },
 });
 

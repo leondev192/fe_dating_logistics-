@@ -11,9 +11,11 @@ import {
   CommonActions,
   NavigationProp,
 } from '@react-navigation/native';
-import {User} from 'iconsax-react-native';
+import {Logout, User} from 'iconsax-react-native';
 import {getUserInfo} from '../../apis/services/userService';
 import LoadingSpinner from '../../components/loading/LoadingSpinner'; // Import LoadingSpinner
+import {useAuth} from '../../contexts/AuthContext';
+import {useAnimatedValue} from '../../hooks/useAnimatedValue';
 
 type RootStackParamList = {
   Auth: undefined;
@@ -25,7 +27,9 @@ const AccountScreen = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const animatedValue = useAnimatedValue(0);
 
+  const {logout} = useAuth();
   useEffect(() => {
     checkLoginStatus();
 
@@ -62,15 +66,6 @@ const AccountScreen = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogin = () => {
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{name: 'Auth'}],
-      }),
-    );
   };
 
   const handleLogout = async () => {
@@ -130,7 +125,7 @@ const AccountScreen = () => {
                 />
               </>
             ) : (
-              <OutlineButton title="Đăng nhập" onPress={handleLogin} />
+              <OutlineButton title="Đăng nhập" onPress={logout} />
             )}
           </View>
         </LinearGradient>
@@ -139,9 +134,7 @@ const AccountScreen = () => {
           <OutlineButton title="Chính sách bảo mật" onPress={() => {}} />
           <OutlineButton title="Trợ giúp" onPress={() => {}} />
           <OutlineButton title="Đóng góp ý kiến" onPress={() => {}} />
-          {isLoggedIn && (
-            <GradientButton title="Đăng xuất" onPress={handleLogout} />
-          )}
+          {isLoggedIn && <GradientButton title="Đăng xuất" onPress={logout} />}
         </View>
 
         <Text style={styles.versionText}>Phiên bản 1.0</Text>

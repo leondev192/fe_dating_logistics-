@@ -99,15 +99,7 @@ const UserEdit = ({route, navigation}: any) => {
             outlineColor={Colors.bordercolor}
             activeOutlineColor={Colors.primary}
           />
-          <TextInput
-            label="Mã số thuế"
-            mode="outlined"
-            value={user.taxCode}
-            onChangeText={value => handleInputChange('taxCode', value)}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-          />
+
           <TextInput
             label="Tên người đại diện"
             mode="outlined"
@@ -143,14 +135,12 @@ const UserEdit = ({route, navigation}: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    padding: 5,
     backgroundColor: Colors.background,
   },
   card: {
     padding: 15,
     borderRadius: 10,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
     elevation: 3,
   },
   divider: {

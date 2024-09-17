@@ -2,9 +2,8 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Platform, Text} from 'react-native';
-import {useNavigation, CompositeNavigationProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
+
 import {
   Home,
   Document,
@@ -18,19 +17,14 @@ import MessagesScreen from '../screens/main/MessagesScreen';
 import NotificationScreen from '../screens/main/NotificationScreen';
 import AccountScreen from '../screens/main/AccountScreen';
 import CustomHeader from '../components/customheader/CustomHomeHeader';
-import {RootStackParamList, TabParamList} from './navigationTypes';
 import Colors from '../constants/colors';
 import AuthGuard from '../components/checktoken/AuthChecker'; // Import AuthGuard
+import RootStackParamList from './RootStackParamList';
 
-const Tab = createBottomTabNavigator<TabParamList>();
-
-type TabNavigationProp = CompositeNavigationProp<
-  BottomTabNavigationProp<TabParamList>,
-  NativeStackNavigationProp<RootStackParamList>
->;
+const Tab = createBottomTabNavigator();
 
 const TabNavigator: React.FC = () => {
-  const navigation = useNavigation<TabNavigationProp>();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   return (
     <Tab.Navigator
@@ -138,7 +132,11 @@ const TabNavigator: React.FC = () => {
           headerTitle: 'Quản lý tin',
           headerTitleAlign: 'center',
         }}>
-        {() => <ManagePostsScreen />}
+        {() => (
+          <AuthGuard>
+            <ManagePostsScreen />
+          </AuthGuard>
+        )}
       </Tab.Screen>
       <Tab.Screen
         name="Messages"
@@ -146,15 +144,24 @@ const TabNavigator: React.FC = () => {
           headerTitle: 'Tin nhắn',
           headerTitleAlign: 'center',
         }}>
-        {() => <MessagesScreen />}
+        {() => (
+          <AuthGuard>
+            <MessagesScreen />
+          </AuthGuard>
+        )}
       </Tab.Screen>
+
       <Tab.Screen
         name="Notifications"
         options={{
           headerTitle: 'Thông báo',
           headerTitleAlign: 'center',
         }}>
-        {() => <NotificationScreen />}
+        {() => (
+          <AuthGuard>
+            <NotificationScreen />
+          </AuthGuard>
+        )}
       </Tab.Screen>
 
       <Tab.Screen

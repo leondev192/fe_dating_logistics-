@@ -3,21 +3,22 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import TabNavigator from './TabNavigator';
 import SearchScreen from '../screens/main/SearchScreen';
-import UserProfile from '../screens/main/UserProfile';
-import UserEdit from '../screens/main/UserEdit';
 import BackButton from '../components/header/ArrowLeft';
 import TitleHeader from '../components/header/TitleHeader';
-import CreateCargoMatchingPost from '../screens/main/createpost/CreateCargoMatchingPost';
-import CreateLookingForTransportPost from '../screens/main/createpost/CreateLookingForTransportPost';
-import CreateOfferingTransportPost from '../screens/main/createpost/CreateOfferingTransportPost';
-
-// Import các màn hình chỉnh sửa
-import EditCargoMatchingPost from '../screens/main/managepost/EditCargoMatchingPost';
-import EditLookingForTransportPost from '../screens/main/managepost/EditLookingForTransportPost';
-import EditOfferingTransportPost from '../screens/main/managepost/EditOfferingTransportPost';
-import PaymentScreen from '../screens/main/createpost/PaymentScreen';
+import {
+  CreateLookingForTransportPost,
+  CreateOfferingTransportPost,
+  EditCargoMatchingPost,
+  EditLookingForTransportPost,
+  EditOfferingTransportPost,
+  MessScreen,
+  Payment,
+  UserEdit,
+  UserProfile,
+} from '../screens';
 import ChatDetail from '../screens/main/ChatDetail';
-import MessagesScreen from '../screens/main/MessagesScreen';
+import MapScreen from '../screens/main/createpost/LocationPickerScreenCreateLookingForTransportPost';
+import MapScreenCreateOfferingTransportPost from '../screens/main/createpost/LocationPickerScreenCreateOfferingTransportPost';
 
 const Stack = createStackNavigator();
 
@@ -61,18 +62,7 @@ const MainNavigator = () => {
           headerTitleAlign: 'center',
         }}
       />
-      <Stack.Screen
-        name="CreateCargoMatchingPost"
-        component={CreateCargoMatchingPost}
-        options={{
-          title: '',
-          headerBackTitleVisible: false,
-          headerBackImage: () => <BackButton />,
-          headerTitle: () => <TitleHeader title="Thêm thông tin" />,
-          headerTransparent: false,
-          headerTitleAlign: 'center',
-        }}
-      />
+
       <Stack.Screen
         name="CreateLookingForTransportPost"
         component={CreateLookingForTransportPost}
@@ -99,7 +89,7 @@ const MainNavigator = () => {
       />
       <Stack.Screen
         name="PaymentScreen"
-        component={PaymentScreen}
+        component={Payment}
         options={{
           title: '',
           headerBackTitleVisible: false,
@@ -159,7 +149,31 @@ const MainNavigator = () => {
       />
       <Stack.Screen
         name="MessagesScreen"
-        component={MessagesScreen}
+        component={MessScreen}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Tin nhắn" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="MapScreen"
+        component={MapScreen}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Tin nhắn" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="MapScreenOffering"
+        component={MapScreenCreateOfferingTransportPost}
         options={{
           title: '',
           headerBackTitleVisible: false,

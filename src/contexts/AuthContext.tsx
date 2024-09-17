@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.tsx
 import React, {
   createContext,
   useContext,
@@ -6,14 +5,11 @@ import React, {
   useState,
   ReactNode,
 } from 'react';
-import {Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation, CommonActions} from '@react-navigation/native'; // Import navigation tools
-import {getUserInfo} from '../apis/services/userService'; // Import user info service
-import jwtDecode from 'jwt-decode'; // Import jwt-decode to decode JWT token
-// Correct import for jwt-decode
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {jwtDecode} from 'jwt-decode';
+import RootStackParamList from '../navigations/RootStackParamList';
 
-// Define type for AuthContext
 interface AuthContextProps {
   isLoggedIn: boolean;
   login: (token: string) => Promise<void>;
@@ -29,18 +25,15 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const navigation = useNavigation(); // Use navigation hook for navigation actions
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
         const token = await AsyncStorage.getItem('userToken');
         if (token && !isTokenExpired(token)) {
-          // Token is valid, fetch user info to ensure it's complete
-          const isUserInfoComplete = await checkUserInfo(token);
-          setIsLoggedIn(isUserInfoComplete);
+          setIsLoggedIn(true);
         } else {
-          // Token is missing or expired
           setIsLoggedIn(false);
         }
       } catch (error) {
@@ -52,7 +45,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     checkLoginStatus();
   }, []);
 
-  // Function to decode and check if the token is expired
   const isTokenExpired = (token: string) => {
     try {
       const decodedToken: any = jwtDecode(token);
@@ -62,57 +54,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     }
   };
 
-  // Function to check if the user's information is complete
-  const checkUserInfo = async (token: string) => {
-    try {
-      const userInfo = await getUserInfo(token);
-      if (
-        !userInfo.companyName ||
-        !userInfo.address ||
-        !userInfo.representativeName ||
-        !userInfo.businessCode ||
-        !userInfo.taxCode
-      ) {
-        Alert.alert(
-          'Thông tin chưa đầy đủ',
-          'Vui lòng cập nhật thông tin tài khoản để sử dụng dịch vụ.',
-          [
-            {
-              text: 'Cập nhật ngay',
-              onPress: () => {
-                navigation.dispatch(
-                  CommonActions.reset({
-                    index: 0,
-                    routes: [{name: 'Account'}],
-                  }),
-                );
-              },
-            },
-          ],
-          {cancelable: false},
-        );
-        return false;
-      }
-      return true;
-    } catch (error) {
-      console.error('Error checking user info:', error);
-      return false;
-    }
-  };
-
   const login = async (token: string) => {
     try {
       await AsyncStorage.setItem('userToken', token);
-      const isUserInfoComplete = await checkUserInfo(token);
-      setIsLoggedIn(isUserInfoComplete);
-      if (isUserInfoComplete) {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{name: 'Main'}],
-          }),
-        );
-      }
+      setIsLoggedIn(true);
+      navigation.navigate('MainNavigator');
     } catch (error) {
       console.error('Login failed:', error);
     }
@@ -122,12 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     try {
       await AsyncStorage.removeItem('userToken');
       setIsLoggedIn(false);
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{name: 'Auth'}],
-        }),
-      );
+      navigation.navigate('AuthNavigator'); // Navigate to AuthNavigator
     } catch (error) {
       console.error('Logout failed:', error);
     }

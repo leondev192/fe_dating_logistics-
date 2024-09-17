@@ -16,7 +16,9 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserInfo} from '../../apis/services/userService';
 import LoadingSpinner from '../../components/loading/LoadingSpinner';
-import {useNavigation} from '@react-navigation/native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import RootStackParamList from '../../navigations/RootStackParamList';
+import {useAnimatedValue} from '../../hooks/useAnimatedValue';
 
 // Định nghĩa các kiểu dữ liệu
 interface UserType {
@@ -40,11 +42,12 @@ interface ConversationType {
 }
 
 const MessagesScreen = () => {
-  const navigation = useNavigation();
   const [conversations, setConversations] = useState<ConversationType[]>([]);
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const animatedValue = useAnimatedValue(0);
 
   useEffect(() => {
     fetchCurrentUser();
@@ -160,7 +163,7 @@ const MessagesScreen = () => {
             ellipsizeMode="tail">
             {item.messages && item.messages.length > 0
               ? item.messages[0].content
-              : 'Chưa có tin nhắn nào'}
+              : 'Đã ghép đôi'}
           </Text>
         </View>
       </TouchableOpacity>
@@ -191,7 +194,7 @@ const MessagesScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFFFFF',
   },
   conversationItem: {
     flexDirection: 'row',

@@ -1,32 +1,32 @@
 // src/navigators/AuthNavigator.tsx
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import LoginScreen from '../screens/auth/LoginScreen';
-import RegisterScreen from '../screens/auth/RegisterScreen';
-import WelcomeScreen from '../screens/auth/WelcomeSCreen';
 import BackButton from '../components/header/ArrowLeft';
 import TitleHeader from '../components/header/TitleHeader';
-import ForgotPassword from '../screens/auth/forgotpassword/ForgotPaswordScreen';
-import VerifyOtpScreen from '../screens/auth/VerifyOtpScreen';
-import VerifyOtpForgotPassword from '../screens/auth/forgotpassword/VerifyOtpScreen';
-import ResetPasswordScreen from '../screens/auth/forgotpassword/ResetPasswordScreen';
+import {RootStackParamList} from './RootStackParamList';
+import {
+  ForgotPassword,
+  Login,
+  Register,
+  ResetPassword,
+  VerifyOtp,
+  VerifyOtpForgotPassword,
+  Welcome,
+} from '../screens';
 
-// Import the types from navigationTypes
-import {AuthStackParamList} from './navigationTypes';
-
-const Stack = createStackNavigator<AuthStackParamList>();
+const Stack = createStackNavigator<RootStackParamList>();
 
 const AuthNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
         name="Welcome"
-        component={WelcomeScreen}
+        component={Welcome}
         options={{headerShown: false}}
       />
       <Stack.Screen
         name="Login"
-        component={LoginScreen}
+        component={Login}
         options={{
           title: '',
           headerBackTitleVisible: false,
@@ -38,7 +38,7 @@ const AuthNavigator = () => {
       />
       <Stack.Screen
         name="Register"
-        component={RegisterScreen}
+        component={Register}
         options={{
           title: '',
           headerBackTitleVisible: false,
@@ -74,7 +74,7 @@ const AuthNavigator = () => {
       />
       <Stack.Screen
         name="ResetPassword"
-        component={ResetPasswordScreen}
+        component={ResetPassword}
         options={{
           title: '',
           headerBackTitleVisible: false,
@@ -86,7 +86,7 @@ const AuthNavigator = () => {
       />
       <Stack.Screen
         name="VerifyOtp"
-        component={VerifyOtpScreen}
+        component={VerifyOtp}
         options={{
           title: '',
           headerBackTitleVisible: false,

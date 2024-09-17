@@ -1,11 +1,18 @@
-import React, {useState} from 'react';
-import {View, StyleSheet, Switch, FlatList, Alert} from 'react-native';
+import React, {useState, useCallback} from 'react';
+import {
+  View,
+  StyleSheet,
+  Switch,
+  FlatList,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import {TextInput, Card, Text} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
-import {createPost} from '../../../apis/services/postService';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 // Định nghĩa kiểu dữ liệu cho formData
 interface FormData {
@@ -21,9 +28,11 @@ interface FormData {
   availableWeight: string;
   pricePerUnit: string;
   vehicleDetails: string;
+  cargoTypeRequest: string;
 }
 
-const CreateOfferingTransportPost = ({route, navigation}: any) => {
+const CreateOfferingTransportPost = ({route}: any) => {
+  const navigation = useNavigation();
   const [formData, setFormData] = useState<FormData>({
     postType: 'OfferingTransport',
     status: 'Active',
@@ -37,16 +46,17 @@ const CreateOfferingTransportPost = ({route, navigation}: any) => {
     availableWeight: '',
     pricePerUnit: '',
     vehicleDetails: '',
+    cargoTypeRequest: '',
   });
 
   const [errors, setErrors] = useState<{[key in keyof FormData]?: string}>({});
   const [showTransportGoesPicker, setShowTransportGoesPicker] = useState(false);
   const [showTransportComesPicker, setShowTransportComesPicker] =
     useState(false);
-
   const [openVehicleType, setOpenVehicleType] = useState(false);
   const [vehicleTypes, setVehicleTypes] = useState([
     {label: 'Xe tải', value: 'Xe tải'},
+    {label: 'Xe tải lạnh ', value: 'Xe tải lạnh'},
     {label: 'Xe container', value: 'Xe container'},
   ]);
 
@@ -67,6 +77,10 @@ const CreateOfferingTransportPost = ({route, navigation}: any) => {
 
     if (!formData.vehicleType) {
       newErrors.vehicleType = 'Vui lòng chọn loại xe';
+      valid = false;
+    }
+    if (!formData.cargoTypeRequest) {
+      newErrors.cargoTypeRequest = 'Vui lòng nhập loại hàng hóa yêu cầu';
       valid = false;
     }
 
@@ -97,6 +111,10 @@ const CreateOfferingTransportPost = ({route, navigation}: any) => {
     setErrors(prevErrors => ({...prevErrors, [name]: undefined}));
   };
 
+  const navigateToMap = (field: 'origin' | 'destination') => {
+    navigation.navigate('MapScreenOffering', {field});
+  };
+
   const handleSubmit = () => {
     if (validateForm()) {
       const formDataToSend = {
@@ -115,38 +133,45 @@ const CreateOfferingTransportPost = ({route, navigation}: any) => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      const handleFocus = () => {
+        if (route.params?.selectedLocation) {
+          const {field, locationName} = route.params.selectedLocation;
+          handleChange(field, locationName);
+          navigation.setParams({selectedLocation: null});
+        }
+      };
+
+      navigation.addListener('focus', handleFocus);
+
+      return () => {
+        navigation.removeListener('focus', handleFocus);
+      };
+    }, [route.params?.selectedLocation]),
+  );
+
   const renderFormFields = () => (
     <Card style={styles.card}>
       <Card.Content>
-        <TextInput
-          label="Nơi bắt đầu"
-          mode="outlined"
-          value={formData.origin}
-          onChangeText={text => handleChange('origin', text)}
-          style={styles.input}
-          outlineColor={Colors.bordercolor}
-          activeOutlineColor={Colors.primary}
-          error={!!errors.origin}
-        />
-        {errors.origin && <Text style={styles.errorText}>{errors.origin}</Text>}
+        <TouchableOpacity
+          onPress={() => navigateToMap('origin')}
+          style={styles.inputContainer}>
+          <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">
+            {formData.origin || 'Nơi bắt đầu'}
+          </Text>
+        </TouchableOpacity>
 
-        <TextInput
-          label="Nơi kết thúc"
-          mode="outlined"
-          value={formData.destination}
-          onChangeText={text => handleChange('destination', text)}
-          style={styles.input}
-          outlineColor={Colors.bordercolor}
-          activeOutlineColor={Colors.primary}
-          error={!!errors.destination}
-        />
-        {errors.destination && (
-          <Text style={styles.errorText}>{errors.destination}</Text>
-        )}
-
+        <TouchableOpacity
+          onPress={() => navigateToMap('destination')}
+          style={styles.inputContainer}>
+          <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">
+            {formData.destination || 'Nơi kết thúc'}
+          </Text>
+        </TouchableOpacity>
         <View style={styles.timeRow}>
           <TextInput
-            label="Thời gian đi"
+            label="Thời gian dụ kiến"
             mode="outlined"
             value={formData.transportGoes.toLocaleDateString()}
             style={[styles.timeInput, {marginRight: 5}]}
@@ -155,19 +180,6 @@ const CreateOfferingTransportPost = ({route, navigation}: any) => {
             onPressIn={() => {
               setShowTransportGoesPicker(true);
               setShowTransportComesPicker(false);
-            }}
-          />
-          <Text style={styles.dash}>-</Text>
-          <TextInput
-            label="Thời gian tới"
-            mode="outlined"
-            value={formData.transportComes.toLocaleDateString()}
-            style={[styles.timeInput, {marginLeft: 5}]}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-            onPressIn={() => {
-              setShowTransportComesPicker(true);
-              setShowTransportGoesPicker(false);
             }}
           />
         </View>
@@ -228,7 +240,19 @@ const CreateOfferingTransportPost = ({route, navigation}: any) => {
         {errors.vehicleType && (
           <Text style={styles.errorText}>{errors.vehicleType}</Text>
         )}
-
+        <TextInput
+          label="Loại hàng hóa vận chuyển"
+          mode="outlined"
+          value={formData.cargoTypeRequest}
+          onChangeText={text => handleChange('cargoTypeRequest', text)}
+          style={styles.input}
+          outlineColor={Colors.bordercolor}
+          activeOutlineColor={Colors.primary}
+          error={!!errors.cargoTypeRequest}
+        />
+        {errors.cargoTypeRequest && (
+          <Text style={styles.errorText}>{errors.cargoTypeRequest}</Text>
+        )}
         <TextInput
           label="Sức chứa xe"
           mode="outlined"
@@ -362,6 +386,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text,
     fontWeight: '600',
+  },
+  inputContainer: {
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 5,
+    borderColor: Colors.bordercolor,
+    borderWidth: 1,
+  },
+  text: {
+    fontSize: 16,
+    color: Colors.text,
   },
 });
 

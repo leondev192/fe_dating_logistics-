@@ -10,7 +10,7 @@ const Colors = {
   text: '#1E232C',
   placeholder: '#B2BAC6',
   icon: '#60656E',
-  background: '#F5F5F5',
+  background: '#FFFFFF',
   bordercolor: '#E8ECF4',
   textbody: '#363538',
 };

@@ -1,4 +1,3 @@
-// src/navigations/RootNavigator.tsx
 import React, {useEffect, useState} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useAuth} from '../contexts/AuthContext';
@@ -13,9 +12,10 @@ const RootNavigator: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Simulate loading effect (could be a real check if needed)
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 3000);
+    }, 1000); // Shorter delay for user experience
 
     return () => clearTimeout(timer);
   }, []);

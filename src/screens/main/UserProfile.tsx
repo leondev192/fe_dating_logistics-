@@ -97,10 +97,7 @@ const UserProfile = () => {
               <Text style={styles.label}>Địa chỉ:</Text>
               <Text style={styles.value}>{userInfo.address || 'N/A'}</Text>
             </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>Mã số thuế:</Text>
-              <Text style={styles.value}>{userInfo.taxCode || 'N/A'}</Text>
-            </View>
+
             <View style={styles.infoRow}>
               <Text style={styles.label}>Người đại diện:</Text>
               <Text style={styles.value}>
@@ -136,13 +133,13 @@ const UserProfile = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 5,
+
     backgroundColor: Colors.background,
   },
   card: {
     padding: 15,
     borderRadius: 10,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
     elevation: 3,
   },
   header: {

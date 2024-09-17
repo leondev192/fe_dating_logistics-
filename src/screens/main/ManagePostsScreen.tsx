@@ -11,16 +11,20 @@ import {
 import {getUserPosts, deletePost} from '../../apis/services/postService';
 import {Post} from '../../models/postModel';
 import PostItem from '../../components/items/PostItemManager';
-import {useNavigation} from '@react-navigation/native';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {Box, TruckFast, Truck, Archive} from 'iconsax-react-native';
 import Colors from '../../constants/colors';
-import LoadingSpinner from '../../components/loading/LoadingSpinner'; // Import LoadingSpinner
+import LoadingSpinner from '../../components/loading/LoadingSpinner';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../navigations/RootStackParamList';
+import {useAnimatedValue} from '../../hooks/useAnimatedValue';
 
 const UserPostsScreen = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState<boolean>(true); // Thêm state loading
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const animatedValue = useAnimatedValue(0);
 
   // Hàm lấy dữ liệu bài đăng của user
   const fetchUserPosts = async () => {
@@ -64,12 +68,8 @@ const UserPostsScreen = () => {
       },
     ]);
   };
-
   const handleEditPost = (post: Post) => {
     switch (post.postType) {
-      case 'CargoMatching':
-        navigation.navigate('EditCargoMatchingPost', {post});
-        break;
       case 'LookingForTransport':
         navigation.navigate('EditLookingForTransportPost', {postId: post.id});
         break;
@@ -87,24 +87,23 @@ const UserPostsScreen = () => {
       companyName={item.companyName}
       hasVehicle={item.hasVehicle}
       cargoType={item.cargoType}
-      cargoWeight={item.cargoWeight}
-      cargoVolume={item.cargoVolume}
+      cargoWeight={parseFloat(item.cargoWeight ?? '0')} // Chuyển từ string sang number
+      cargoVolume={parseFloat(item.cargoVolume ?? '0')} // Chuyển từ string sang number
       requiredVehicleType={item.requiredVehicleType}
       cargoTypeRequest={item.cargoTypeRequest}
       vehicleType={item.vehicleType}
-      maxWeight={item.vehicleCapacity}
-      availableWeight={item.availableWeight}
-      pricePerUnit={item.pricePerUnit}
+      maxWeight={parseFloat(item.vehicleCapacity ?? '0')} // Chuyển từ string sang number
+      availableWeight={parseFloat(item.availableWeight ?? '0')} // Chuyển từ string sang number
+      pricePerUnit={parseFloat(item.pricePerUnit ?? '0')} // Chuyển từ string sang number
       vehicleDetails={item.vehicleDetails}
       origin={item.origin}
       destination={item.destination}
-      transportTime={item.transportTime}
+      transportTime={item.transportComes} // Sử dụng đúng tên trường nếu cần thiết
       returnTrip={item.returnTrip}
       returnTime={item.returnTime}
       status={item.status}
       specialRequirements={item.specialRequirements}
       image={{uri: item.companyImageUrl || 'https://via.placeholder.com/50'}}
-      onPress={() => console.log(`Pressed on post: ${item.id}`)}
       onEdit={() => handleEditPost(item)}
       onDelete={() => handleDeletePost(item.id)}
     />
@@ -165,7 +164,7 @@ const UserPostsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFFFFF',
   },
   postContainer: {
     flexDirection: 'row',

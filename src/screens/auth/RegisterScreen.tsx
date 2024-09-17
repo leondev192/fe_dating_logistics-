@@ -20,6 +20,11 @@ import {register} from '../../apis/services/authService';
 import Toast from 'react-native-toast-message'; // Import Toast
 import {toastConfig} from '../../components/toast/ToastAuth'; // Import cấu hình Toast
 import BlurredToast from '../../components/toast/BlurredToast'; // Import BlurredToast
+import {
+  signInWithGoogle,
+  googleLogin,
+} from '../../apis/services/googleAuthService'; // Import cả googleLogin để xử lý đăng nhập với Google
+import {useAuth} from '../../contexts/AuthContext';
 
 type RootStackParamList = {
   VerifyOtp: {
@@ -40,7 +45,7 @@ const RegisterScreen = () => {
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [roleError, setRoleError] = useState(''); // Trạng thái lỗi cho role
-  const [isToastVisible, setIsToastVisible] = useState(false); // Trạng thái hiển thị Toast
+  const {login} = useAuth();
 
   const validateEmail = (value: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -83,9 +88,7 @@ const RegisterScreen = () => {
         text2: 'Vui lòng kiểm tra lại thông tin.',
         position: 'top',
         topOffset: 300,
-        onHide: () => setIsToastVisible(false), // Ẩn Toast khi bấm nút
       });
-      setIsToastVisible(true);
       return;
     }
 
@@ -99,7 +102,6 @@ const RegisterScreen = () => {
         text2: 'Vui lòng kiểm tra email để xác nhận tài khoản.',
         position: 'top',
         topOffset: 300,
-        onHide: () => setIsToastVisible(false), // Ẩn Toast khi bấm nút
       });
       navigation.navigate('VerifyOtp', {email});
     } catch (error: any) {
@@ -110,10 +112,20 @@ const RegisterScreen = () => {
           error.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
         position: 'top',
         topOffset: 300,
-        onHide: () => setIsToastVisible(false), // Ẩn Toast khi bấm nút
       });
+    } finally {
       setLoading(false);
-      setIsToastVisible(true);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      // Lấy idToken từ Google Sign-In
+      const idToken = await signInWithGoogle();
+      const response = await googleLogin(idToken);
+      await login(response.data.token);
+    } catch (error) {
     } finally {
       setLoading(false);
     }
@@ -178,23 +190,14 @@ const RegisterScreen = () => {
           <GradientButton title="Đăng ký" onPress={handleRegister} />
           <View style={styles.dividerContainer}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>Hoặc đăng nhập với</Text>
+            <Text style={styles.dividerText}>Hoặc</Text>
             <View style={styles.dividerLine} />
           </View>
           <View style={styles.socialLoginContainer}>
-            <TouchableOpacity style={styles.socialButton} onPress={() => {}}>
-              <Image
-                source={require('../../assets/images/facebook.png')}
-                style={styles.socialButtonIcon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton} onPress={() => {}}>
-              <Image
-                source={require('../../assets/images/apple.png')}
-                style={styles.socialButtonIcon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton} onPress={() => {}}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={handleGoogleSignIn}>
+              <Text style={styles.loginWithGoogle}> Đăng nhập với Google</Text>
               <Image
                 source={require('../../assets/images/google.png')}
                 style={styles.socialButtonIcon}
@@ -243,7 +246,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   errorText: {
-    color: Colors.error, // Màu sắc lỗi từ Colors
+    color: Colors.error,
     fontSize: 14,
     marginTop: 5,
     textAlign: 'left',
@@ -253,7 +256,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 20,
-    marginHorizontal: '20%',
+    marginHorizontal: '10%',
   },
   dividerText: {
     color: '#6A707C',
@@ -288,14 +291,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   socialLoginContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'center',
+    width: '100%',
     marginTop: 30,
   },
   socialButton: {
     flexDirection: 'row',
-    width: '30%',
-    marginHorizontal: 10,
+    width: '100%',
     height: 56,
     borderRadius: 50,
     alignItems: 'center',
@@ -308,6 +310,11 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     width: 26,
     height: 26,
+  },
+  loginWithGoogle: {
+    marginRight: 20,
+    color: '#6A707C',
+    fontSize: 15,
   },
 });
 

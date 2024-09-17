@@ -67,10 +67,6 @@ const PostManagerItem: React.FC<PostManagerItemProps> = ({
     let title;
 
     switch (postType) {
-      case 'CargoMatching':
-        icon = <Box size="20" color="#555" />;
-        title = 'Ghép hàng';
-        break;
       case 'LookingForTransport':
         icon = <TruckFast size="20" color="#555" />;
         title = 'Tìm vận chuyển';
@@ -102,73 +98,6 @@ const PostManagerItem: React.FC<PostManagerItemProps> = ({
 
   const renderDetails = () => {
     switch (postType) {
-      case 'CargoMatching':
-        return (
-          <View style={styles.detailsContainer}>
-            <View style={styles.column}>
-              {hasVehicle !== undefined && hasVehicle !== null && (
-                <View style={styles.rowInfo}>
-                  <Text style={styles.label}>Đã có xe:</Text>
-                  <Text style={styles.detail}>
-                    {hasVehicle ? 'Đã có' : 'Chưa có'}
-                  </Text>
-                </View>
-              )}
-              {cargoType && (
-                <View style={styles.rowInfo}>
-                  <Text style={styles.label}>Loại hàng:</Text>
-                  <Text style={styles.detail} numberOfLines={1}>
-                    {cargoType}
-                  </Text>
-                </View>
-              )}
-              {cargoWeight !== undefined && cargoWeight !== null && (
-                <View style={styles.rowInfo}>
-                  <Text style={styles.label}>Khối lượng:</Text>
-                  <Text style={styles.detail}>{cargoWeight} tấn</Text>
-                </View>
-              )}
-              {cargoVolume !== undefined && cargoVolume !== null && (
-                <View style={styles.rowInfo}>
-                  <Text style={styles.label}>Thể tích:</Text>
-                  <Text style={styles.detail}>{cargoVolume} m³</Text>
-                </View>
-              )}
-            </View>
-            <View style={styles.column}>
-              {origin && destination && (
-                <View style={styles.routeRow}>
-                  <Text style={styles.label}>Tuyến:</Text>
-                  <View style={styles.routeContainer}>
-                    <Text style={styles.detail}>{origin}</Text>
-                    <ArrowRight
-                      size="16"
-                      color="#888"
-                      style={styles.arrowIcon}
-                    />
-                    <Text style={styles.detail}>{destination}</Text>
-                  </View>
-                </View>
-              )}
-              {transportTime && (
-                <View style={styles.rowInfo}>
-                  <Text style={styles.label}>Thời gian:</Text>
-                  <Text style={styles.detail}>
-                    {new Date(transportTime).toLocaleDateString()}
-                  </Text>
-                </View>
-              )}
-              {specialRequirements && (
-                <View style={styles.rowInfo}>
-                  <Text style={styles.label}>Yêu cầu đặc biệt:</Text>
-                  <Text style={styles.detail} numberOfLines={1}>
-                    {specialRequirements}
-                  </Text>
-                </View>
-              )}
-            </View>
-          </View>
-        );
       case 'LookingForTransport':
         return (
           <View style={styles.detailsContainer}>
@@ -205,7 +134,7 @@ const PostManagerItem: React.FC<PostManagerItemProps> = ({
               )}
               {transportTime && (
                 <View style={styles.rowInfo}>
-                  <Text style={styles.label}>Thời gian:</Text>
+                  <Text style={styles.label}>Thời gian dự kiến:</Text>
                   <Text style={styles.detail}>
                     {new Date(transportTime).toLocaleDateString()}
                   </Text>
