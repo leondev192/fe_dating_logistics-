@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, Alert} from 'react-native';
-import {Card, Text, TextInput, Divider} from 'react-native-paper';
+import {View, StyleSheet, Alert, Image} from 'react-native';
+import {Card, Text, Divider} from 'react-native-paper';
 import Colors from '../../../constants/colors';
 import {createPost} from '../../../apis/services/postService';
 import GradientButton from '../../../components/button/payment/GradientButton'; // Import GradientButton
@@ -8,16 +8,7 @@ import LoadingSpinner from '../../../components/loading/LoadingSpinner'; // Impo
 
 const PaymentScreen = ({navigation, route}: any) => {
   const [isPaying, setIsPaying] = useState(false);
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [cvv, setCvv] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const [errors, setErrors] = useState({
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-  });
 
   const formData = {
     ...route.params.formData,
@@ -25,33 +16,10 @@ const PaymentScreen = ({navigation, route}: any) => {
     transportComes: new Date(route.params.formData.transportComes),
   };
 
-  const validateInputs = () => {
-    const newErrors = {cardNumber: '', expiryDate: '', cvv: ''};
-    let isValid = true;
-
-    if (!cardNumber) {
-      newErrors.cardNumber = 'Vui lòng nhập số thẻ';
-      isValid = false;
-    }
-    if (!expiryDate) {
-      newErrors.expiryDate = 'Vui lòng nhập ngày hết hạn';
-      isValid = false;
-    }
-    if (!cvv) {
-      newErrors.cvv = 'Vui lòng nhập CVV';
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-
-    return isValid;
-  };
-
   const handlePayment = async () => {
-    if (!validateInputs()) return;
-
     setIsPaying(true);
     setLoading(true);
+
     setTimeout(async () => {
       setIsPaying(false);
       try {
@@ -60,8 +28,8 @@ const PaymentScreen = ({navigation, route}: any) => {
 
         // Hiển thị thông báo thành công
         Alert.alert(
-          'Thành công',
-          'Thanh toán và đăng bài thành công',
+          'Chờ trong giây lát',
+          'bài đăng của bạn sẻ được đăng sau khi chúng tôi xác thực thanh toán',
           [
             {
               text: 'OK',
@@ -78,7 +46,7 @@ const PaymentScreen = ({navigation, route}: any) => {
         );
       } catch (error) {
         // Xử lý lỗi nếu có
-        console.error('Error creating post:', error);
+        // console.error('Error creating post:', error);
         Alert.alert(
           'Lỗi',
           'Lỗi khi tạo bài đăng',
@@ -88,7 +56,7 @@ const PaymentScreen = ({navigation, route}: any) => {
       } finally {
         setLoading(false);
       }
-    }, 2000);
+    }, 3000); // Thời gian chờ 5 giây
   };
 
   return (
@@ -106,50 +74,25 @@ const PaymentScreen = ({navigation, route}: any) => {
             <Text style={styles.paymentValue}>50.000 VND</Text>
           </View>
           <Divider style={styles.divider} />
-          <Text style={styles.sectionTitle}>Chi tiết thẻ</Text>
-          <TextInput
-            label="Số Thẻ"
-            value={cardNumber}
-            onChangeText={text => setCardNumber(text)}
-            style={styles.input}
-            error={!!errors.cardNumber}
+          <Text style={styles.sectionTitle}>Thông tin chuyển khoản</Text>
+          <Text style={styles.bankInfo}>
+            Ngân hàng: Techcombank
+            {'\n'}Chủ tài khoản: VO THI HANG NGA
+            {'\n'}Số tài khoản: 1903 9249 6300 17
+          </Text>
+          <Image
+            source={require('../../../assets/images/qr.png')} // Thay bằng link hoặc đường dẫn tới ảnh QR code
+            style={styles.qrImage}
           />
-          {errors.cardNumber ? (
-            <Text style={styles.errorText}>{errors.cardNumber}</Text>
-          ) : null}
-
-          <TextInput
-            label="Ngày Hết Hạn"
-            value={expiryDate}
-            onChangeText={text => setExpiryDate(text)}
-            placeholder="MM/YY"
-            style={styles.input}
-            error={!!errors.expiryDate}
-          />
-          {errors.expiryDate ? (
-            <Text style={styles.errorText}>{errors.expiryDate}</Text>
-          ) : null}
-
-          <TextInput
-            label="CVV"
-            value={cvv}
-            onChangeText={text => setCvv(text)}
-            secureTextEntry
-            style={styles.input}
-            error={!!errors.cvv}
-          />
-          {errors.cvv ? (
-            <Text style={styles.errorText}>{errors.cvv}</Text>
-          ) : null}
-
-          <Card.Actions style={styles.cardActions}>
-            <GradientButton
-              title={isPaying ? 'Đang xử lý...' : 'Thanh Toán'}
-              onPress={handlePayment}
-              style={styles.button}
-            />
-          </Card.Actions>
+          <Divider style={styles.divider} />
         </Card.Content>
+        <Card.Actions style={styles.cardActions}>
+          <GradientButton
+            title={isPaying ? 'Đang xử lý...' : 'Xác nhận đã chuyển khoản'}
+            onPress={handlePayment}
+            style={styles.button}
+          />
+        </Card.Actions>
       </Card>
       {loading && <LoadingSpinner loading={loading} />}
     </View>
@@ -157,10 +100,6 @@ const PaymentScreen = ({navigation, route}: any) => {
 };
 
 const styles = StyleSheet.create({
-  cardActions: {
-    justifyContent: 'center',
-    marginTop: 15,
-  },
   container: {
     flex: 1,
     padding: 5,
@@ -186,19 +125,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: Colors.textbody,
   },
-  input: {
-    marginBottom: 10,
-    backgroundColor: '#fff',
-  },
-  button: {
-    alignSelf: 'center',
-    width: '80%',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginBottom: 10,
-  },
   paymentDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -214,8 +140,27 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: 'bold',
   },
+  bankInfo: {
+    fontSize: 16,
+    color: '#333',
+    marginVertical: 10,
+  },
+  qrImage: {
+    width: 200,
+    height: 160,
+    alignSelf: 'center',
+    marginBottom: 10,
+  },
   divider: {
     marginVertical: 10,
+  },
+  cardActions: {
+    justifyContent: 'center',
+    marginTop: 15,
+  },
+  button: {
+    alignSelf: 'center',
+    width: '80%',
   },
 });
 

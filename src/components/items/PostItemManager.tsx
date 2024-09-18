@@ -341,6 +341,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     textAlign: 'center',
+    marginTop: 25,
     padding: 4,
     borderRadius: 4,
   },

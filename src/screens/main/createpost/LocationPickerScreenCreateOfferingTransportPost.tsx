@@ -16,6 +16,7 @@ import Geolocation from 'react-native-geolocation-service';
 import axios from 'axios';
 import {Add, Gps} from 'iconsax-react-native';
 import {useNavigation} from '@react-navigation/native';
+import GradientButton from '../../../components/button/GradientButton';
 
 const HERE_API_KEY = '0iK9NH7BKY8yWYhFjJIUHk4UQHcGjZ6NxvdFizl4rwc';
 
@@ -197,7 +198,7 @@ const MapScreen: React.FC = ({route}: any) => {
         {location && <Marker coordinate={location} />}
       </MapView>
       <View style={styles.centerMarkerContainer}>
-        <Add size={30} color="red" variant="Broken" />
+        <Add size={30} color="#110088" variant="Broken" />
       </View>
       <SafeAreaView style={styles.headerContainer}>
         <View style={styles.searchContainer}>
@@ -213,7 +214,7 @@ const MapScreen: React.FC = ({route}: any) => {
           <TouchableOpacity
             style={styles.locationButton}
             onPress={getCurrentLocation}>
-            <Gps size={24} color="#0084ff" variant="Broken" />
+            <Gps size={24} color="#110088" variant="Broken" />
           </TouchableOpacity>
         </View>
         {suggestions.length > 0 && (
@@ -240,9 +241,9 @@ const MapScreen: React.FC = ({route}: any) => {
           <Text style={styles.infoText}>Kéo bản đồ để chọn vị trí</Text>
         )}
       </View>
-      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-        <Text style={styles.confirmButtonText}>Xác nhận</Text>
-      </TouchableOpacity>
+      <View style={styles.confirmButton}>
+        <GradientButton title="Xác Nhận" onPress={handleConfirm} />
+      </View>
     </View>
   );
 };
@@ -295,7 +296,6 @@ const styles = StyleSheet.create({
   },
   suggestionsList: {
     position: 'absolute',
-    marginTop: 50,
     top: 60,
     left: 10,
     right: 10,
@@ -329,14 +329,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   confirmButton: {
-    position: 'absolute',
-    bottom: 20,
-    left: 10,
-    right: 10,
-    backgroundColor: '#0084ff',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
+    padding: 20,
   },
   confirmButtonText: {
     color: '#fff',

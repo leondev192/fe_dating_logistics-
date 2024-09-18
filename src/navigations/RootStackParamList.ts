@@ -23,6 +23,8 @@ export type RootStackParamList = {
   MainNavigator: undefined;
   AuthNavigator: undefined;
   ChatDetail: {conversationId: string};
+  ConversationDetail: undefined;
+  UserDetailScreen: undefined;
 };
 
 export default RootStackParamList;

@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
           setIsLoggedIn(false);
         }
       } catch (error) {
-        console.error('Failed to load login status:', error);
+        // console.error('Failed to load login status:', error);
         setIsLoggedIn(false);
       }
     };
@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       setIsLoggedIn(true);
       navigation.navigate('MainNavigator');
     } catch (error) {
-      console.error('Login failed:', error);
+      // console.error('Login failed:', error);
     }
   };
 
@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       setIsLoggedIn(false);
       navigation.navigate('AuthNavigator'); // Navigate to AuthNavigator
     } catch (error) {
-      console.error('Logout failed:', error);
+      // console.error('Logout failed:', error);
     }
   };
 

@@ -10,7 +10,7 @@ const UserEdit = ({route, navigation}: any) => {
   const userInfo = route.params?.userInfo;
 
   if (!userInfo) {
-    console.error('User info is missing from route params.');
+    // console.error('User info is missing from route params.');
     return (
       <Text style={{textAlign: 'center', marginTop: 20}}>
         Lỗi: Không có thông tin người dùng.
@@ -23,7 +23,6 @@ const UserEdit = ({route, navigation}: any) => {
     companyName: userInfo.companyName || '',
     address: userInfo.address || '',
     businessCode: userInfo.businessCode || '',
-    taxCode: userInfo.taxCode || '',
     representativeName: userInfo.representativeName || '',
     representativeUrl: userInfo.representativeUrl || '',
     profilePictureUrl: userInfo.profilePictureUrl || '',

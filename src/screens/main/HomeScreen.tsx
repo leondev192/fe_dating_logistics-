@@ -21,7 +21,7 @@ import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserInfo} from '../../apis/services/userService';
 import RootStackParamList from '../../navigations/RootStackParamList';
-
+import {useAnimatedValue} from '../../hooks/useAnimatedValue';
 const HomeScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [posts, setPosts] = useState<Post[]>([]);
@@ -30,6 +30,7 @@ const HomeScreen = () => {
   const [filter, setFilter] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const animatedValue = useAnimatedValue(0);
 
   // Fetch current user info
   const fetchCurrentUser = async () => {
@@ -40,7 +41,7 @@ const HomeScreen = () => {
         setCurrentUser(userInfo);
       }
     } catch (error) {
-      console.error('Error fetching current user:', error);
+      // console.error('Error fetching current user:', error);
     }
   };
 
@@ -52,7 +53,7 @@ const HomeScreen = () => {
       setPosts(postsData);
       applyFilter(filter, postsData);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      // console.error('Error fetching posts:', error);
     } finally {
       setLoading(false);
     }
@@ -116,6 +117,7 @@ const HomeScreen = () => {
   const renderItem = ({item}: {item: Post}) => (
     <PostItem
       postId={item.id}
+      createdAt={item.createdAt}
       receiverId={item.userId}
       postType={item.postType}
       companyName={item.companyName}

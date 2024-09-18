@@ -1,5 +1,3 @@
-// googleAuthService.ts
-import {Alert} from 'react-native';
 import {
   GoogleSignin,
   statusCodes,
@@ -20,43 +18,33 @@ GoogleSignin.configure({
 // Đăng nhập với Google và lấy idToken
 export const signInWithGoogle = async (): Promise<string> => {
   try {
-    // Kiểm tra nếu Google Play Services có sẵn trên thiết bị (đối với Android)
     await GoogleSignin.hasPlayServices();
-
-    // Thực hiện đăng nhập Google và lấy thông tin người dùng
     const userInfo = await GoogleSignin.signIn();
-
-    // In ra toàn bộ thông tin userInfo để xác định rõ idToken
-    console.log('Google Sign-In User Info:', userInfo);
-
-    // Truy xuất idToken từ userInfo
     const idToken = userInfo?.idToken || userInfo?.data?.idToken;
 
-    // Kiểm tra nếu idToken không tồn tại
     if (!idToken) {
-      console.error('Không lấy được idToken từ Google Sign-In', userInfo);
       throw new Error('Không lấy được idToken từ Google Sign-In');
     }
 
-    // Không hiển thị Alert tại đây để tránh hiển thị hai lần
-    return idToken; // Trả về idToken để gửi đến backend
+    return idToken;
   } catch (error: any) {
-    console.error('Google Sign-In Error:', error);
-    handleSignInError(error);
-    throw error;
+    // Chỉ throw lỗi mà không Alert
+    throw handleSignInError(error);
   }
 };
 
-// Hàm xử lý lỗi đăng nhập
+// Hàm xử lý lỗi đăng nhập, trả về lỗi đã format
 const handleSignInError = (error: any) => {
   if (error?.code === statusCodes.SIGN_IN_CANCELLED) {
-    Alert.alert('Hủy', 'Đăng nhập bị hủy');
+    return new Error('Đăng nhập đã bị hủy. Vui lòng thử lại.');
   } else if (error?.code === statusCodes.IN_PROGRESS) {
-    Alert.alert('Đang tiến hành', 'Đang tiến hành đăng nhập');
+    return new Error('Đăng nhập đang được tiến hành.');
   } else if (error?.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-    Alert.alert('Lỗi', 'Google Play Services không khả dụng');
+    return new Error('Google Play Services không khả dụng trên thiết bị.');
   } else {
-    Alert.alert('Lỗi', `Đăng nhập thất bại: ${error.message}`);
+    return new Error(
+      `Đăng nhập thất bại: ${error.message || 'Không rõ nguyên nhân.'}`,
+    );
   }
 };
 
@@ -64,15 +52,13 @@ const handleSignInError = (error: any) => {
 export const googleLogin = async (idToken: string) => {
   try {
     if (!idToken) {
-      throw new Error('idToken không được cung cấp');
+      throw new Error('idToken không được cung cấp.');
     }
 
-    // Gọi API backend thông qua apiClient
     const response = await apiClient.post('/auth/google-login', {idToken});
 
     if (response.data.status === 'success') {
       await AsyncStorage.setItem('userToken', response.data.data.token);
-      Alert.alert('Thành công', 'Đăng nhập với Google thành công'); // Chỉ hiển thị Alert tại đây
       return response.data;
     } else {
       throw new Error(
@@ -80,11 +66,7 @@ export const googleLogin = async (idToken: string) => {
       );
     }
   } catch (error: any) {
-    console.error('Google Login API Error:', error);
-    Alert.alert(
-      'Lỗi',
-      `Đăng nhập với Google không thành công: ${error.message}`,
-    );
+    // Chỉ throw lỗi mà không Alert
     throw error;
   }
 };

@@ -149,3 +149,51 @@ export const markMessagesAsRead = async conversationId => {
     console.warn('Không thể đánh dấu tin nhắn là đã đọc.', error);
   }
 };
+// Lấy thông tin chi tiết của cuộc trò chuyện (bao gồm contractImageUrl)
+export const getConversationDetails = async (conversationId: string) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      throw new Error('Vui lòng đăng nhập lại.');
+    }
+
+    const response = await apiClient.get(`/chats/${conversationId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching conversation details:', error);
+    throw error;
+  }
+};
+
+// Cập nhật URL ảnh hợp đồng cho cuộc trò chuyện
+export const updateContractImage = async (
+  conversationId: string,
+  imageUrl: string,
+) => {
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      throw new Error('Vui lòng đăng nhập lại.');
+    }
+
+    const response = await apiClient.patch(
+      `/chats/${conversationId}/contract-image`,
+      {imageUrl},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error updating contract image:', error);
+    throw error;
+  }
+};

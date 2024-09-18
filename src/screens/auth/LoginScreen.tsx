@@ -44,7 +44,11 @@ const LoginScreen = () => {
       const response = await googleLogin(idToken);
 
       await login(response.data.token);
-    } catch (error) {}
+    } catch (error) {
+      navigation.goBack();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogin = async () => {
@@ -275,7 +279,7 @@ const styles = StyleSheet.create({
   socialButton: {
     flexDirection: 'row',
     width: '100%',
-    height: 56,
+    height: 48,
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',

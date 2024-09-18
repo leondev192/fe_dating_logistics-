@@ -33,7 +33,7 @@ const UserPostsScreen = () => {
       const userPosts = await getUserPosts();
       setPosts(userPosts);
     } catch (error) {
-      console.error('Error fetching user posts:', error);
+      // console.error('Error fetching user posts:', error);
     } finally {
       setLoading(false); // Kết thúc loading sau khi tải dữ liệu
     }
@@ -62,7 +62,7 @@ const UserPostsScreen = () => {
             await deletePost(postId);
             fetchUserPosts();
           } catch (error) {
-            console.error('Error deleting post:', error);
+            // console.error('Error deleting post:', error);
           }
         },
       },
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   postContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 10,
+    paddingVertical: 2,
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
     borderWidth: 1,

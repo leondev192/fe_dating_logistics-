@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 30,
     width: '100%',
-    height: 58,
+    height: 48,
     marginVertical: 10,
   },
   solidText: {

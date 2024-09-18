@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: '-30%',
   },
   lottie: {
     width: 70,

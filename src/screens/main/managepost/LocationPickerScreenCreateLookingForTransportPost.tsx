@@ -166,12 +166,15 @@ const MapScreen: React.FC = ({route}: any) => {
   };
 
   // Handle confirm button press
+  // Handle confirm button press
   const handleConfirm = () => {
     if (!locationName || !location) {
       Alert.alert('Chưa chọn vị trí', 'Vui lòng chọn vị trí trên bản đồ.');
       return;
     }
-    navigation.navigate('CreateLookingForTransportPost', {
+    // Truyền dữ liệu về màn hình chỉnh sửa bài đăng, đảm bảo gửi cả postId
+    navigation.navigate('EditLookingForTransportPost', {
+      postId: route.params?.postId, // Truyền lại postId
       selectedLocation: {field, locationName},
     });
   };

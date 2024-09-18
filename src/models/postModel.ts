@@ -20,8 +20,7 @@ export interface Post {
   cargoWeight?: string | null;
   cargoVolume?: string | null;
   specialRequirements?: string;
-
-  // Fields specific to LookingForTransport
+  createdAt: string; // Fields specific to LookingForTransport
   requiredVehicleType?: string;
   cargoTypeRequest?: string;
 

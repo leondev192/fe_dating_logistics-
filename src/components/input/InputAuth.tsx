@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.bordercolor,
     borderRadius: 50,
-    height: 56,
+    height: 48,
     backgroundColor: '#fff',
   },
   icon: {

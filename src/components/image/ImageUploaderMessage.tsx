@@ -1,4 +1,3 @@
-// src/components/image/ImageUploader.tsx
 import React, {useState} from 'react';
 import {
   View,
@@ -18,11 +17,11 @@ import {
   CLOUDINARY_UPLOAD_PRESET,
   CLOUDINARY_API_URL,
 } from '../../apis/cloudinary.config';
-import {Add} from 'iconsax-react-native'; // Import icon Add từ iconsax-react-native
+import {Add} from 'iconsax-react-native';
 
 interface ImageUploaderProps {
-  onImageUpload: (url: string) => void; // Hàm callback để truyền URL về component cha
-  currentImageUrl?: string; // URL của ảnh hiện tại (nếu có)
+  onImageUpload: (url: string) => void;
+  currentImageUrl?: string;
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({
@@ -30,9 +29,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   currentImageUrl,
 }) => {
   const [uploading, setUploading] = useState(false);
-  const [imageUrl, setImageUrl] = useState(currentImageUrl || ''); // Trạng thái để lưu URL ảnh hiện tại
+  const [imageUrl, setImageUrl] = useState(currentImageUrl || '');
 
-  // Chọn ảnh từ thư viện và tự động upload
+  // Khi component nhận props mới, cập nhật lại imageUrl
+  React.useEffect(() => {
+    setImageUrl(currentImageUrl || '');
+  }, [currentImageUrl]);
+
   const handleChoosePhoto = () => {
     const options: ImageLibraryOptions = {
       mediaType: 'photo',
@@ -51,7 +54,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     });
   };
 
-  // Upload ảnh lên Cloudinary
   const handleUploadPhoto = async (selectedImage: Asset) => {
     setUploading(true);
 
@@ -66,7 +68,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     try {
       const response = await axios.post(CLOUDINARY_API_URL, data);
       const uploadedUrl = response.data.secure_url;
-      setImageUrl(uploadedUrl); // Cập nhật trạng thái URL ảnh mới
+      setImageUrl(uploadedUrl);
       onImageUpload(uploadedUrl); // Gửi URL ảnh đã upload lên cho component cha
     } catch (error) {
     } finally {
@@ -82,7 +84,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       {uploading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : imageUrl ? (
-        <Image source={{uri: imageUrl}} style={styles.image} /> // Hiển thị ảnh hiện tại
+        <Image source={{uri: imageUrl}} style={styles.image} />
       ) : (
         <View style={styles.placeholder}>
           <Add size={50} color="#ccc" />

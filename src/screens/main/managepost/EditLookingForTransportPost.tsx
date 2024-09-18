@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   StyleSheet,
@@ -12,6 +12,7 @@ import Colors from '../../../constants/colors';
 import {updatePost, getPostById} from '../../../apis/services/postService';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DropDownPicker from 'react-native-dropdown-picker';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 
 interface FormData {
   postType: 'LookingForTransport';
@@ -25,8 +26,9 @@ interface FormData {
   cargoWeight: string;
 }
 
-const EditLookingForTransportPost = ({route, navigation}: any) => {
+const EditLookingForTransportPost = ({route}: any) => {
   const {postId} = route.params;
+  const navigation = useNavigation();
   const [formData, setFormData] = useState<FormData>({
     postType: 'LookingForTransport',
     status: 'active',
@@ -38,6 +40,12 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
     cargoTypeRequest: '',
     cargoWeight: '',
   });
+  const navigateToMap = (field: 'origin' | 'destination') => {
+    navigation.navigate('EditMapScreen', {
+      field,
+      postId,
+    });
+  };
 
   const [showTransportGoesPicker, setShowTransportGoesPicker] = useState(false);
   const [showTransportComesPicker, setShowTransportComesPicker] =
@@ -78,7 +86,7 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
           cargoWeight: post.cargoWeight || '',
         });
       } catch (error) {
-        console.error('Error fetching post by ID:', error);
+        // console.error('Error fetching post by ID:', error);
         Alert.alert('Lỗi', 'Lỗi khi tải dữ liệu bài đăng', [
           {text: 'OK', onPress: () => console.log('Alert closed')},
         ]);
@@ -117,7 +125,6 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
         'Khối lượng hàng hóa phải lớn hơn 0 và là số hợp lệ';
       valid = false;
     }
-
     setErrors(newErrors);
     return valid;
   };
@@ -152,6 +159,30 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      const handleFocus = () => {
+        // Kiểm tra và cập nhật lại formData khi có selectedLocation
+        if (route.params?.selectedLocation) {
+          const {field, locationName} = route.params.selectedLocation;
+          handleChange(field, locationName);
+          // Đảm bảo postId vẫn được giữ nguyên và không bị mất khi quay lại
+          if (!postId) {
+            navigation.setParams({postId: route.params?.postId});
+          }
+          // Đặt lại selectedLocation để tránh cập nhật lại không cần thiết
+          navigation.setParams({selectedLocation: null});
+        }
+      };
+
+      navigation.addListener('focus', handleFocus);
+
+      return () => {
+        navigation.removeListener('focus', handleFocus);
+      };
+    }, [route.params?.selectedLocation, postId]),
+  );
+
   const renderStatusButtons = () => (
     <View style={styles.statusButtonContainer}>
       <TouchableOpacity
@@ -180,35 +211,25 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
   const renderFormFields = () => (
     <Card style={styles.card}>
       <Card.Content>
-        <TextInput
-          label="Nơi bắt đầu"
-          mode="outlined"
-          value={formData.origin}
-          onChangeText={text => handleChange('origin', text)}
-          style={styles.input}
-          outlineColor={Colors.bordercolor}
-          activeOutlineColor={Colors.primary}
-          error={!!errors.origin}
-        />
-        {errors.origin && <Text style={styles.errorText}>{errors.origin}</Text>}
+        <TouchableOpacity
+          onPress={() => navigateToMap('origin')}
+          style={styles.inputContainer}>
+          <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">
+            {formData.origin || 'Nơi bắt đầu'}
+          </Text>
+        </TouchableOpacity>
 
-        <TextInput
-          label="Nơi kết thúc"
-          mode="outlined"
-          value={formData.destination}
-          onChangeText={text => handleChange('destination', text)}
-          style={styles.input}
-          outlineColor={Colors.bordercolor}
-          activeOutlineColor={Colors.primary}
-          error={!!errors.destination}
-        />
-        {errors.destination && (
-          <Text style={styles.errorText}>{errors.destination}</Text>
-        )}
+        <TouchableOpacity
+          onPress={() => navigateToMap('destination')}
+          style={styles.inputContainer}>
+          <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">
+            {formData.destination || 'Nơi kết thúc'}
+          </Text>
+        </TouchableOpacity>
 
         <View style={styles.timeRow}>
           <TextInput
-            label="Thời gian đi"
+            label="Thời gian dự kiến"
             mode="outlined"
             value={formData.transportGoes.toLocaleDateString()}
             style={[styles.timeInput, {marginRight: 5}]}
@@ -217,19 +238,6 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
             onPressIn={() => {
               setShowTransportGoesPicker(true);
               setShowTransportComesPicker(false);
-            }}
-          />
-          <Text style={styles.dash}>-</Text>
-          <TextInput
-            label="Thời gian tới"
-            mode="outlined"
-            value={formData.transportComes.toLocaleDateString()}
-            style={[styles.timeInput, {marginLeft: 5}]}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-            onPressIn={() => {
-              setShowTransportComesPicker(true);
-              setShowTransportGoesPicker(false);
             }}
           />
         </View>
@@ -295,7 +303,7 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
         )}
 
         <TextInput
-          label="Loại hàng hóa yêu cầu"
+          label="Loại hàng hóa"
           mode="outlined"
           value={formData.cargoTypeRequest}
           onChangeText={text => handleChange('cargoTypeRequest', text)}
@@ -311,7 +319,6 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
         <TextInput
           label="Khối lượng hàng hóa"
           mode="outlined"
-          keyboardType="numeric"
           value={String(formData.cargoWeight)}
           onChangeText={text => handleChange('cargoWeight', text)}
           style={styles.input}
@@ -346,7 +353,6 @@ const EditLookingForTransportPost = ({route, navigation}: any) => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 5,
     backgroundColor: Colors.background,
   },
   card: {
@@ -412,6 +418,18 @@ const styles = StyleSheet.create({
   statusButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  inputContainer: {
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 5,
+    borderColor: Colors.bordercolor,
+    borderWidth: 1,
+  },
+  text: {
+    fontSize: 16,
+    color: Colors.text,
   },
 });
 

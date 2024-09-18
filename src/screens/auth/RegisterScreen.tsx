@@ -126,6 +126,7 @@ const RegisterScreen = () => {
       const response = await googleLogin(idToken);
       await login(response.data.token);
     } catch (error) {
+      navigation.goBack();
     } finally {
       setLoading(false);
     }
@@ -298,7 +299,7 @@ const styles = StyleSheet.create({
   socialButton: {
     flexDirection: 'row',
     width: '100%',
-    height: 56,
+    height: 48,
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',

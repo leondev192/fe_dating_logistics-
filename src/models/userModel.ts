@@ -4,7 +4,6 @@ export interface UpdateUserRequest {
   companyName?: string;
   address?: string;
   businessCode?: string;
-  taxCode?: string;
   representativeName?: string;
   representativeUrl?: string;
   profilePictureUrl?: string;

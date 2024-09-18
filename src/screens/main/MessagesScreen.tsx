@@ -1,3 +1,4 @@
+// MessagesScreen.tsx
 import React, {useEffect, useState, useCallback} from 'react';
 import {
   View,
@@ -16,37 +17,15 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserInfo} from '../../apis/services/userService';
 import LoadingSpinner from '../../components/loading/LoadingSpinner';
-import {NavigationProp, useNavigation} from '@react-navigation/native';
-import RootStackParamList from '../../navigations/RootStackParamList';
+import {useNavigation} from '@react-navigation/native';
 import {useAnimatedValue} from '../../hooks/useAnimatedValue';
 
-// Định nghĩa các kiểu dữ liệu
-interface UserType {
-  id: string;
-  companyName?: string;
-  profilePictureUrl?: string;
-}
-
-interface MessageType {
-  content: string;
-  createdAt: string;
-  isRead: boolean;
-  senderId: string;
-}
-
-interface ConversationType {
-  id: string;
-  sender: UserType;
-  receiver: UserType;
-  messages: MessageType[];
-}
-
 const MessagesScreen = () => {
-  const [conversations, setConversations] = useState<ConversationType[]>([]);
-  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+  const navigation = useNavigation();
+  const [conversations, setConversations] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const animatedValue = useAnimatedValue(0);
 
   useEffect(() => {
@@ -62,7 +41,7 @@ const MessagesScreen = () => {
         setCurrentUser(userInfo);
       }
     } catch (error) {
-      console.error('Không thể lấy thông tin người dùng:', error);
+      // console.error('Không thể lấy thông tin người dùng:', error);
     }
   };
 
@@ -70,36 +49,15 @@ const MessagesScreen = () => {
     try {
       setLoading(true);
       const conversationsData = await getUserConversations();
-      if (!currentUser) return;
-
-      // Sắp xếp các cuộc trò chuyện: đưa những cuộc có tin nhắn chưa đọc lên đầu
-      const sortedConversations = conversationsData.sort(
-        (a: ConversationType, b: ConversationType) => {
-          const aUnread =
-            a.messages[0]?.isRead === false &&
-            a.messages[0]?.senderId !== currentUser.id;
-          const bUnread =
-            b.messages[0]?.isRead === false &&
-            b.messages[0]?.senderId !== currentUser.id;
-
-          if (aUnread && !bUnread) return -1; // Cuộc trò chuyện `a` có tin nhắn chưa đọc
-          if (!aUnread && bUnread) return 1; // Cuộc trò chuyện `b` có tin nhắn chưa đọc
-          return (
-            new Date(b.messages[0]?.createdAt).getTime() -
-            new Date(a.messages[0]?.createdAt).getTime()
-          ); // Sắp xếp theo thời gian tin nhắn mới nhất
-        },
-      );
-
-      setConversations(sortedConversations);
+      setConversations(conversationsData);
     } catch (error) {
-      console.warn('Không thể lấy danh sách cuộc hội thoại.', error);
+      console.warn('Không thể lấy danh sách cuộc hội thoại:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteConversation = (conversationId: string) => {
+  const handleDeleteConversation = conversationId => {
     Alert.alert(
       'Xác nhận xóa',
       'Bạn có chắc chắn muốn xóa cuộc trò chuyện này?',
@@ -122,26 +80,27 @@ const MessagesScreen = () => {
   };
 
   const onRefresh = useCallback(() => {
-    fetchConversations();
-  }, [currentUser]);
+    setRefreshing(true);
+    fetchConversations().finally(() => setRefreshing(false));
+  }, []);
 
-  const renderConversationItem = ({item}: {item: ConversationType}) => {
+  const renderConversationItem = ({item}) => {
     if (!currentUser) return null;
 
+    // Xác định đối tác trong cuộc trò chuyện
     const user =
       item.sender.id !== currentUser.id ? item.sender : item.receiver;
+    const latestMessage = item.messages[0]; // Tin nhắn mới nhất
+    const isUnread =
+      latestMessage &&
+      !latestMessage.isRead &&
+      latestMessage.senderId !== currentUser.id; // Kiểm tra tin nhắn chưa đọc
 
     return (
       <TouchableOpacity
         style={[
           styles.conversationItem,
-          {
-            backgroundColor:
-              item.messages[0]?.isRead === false &&
-              item.messages[0]?.senderId !== currentUser.id
-                ? '#E8F0FE' // Màu nền khi có tin nhắn chưa đọc
-                : '#FFFFFF',
-          },
+          {backgroundColor: isUnread ? '#E8F0FE' : '#FFFFFF'}, // Thay đổi màu nền nếu tin nhắn chưa đọc
         ]}
         onPress={() =>
           navigation.navigate('ChatDetail', {conversationId: item.id})
@@ -161,9 +120,9 @@ const MessagesScreen = () => {
             style={styles.lastMessage}
             numberOfLines={1}
             ellipsizeMode="tail">
-            {item.messages && item.messages.length > 0
-              ? item.messages[0].content
-              : 'Đã ghép đôi'}
+            {latestMessage
+              ? latestMessage.content
+              : 'Đã ghép đôi, hãy trò chuyện cùng đối tác'}
           </Text>
         </View>
       </TouchableOpacity>
@@ -202,7 +161,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#ccc',
     alignItems: 'center',
-    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 50,
     marginHorizontal: 10,
     marginTop: 5,
   },
@@ -222,12 +182,12 @@ const styles = StyleSheet.create({
   lastMessage: {
     fontSize: 12,
     color: '#666',
-    maxWidth: '90%',
+    maxWidth: '90%', // Đảm bảo văn bản không vượt quá chiều rộng của container
   },
   emptyText: {
     textAlign: 'center',
     marginTop: 20,
-    fontSize: 12,
+    fontSize: 16,
     color: '#888',
   },
 });

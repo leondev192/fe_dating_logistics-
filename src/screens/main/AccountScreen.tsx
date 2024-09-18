@@ -6,20 +6,20 @@ import LinearGradient from 'react-native-linear-gradient';
 import Colors from '../../constants/colors';
 import GradientButton from '../../components/button/GradientButton';
 import OutlineButton from '../../components/button/OutlineButton';
-import {
-  useNavigation,
-  CommonActions,
-  NavigationProp,
-} from '@react-navigation/native';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
 import {Logout, User} from 'iconsax-react-native';
 import {getUserInfo} from '../../apis/services/userService';
-import LoadingSpinner from '../../components/loading/LoadingSpinner'; // Import LoadingSpinner
+import LoadingSpinner from '../../components/loading/LoadingSpinner';
 import {useAuth} from '../../contexts/AuthContext';
-import {useAnimatedValue} from '../../hooks/useAnimatedValue';
+import {Guide} from '..';
 
 type RootStackParamList = {
   Auth: undefined;
   UserProfile: undefined;
+  PrivacyPolicy: undefined;
+  Help: undefined;
+  Feedback: undefined;
+  Guide: undefined;
 };
 
 const AccountScreen = () => {
@@ -27,9 +27,9 @@ const AccountScreen = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const animatedValue = useAnimatedValue(0);
 
   const {logout} = useAuth();
+
   useEffect(() => {
     checkLoginStatus();
 
@@ -62,7 +62,6 @@ const AccountScreen = () => {
       const userData = await getUserInfo(token);
       setUserInfo(userData);
     } catch (error) {
-      console.error('Error fetching user info:', error);
     } finally {
       setLoading(false);
     }
@@ -83,7 +82,21 @@ const AccountScreen = () => {
     navigation.navigate('UserProfile');
   };
 
-  // Hiển thị LoadingSpinner khi đang tải dữ liệu
+  const handleNavigateToPrivacyPolicy = () => {
+    navigation.navigate('PrivacyPolicy');
+  };
+
+  const handleNavigateToHelp = () => {
+    navigation.navigate('Help');
+  };
+
+  const handleNavigateToFeedback = () => {
+    navigation.navigate('Feedback');
+  };
+  const handleNavigateToGuide = () => {
+    navigation.navigate('Guide');
+  };
+
   if (loading) {
     return <LoadingSpinner loading={loading} />;
   }
@@ -131,10 +144,22 @@ const AccountScreen = () => {
         </LinearGradient>
 
         <View style={styles.body}>
-          <OutlineButton title="Chính sách bảo mật" onPress={() => {}} />
-          <OutlineButton title="Trợ giúp" onPress={() => {}} />
-          <OutlineButton title="Đóng góp ý kiến" onPress={() => {}} />
-          {isLoggedIn && <GradientButton title="Đăng xuất" onPress={logout} />}
+          <OutlineButton
+            title="Chính sách bảo mật"
+            onPress={handleNavigateToPrivacyPolicy}
+          />
+          <OutlineButton title="Trợ giúp" onPress={handleNavigateToHelp} />
+          <OutlineButton
+            title="Đóng góp ý kiến"
+            onPress={handleNavigateToFeedback}
+          />
+          <OutlineButton
+            title="Hướng dẩn sử dụng"
+            onPress={handleNavigateToGuide}
+          />
+          {isLoggedIn && (
+            <GradientButton title="Đăng xuất" onPress={handleLogout} />
+          )}
         </View>
 
         <Text style={styles.versionText}>Phiên bản 1.0</Text>

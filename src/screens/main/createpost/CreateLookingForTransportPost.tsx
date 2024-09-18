@@ -277,7 +277,6 @@ const CreateLookingForTransportPost = ({route}: any) => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 5,
     backgroundColor: Colors.background,
   },
   card: {

@@ -1,50 +1,112 @@
-import React from 'react';
+// src/components/CustomHeader.tsx
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Image,
-  Platform,
+  Animated,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {SearchNormal, Filter} from 'iconsax-react-native';
+import {Colorfilter} from 'iconsax-react-native';
 import Colors from '../../constants/colors';
+import {getUserInfo} from '../../apis/services/userService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
+
+type RootStackParamList = {
+  Filter: undefined;
+};
 
 interface CustomHeaderProps {
-  title?: string;
-  showSearch?: boolean;
-  showLogo?: boolean;
-  onPressSearch?: () => void;
+  onPressFilter?: () => void;
 }
 
-const CustomHeader: React.FC<CustomHeaderProps> = ({
-  title,
-  showSearch,
-  showLogo,
-  onPressSearch,
-}) => {
+const CustomHeader: React.FC<CustomHeaderProps> = () => {
+  const [userName, setUserName] = useState<string>('Người dùng');
+  const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(
+    null,
+  );
+  const [displayText, setDisplayText] = useState<string>('');
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const token = await AsyncStorage.getItem('userToken');
+        if (token) {
+          const userInfo = await getUserInfo(token);
+          const shortenedName = truncateName(
+            userInfo.companyName || 'Người dùng',
+          );
+          setUserName(shortenedName);
+          setProfilePictureUrl(userInfo.profilePictureUrl || null);
+          startTypingEffect(shortenedName);
+        }
+      } catch (error) {}
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  const startTypingEffect = (text: string) => {
+    let index = 0;
+    setDisplayText('');
+    const typeLetter = () => {
+      if (index < text.length) {
+        setDisplayText(prev => prev + text[index]);
+        index++;
+        setTimeout(typeLetter, 200);
+      } else {
+        setTimeout(() => {
+          startTypingEffect(text);
+        }, 4000);
+      }
+    };
+
+    typeLetter();
+  };
+
+  const truncateName = (name: string, maxLength: number = 25) => {
+    return name.length > maxLength ? `${name.slice(0, maxLength)}...` : name;
+  };
+
+  // Xử lý khi nhấn nút lọc
+  const handleFilterPress = () => {
+    navigation.navigate('Filter');
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.headerContainer}>
-        {showLogo && (
+      <LinearGradient
+        colors={['#FF358A', '#110088']}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 1}}
+        style={styles.gradientBorder}>
+        <View style={styles.headerContainer}>
           <Image
-            source={require('../../assets/images/log.png')}
-            style={styles.logo}
+            source={
+              profilePictureUrl
+                ? {uri: profilePictureUrl}
+                : require('../../assets/images/log.png')
+            }
+            style={styles.avatar}
           />
-        )}
-        {showSearch && (
-          <View style={styles.searchWrapper}>
-            <TouchableOpacity
-              style={styles.searchContainer}
-              onPress={onPressSearch}>
-              <Text style={styles.searchPlaceholder}>Tìm kiếm...</Text>
-              <SearchNormal size={25} style={styles.searchIcon} />
-            </TouchableOpacity>
+          <View style={styles.textWrapper}>
+            <Text style={styles.welcomeText}>Xin chào, </Text>
+            <Animated.Text style={styles.typingText}>
+              {displayText}
+            </Animated.Text>
           </View>
-        )}
-        {title && <Text style={styles.headerText}>{title}</Text>}
-      </View>
+          <TouchableOpacity
+            style={styles.filterButton}
+            onPress={handleFilterPress}>
+            <Colorfilter size={25} color={Colors.primary} />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
     </SafeAreaView>
   );
 };
@@ -52,61 +114,49 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 const styles = StyleSheet.create({
   safeArea: {
     backgroundColor: '#FFFFFF',
+    paddingHorizontal: 5,
+    paddingBottom: -80,
+  },
+  gradientBorder: {
+    borderRadius: 50,
+    padding: 1.5,
+    marginBottom: 5,
   },
   headerContainer: {
-    height: 50,
-    marginBottom: Platform.OS === 'ios' ? -30 : 5,
-    marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    backgroundColor: '#FFFFFF',
-  },
-  logo: {
-    width: 40,
     height: 40,
-    marginRight: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 50,
   },
-  headerText: {
-    fontSize: 18,
-    color: '#000',
-    textAlign: 'center',
+  avatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginLeft: -3,
+    marginRight: 10,
   },
-  searchWrapper: {
+  textWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.bordercolor,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    flex: 1,
-  },
-  searchIcon: {
-    marginLeft: 5,
+  welcomeText: {
+    fontSize: 14,
     color: Colors.primary,
+    fontStyle: 'italic',
   },
-  searchPlaceholder: {
-    color: '#6a6a6a',
-    flex: 1,
+  typingText: {
+    fontSize: 14,
+    color: Colors.primary,
+    fontStyle: 'italic',
   },
   filterButton: {
-    marginLeft: 10,
-    padding: 5,
-    backgroundColor: Colors.bordercolor,
+    padding: 8,
     borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
   },
 });
 

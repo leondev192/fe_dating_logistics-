@@ -16,18 +16,17 @@ const isTokenExpired = (token: string) => {
   }
 };
 
-// Function to check if the user's information is complete
+// Function to check if the user's information is complete, excluding password
 const checkUserInfo = async (token: string, navigation: any) => {
   try {
     const userInfo = await getUserInfo(token);
 
-    // Check required user information fields
+    // Kiểm tra các trường thông tin cần thiết, bỏ qua password
     if (
       !userInfo.companyName ||
       !userInfo.address ||
       !userInfo.representativeName ||
-      !userInfo.businessCode ||
-      !userInfo.taxCode
+      !userInfo.businessCode
     ) {
       Alert.alert(
         'Thông tin chưa đầy đủ',
@@ -36,7 +35,7 @@ const checkUserInfo = async (token: string, navigation: any) => {
           {
             text: 'Cập nhật ngay',
             onPress: () => {
-              navigation.navigate('Account'); // Navigate to the Account screen
+              navigation.navigate('Account'); // Điều hướng đến màn hình cập nhật thông tin
             },
           },
         ],
@@ -47,7 +46,6 @@ const checkUserInfo = async (token: string, navigation: any) => {
 
     return true;
   } catch (error) {
-    console.error('Error checking user info:', error);
     return false;
   }
 };

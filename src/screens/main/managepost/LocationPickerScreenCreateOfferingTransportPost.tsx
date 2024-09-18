@@ -171,7 +171,8 @@ const MapScreen: React.FC = ({route}: any) => {
       Alert.alert('Chưa chọn vị trí', 'Vui lòng chọn vị trí trên bản đồ.');
       return;
     }
-    navigation.navigate('CreateLookingForTransportPost', {
+    navigation.navigate('EditOfferingTransportPost', {
+      postId: route.params?.postId, // Truyền lại postId
       selectedLocation: {field, locationName},
     });
   };

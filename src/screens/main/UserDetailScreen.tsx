@@ -1,5 +1,4 @@
-// src/screens/UserProfile.tsx
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -7,55 +6,30 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
-import {
-  NavigationProp,
-  useNavigation,
-  useFocusEffect,
-} from '@react-navigation/native';
 import {Avatar, Card, Divider, Text} from 'react-native-paper';
-import {getUserInfo} from '../../apis/services/userService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getUserInfoById} from '../../apis/services/userService'; // API mới để lấy thông tin người dùng theo ID
 import Colors from '../../constants/colors';
-import GradientButton from '../../components/button/GradientButton';
 
-type RootStackParamList = {
-  UserEdit: {userInfo: any};
-};
-
-const UserProfile = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+const UserDetailScreen = ({route}) => {
+  const {userId} = route.params; // Nhận userId từ route params
   const [userInfo, setUserInfo] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Hàm lấy thông tin người dùng
+  // Hàm lấy thông tin người dùng theo ID
   const fetchUserInfo = async () => {
     try {
-      const token = await AsyncStorage.getItem('userToken');
-      if (!token) {
-        // console.error('Token không tồn tại');
-        return;
-      }
-
-      const userData = await getUserInfo(token);
+      const userData = await getUserInfoById(userId);
       setUserInfo(userData);
     } catch (error) {
-      // console.error('Error fetching user info:', error);
+      console.error('Error fetching user info:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Sử dụng useFocusEffect để gọi lại hàm khi trang được focus
-  useFocusEffect(
-    useCallback(() => {
-      setLoading(true);
-      fetchUserInfo();
-    }, []),
-  );
-
-  const handleEditPress = () => {
-    navigation.navigate('UserEdit', {userInfo});
-  };
+  useEffect(() => {
+    fetchUserInfo();
+  }, [userId]);
 
   if (loading) {
     return <ActivityIndicator size="large" color={Colors.primary} />;
@@ -104,25 +78,7 @@ const UserProfile = () => {
                 {userInfo.representativeName || 'N/A'}
               </Text>
             </View>
-            <Divider style={styles.divider} />
-            <View style={styles.imageSection}>
-              <Text style={styles.label}>Ảnh CCCD:</Text>
-              {userInfo.representativeUrl ? (
-                <Image
-                  source={{uri: userInfo.representativeUrl}}
-                  style={styles.squareImage}
-                />
-              ) : (
-                <Text style={styles.placeholder}>Chưa có ảnh CCCD</Text>
-              )}
-            </View>
           </Card.Content>
-          <Card.Actions style={styles.cardActions}>
-            <GradientButton
-              onPress={handleEditPress}
-              title="Chỉnh sửa thông tin"
-            />
-          </Card.Actions>
         </Card>
       ) : (
         <Text>Không có thông tin người dùng.</Text>
@@ -130,6 +86,7 @@ const UserProfile = () => {
     </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -185,7 +142,7 @@ const styles = StyleSheet.create({
   squareImage: {
     width: '100%',
     height: 200,
-    borderRadius: 10, // Giữ hình vuông nhưng bo góc nhẹ
+    borderRadius: 10,
     marginBottom: 10,
     marginTop: 20,
   },
@@ -193,10 +150,6 @@ const styles = StyleSheet.create({
     color: Colors.placeholder,
     fontStyle: 'italic',
   },
-  cardActions: {
-    justifyContent: 'center',
-    marginTop: 15,
-  },
 });
 
-export default UserProfile;
+export default UserDetailScreen;

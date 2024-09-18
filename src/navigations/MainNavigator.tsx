@@ -6,23 +6,39 @@ import SearchScreen from '../screens/main/SearchScreen';
 import BackButton from '../components/header/ArrowLeft';
 import TitleHeader from '../components/header/TitleHeader';
 import {
+  ConversationDetail,
   CreateLookingForTransportPost,
   CreateOfferingTransportPost,
-  EditCargoMatchingPost,
   EditLookingForTransportPost,
   EditOfferingTransportPost,
+  Feedback,
+  Filter,
+  Guide,
+  Help,
   MessScreen,
   Payment,
+  PrivacyPolicy,
+  UserDetailScreen,
   UserEdit,
   UserProfile,
 } from '../screens';
 import ChatDetail from '../screens/main/ChatDetail';
 import MapScreen from '../screens/main/createpost/LocationPickerScreenCreateLookingForTransportPost';
 import MapScreenCreateOfferingTransportPost from '../screens/main/createpost/LocationPickerScreenCreateOfferingTransportPost';
+import EditMapScreen from '../screens/main/managepost/LocationPickerScreenCreateLookingForTransportPost';
+import EditMapScreenCreateOfferingTransportPost from '../screens/main/managepost/LocationPickerScreenCreateOfferingTransportPost';
+import {Document} from 'iconsax-react-native'; // Import icon tài liệu
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import RootStackParamList from './RootStackParamList';
 
 const Stack = createStackNavigator();
 
 const MainNavigator = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const handleConversationDetail = (conversationId: string) => {
+    navigation.navigate('ConversationDetail', {conversationId});
+  };
   return (
     <Stack.Navigator initialRouteName="Tabs">
       <Stack.Screen
@@ -99,18 +115,7 @@ const MainNavigator = () => {
           headerTitleAlign: 'center',
         }}
       />
-      <Stack.Screen
-        name="EditCargoMatchingPost"
-        component={EditCargoMatchingPost}
-        options={{
-          title: '',
-          headerBackTitleVisible: false,
-          headerBackImage: () => <BackButton />,
-          headerTitle: () => <TitleHeader title="Chỉnh sửa bài đăng" />,
-          headerTransparent: false,
-          headerTitleAlign: 'center',
-        }}
-      />
+
       <Stack.Screen
         name="EditLookingForTransportPost"
         component={EditLookingForTransportPost}
@@ -138,17 +143,27 @@ const MainNavigator = () => {
       <Stack.Screen
         name="ChatDetail"
         component={ChatDetail}
-        options={{
+        options={({route}) => ({
           title: '',
           headerBackTitleVisible: false,
           headerBackImage: () => <BackButton />,
           headerTitle: () => <TitleHeader title="Cuộc trò chuyện" />,
           headerTransparent: false,
           headerTitleAlign: 'center',
-        }}
+          headerRight: () => (
+            <Document
+              size={24}
+              color="#000"
+              style={{marginRight: 15}}
+              onPress={() =>
+                handleConversationDetail(route.params.conversationId)
+              } // Truyền conversationId vào hàm điều hướng
+            />
+          ),
+        })}
       />
       <Stack.Screen
-        name="MessagesScreen"
+        name="Message"
         component={MessScreen}
         options={{
           title: '',
@@ -166,7 +181,7 @@ const MainNavigator = () => {
           title: '',
           headerBackTitleVisible: false,
           headerBackImage: () => <BackButton />,
-          headerTitle: () => <TitleHeader title="Tin nhắn" />,
+          headerTitle: () => <TitleHeader title="Chọn địa chỉ" />,
           headerTransparent: false,
           headerTitleAlign: 'center',
         }}
@@ -178,7 +193,115 @@ const MainNavigator = () => {
           title: '',
           headerBackTitleVisible: false,
           headerBackImage: () => <BackButton />,
-          headerTitle: () => <TitleHeader title="Tin nhắn" />,
+          headerTitle: () => <TitleHeader title="Chọn địa chỉ" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="EditMapScreen"
+        component={EditMapScreen}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Chọn địa chỉ" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="EditMapScreenOffering"
+        component={EditMapScreenCreateOfferingTransportPost}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Chọn địa chỉ" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="Feedback"
+        component={Feedback}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Đóng góp ý kiến" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="Help"
+        component={Help}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Trợ giúp" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicy}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Chính sách bảo mật" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="Guide"
+        component={Guide}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Hướng dẩn sử dụng" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="Filter"
+        component={Filter}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Lọc bài đăng" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="ConversationDetail"
+        component={ConversationDetail}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Hợp đồng" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="UserProfileScreen"
+        component={UserDetailScreen}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Thông tin người đăng bài" />,
           headerTransparent: false,
           headerTitleAlign: 'center',
         }}
