@@ -1,16 +1,23 @@
-import React, {useState} from 'react';
-import {View, ScrollView, StyleSheet, Alert} from 'react-native';
-import {TextInput, Card, Text, Divider} from 'react-native-paper';
+import React, {useState, useCallback, useEffect} from 'react';
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
+import {TextInput, Divider} from 'react-native-paper';
 import ImageUploader from '../../components/image/ImageUploader';
 import {updateUser} from '../../apis/services/userService';
 import GradientButton from '../../components/button/GradientButton';
 import Colors from '../../constants/colors';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 
 const UserEdit = ({route, navigation}: any) => {
   const userInfo = route.params?.userInfo;
 
   if (!userInfo) {
-    // console.error('User info is missing from route params.');
     return (
       <Text style={{textAlign: 'center', marginTop: 20}}>
         Lỗi: Không có thông tin người dùng.
@@ -29,6 +36,7 @@ const UserEdit = ({route, navigation}: any) => {
   });
 
   const handleInputChange = (field: string, value: string) => {
+    // console.log(`Cập nhật field ${field}:`, value); // Log để kiểm tra giá trị
     setUser(prevState => ({...prevState, [field]: value}));
   };
 
@@ -39,8 +47,6 @@ const UserEdit = ({route, navigation}: any) => {
   const handleUpdate = async () => {
     try {
       await updateUser(user);
-
-      // Hiển thị thông báo thành công và sau đó điều hướng quay lại
       Alert.alert('Thành công', 'Cập nhật thông tin thành công', [
         {
           text: 'OK',
@@ -50,84 +56,95 @@ const UserEdit = ({route, navigation}: any) => {
         },
       ]);
     } catch (error) {
-      // Hiển thị thông báo lỗi khi cập nhật thất bại
       Alert.alert('Lỗi', 'Cập nhật thông tin thất bại', [{text: 'OK'}]);
     }
   };
+
+  // Điều hướng đến bản đồ
+  const navigateToMap = () => {
+    navigation.navigate('LocationUserEdit', {
+      field: 'address',
+      userInfo: user, // Truyền lại thông tin người dùng
+    });
+  };
+
+  useEffect(() => {
+    if (route.params?.selectedLocation) {
+      const {field, locationName} = route.params.selectedLocation;
+      // console.log('Nhận selectedLocation:', {field, locationName});
+      if (field === 'address') {
+        handleInputChange('address', locationName);
+      }
+      navigation.setParams({selectedLocation: null});
+    }
+  }, [route.params?.selectedLocation]);
 
   return (
     <ScrollView
       contentContainerStyle={styles.container}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}>
-      <Card style={styles.card}>
-        <Card.Content>
-          <TextInput
-            label="Số điện thoại"
-            mode="outlined"
-            value={user.phone}
-            onChangeText={value => handleInputChange('phone', value)}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-          />
-          <TextInput
-            label="Tên công ty"
-            mode="outlined"
-            value={user.companyName}
-            onChangeText={value => handleInputChange('companyName', value)}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-          />
-          <TextInput
-            label="Địa chỉ"
-            mode="outlined"
-            value={user.address}
-            onChangeText={value => handleInputChange('address', value)}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-          />
-          <TextInput
-            label="Mã kinh doanh"
-            mode="outlined"
-            value={user.businessCode}
-            onChangeText={value => handleInputChange('businessCode', value)}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-          />
+      <View style={styles.content}>
+        <TextInput
+          label="Số điện thoại"
+          mode="outlined"
+          value={user.phone}
+          onChangeText={value => handleInputChange('phone', value)}
+          style={styles.input}
+          outlineColor={Colors.bordercolor}
+          activeOutlineColor={Colors.primary}
+        />
+        <TextInput
+          label="Tên công ty"
+          mode="outlined"
+          value={user.companyName}
+          onChangeText={value => handleInputChange('companyName', value)}
+          style={styles.input}
+          outlineColor={Colors.bordercolor}
+          activeOutlineColor={Colors.primary}
+        />
+        <TouchableOpacity onPress={navigateToMap} style={styles.inputContainer}>
+          <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">
+            {user.address || 'Chọn địa chỉ từ bản đồ'}
+          </Text>
+        </TouchableOpacity>
 
-          <TextInput
-            label="Tên người đại diện"
-            mode="outlined"
-            value={user.representativeName}
-            onChangeText={value =>
-              handleInputChange('representativeName', value)
-            }
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-          />
+        <TextInput
+          label="Mã kinh doanh"
+          mode="outlined"
+          value={user.businessCode}
+          onChangeText={value => handleInputChange('businessCode', value)}
+          style={styles.input}
+          outlineColor={Colors.bordercolor}
+          activeOutlineColor={Colors.primary}
+        />
 
-          <Text style={styles.label}>Ảnh đại diện:</Text>
-          <ImageUploader
-            onImageUpload={handleImageUpload('profilePictureUrl')}
-            currentImageUrl={user.profilePictureUrl}
-          />
+        <TextInput
+          label="Tên người đại diện"
+          mode="outlined"
+          value={user.representativeName}
+          onChangeText={value => handleInputChange('representativeName', value)}
+          style={styles.input}
+          outlineColor={Colors.bordercolor}
+          activeOutlineColor={Colors.primary}
+        />
 
-          <Divider style={styles.divider} />
-          <Text style={styles.label}>Ảnh CCCD:</Text>
-          <ImageUploader
-            onImageUpload={handleImageUpload('representativeUrl')}
-            currentImageUrl={user.representativeUrl}
-          />
-        </Card.Content>
-        <Card.Actions style={styles.cardActions}>
-          <GradientButton title="Lưu thông tin" onPress={handleUpdate} />
-        </Card.Actions>
-      </Card>
+        <Text style={styles.label}>Ảnh đại diện:</Text>
+        <ImageUploader
+          onImageUpload={handleImageUpload('profilePictureUrl')}
+          currentImageUrl={user.profilePictureUrl}
+        />
+
+        <Divider style={styles.divider} />
+        <Text style={styles.label}>Ảnh CCCD:</Text>
+        <ImageUploader
+          onImageUpload={handleImageUpload('representativeUrl')}
+          currentImageUrl={user.representativeUrl}
+        />
+      </View>
+      <View style={styles.actions}>
+        <GradientButton title="Lưu thông tin" onPress={handleUpdate} />
+      </View>
     </ScrollView>
   );
 };
@@ -135,12 +152,10 @@ const UserEdit = ({route, navigation}: any) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.background,
-  },
-  card: {
     padding: 15,
-    borderRadius: 10,
+  },
+  content: {
     backgroundColor: Colors.background,
-    elevation: 3,
   },
   divider: {
     marginVertical: 10,
@@ -149,13 +164,25 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#fff',
   },
+  inputContainer: {
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 5,
+    borderColor: Colors.bordercolor,
+    borderWidth: 1,
+  },
+  text: {
+    fontSize: 16,
+    color: Colors.text,
+  },
   label: {
     fontSize: 16,
     marginBottom: 10,
     color: Colors.text,
     fontWeight: '600',
   },
-  cardActions: {
+  actions: {
     justifyContent: 'center',
     marginTop: 15,
   },

@@ -1,4 +1,3 @@
-// src/components/CustomHeader.tsx
 import React, {useEffect, useState} from 'react';
 import {
   View,
@@ -9,7 +8,7 @@ import {
   Animated,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Colorfilter} from 'iconsax-react-native';
+import {Colorfilter, Notification} from 'iconsax-react-native'; // Import Notification từ Iconsax
 import Colors from '../../constants/colors';
 import {getUserInfo} from '../../apis/services/userService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +17,7 @@ import {useNavigation, NavigationProp} from '@react-navigation/native';
 
 type RootStackParamList = {
   Filter: undefined;
+  Notifications: undefined;
 };
 
 interface CustomHeaderProps {
@@ -78,6 +78,11 @@ const CustomHeader: React.FC<CustomHeaderProps> = () => {
     navigation.navigate('Filter');
   };
 
+  // Xử lý khi nhấn nút thông báo
+  const handleNotificationPress = () => {
+    navigation.navigate('Notifications');
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <LinearGradient
@@ -100,10 +105,17 @@ const CustomHeader: React.FC<CustomHeaderProps> = () => {
               {displayText}
             </Animated.Text>
           </View>
+          {/* Nút Lọc */}
           <TouchableOpacity
             style={styles.filterButton}
             onPress={handleFilterPress}>
             <Colorfilter size={25} color={Colors.primary} />
+          </TouchableOpacity>
+          {/* Nút Thông Báo */}
+          <TouchableOpacity
+            style={styles.notificationButton}
+            onPress={handleNotificationPress}>
+            <Notification size={24} color={Colors.primary} variant="Outline" />
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -116,6 +128,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 5,
     paddingBottom: -80,
+    marginTop: 0.5,
   },
   gradientBorder: {
     borderRadius: 50,
@@ -153,6 +166,12 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   filterButton: {
+    padding: 8,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notificationButton: {
     padding: 8,
     borderRadius: 50,
     justifyContent: 'center',

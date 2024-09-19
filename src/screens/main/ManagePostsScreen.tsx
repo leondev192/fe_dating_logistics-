@@ -130,9 +130,7 @@ const UserPostsScreen = () => {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.postButton}
-          onPress={() => navigation.navigate('TheoDoiDonHangScreen')}>
+        <TouchableOpacity style={styles.postButton}>
           <Archive size="24" color={'#555'} />
           <Text style={styles.filterText} numberOfLines={1}>
             Theo dõi

@@ -24,3 +24,4 @@ export {default as Guide} from './main/GuideScreen';
 export {default as Filter} from './main/FilterScreen';
 export {default as ConversationDetail} from './main/ConversationDetailScreen';
 export {default as UserDetailScreen} from './main/UserDetailScreen';
+export {default as LocationUserEdit} from './main/LocationUserEdit';

@@ -165,7 +165,7 @@ export const getConversationDetails = async (conversationId: string) => {
 
     return response.data;
   } catch (error) {
-    console.error('Error fetching conversation details:', error);
+    // console.error('Error fetching conversation details:', error);
     throw error;
   }
 };
@@ -193,7 +193,7 @@ export const updateContractImage = async (
 
     return response.data;
   } catch (error) {
-    console.error('Error updating contract image:', error);
+    // console.error('Error updating contract image:', error);
     throw error;
   }
 };

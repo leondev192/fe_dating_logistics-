@@ -202,7 +202,7 @@ const ChatDetail = ({route}) => {
           {uploading ? (
             <ActivityIndicator size="small" color="#007AFF" />
           ) : (
-            <Add size={30} color="#007AFF" />
+            <Add size={30} color="#110088" />
           )}
         </TouchableOpacity>
         <TextInput
@@ -213,7 +213,7 @@ const ChatDetail = ({route}) => {
           placeholderTextColor="#888"
         />
         <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-          <Send size={30} color="#007AFF" variant="Bold" />
+          <Send size={30} color="#110088" variant="Bold" />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -223,7 +223,7 @@ const ChatDetail = ({route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F2',
+    backgroundColor: '#F5F5F5',
   },
   messageContainer: {
     flexDirection: 'row',
@@ -251,25 +251,25 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   myBubble: {
-    backgroundColor: '#0884fc',
+    backgroundColor: '#FFFFFF',
   },
   theirBubble: {
-    backgroundColor: '#B1B1B1',
+    backgroundColor: '#FFFFFF',
   },
   messageText: {
     fontSize: 16,
-    color: '#fff',
+    color: '#333',
   },
   timestamp: {
     fontSize: 12,
     color: '#888',
-    marginTop: 4, // Khoảng cách phía trên với khung tin nhắn
-    alignSelf: 'center', // Canh giữa thời gian dưới khung tin nhắn
+    marginTop: 4,
+    alignSelf: 'center',
   },
   inputContainer: {
     flexDirection: 'row',
     borderRadius: 50,
-    marginBottom: 30,
+    marginBottom: 15,
     padding: 10,
     borderTopWidth: 1,
     borderTopColor: '#ddd',

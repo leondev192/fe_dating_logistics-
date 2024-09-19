@@ -6,7 +6,7 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import {TextInput, Card, Text} from 'react-native-paper';
+import {TextInput, Text} from 'react-native-paper';
 import GradientButton from '../../../components/button/GradientButton';
 import Colors from '../../../constants/colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -134,131 +134,129 @@ const CreateLookingForTransportPost = ({route}: any) => {
 
   const renderFormFields = () => {
     return (
-      <Card style={styles.card}>
-        <Card.Content>
-          <TouchableOpacity
-            onPress={() => navigateToMap('origin')}
-            style={styles.inputContainer}>
-            <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">
-              {formData.origin || 'Nơi bắt đầu'}
-            </Text>
-          </TouchableOpacity>
+      <View style={styles.formContainer}>
+        <TouchableOpacity
+          onPress={() => navigateToMap('origin')}
+          style={styles.inputContainer}>
+          <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">
+            {formData.origin || 'Nơi bắt đầu'}
+          </Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => navigateToMap('destination')}
-            style={styles.inputContainer}>
-            <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">
-              {formData.destination || 'Nơi kết thúc'}
-            </Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigateToMap('destination')}
+          style={styles.inputContainer}>
+          <Text style={styles.text} numberOfLines={1} ellipsizeMode="tail">
+            {formData.destination || 'Nơi kết thúc'}
+          </Text>
+        </TouchableOpacity>
 
-          <View style={styles.timeRow}>
-            <TextInput
-              label="Thời gian dự kiến"
-              mode="outlined"
-              value={formData.transportGoes.toLocaleDateString()}
-              style={[styles.timeInput, {marginRight: 5}]}
-              outlineColor={Colors.bordercolor}
-              activeOutlineColor={Colors.primary}
-              onPressIn={() => {
-                setShowTransportGoesPicker(true);
-                setShowTransportComesPicker(false);
-              }}
-            />
-          </View>
+        <View style={styles.timeRow}>
+          <TextInput
+            label="Thời gian dự kiến"
+            mode="outlined"
+            value={formData.transportGoes.toLocaleDateString()}
+            style={[styles.timeInput, {marginRight: 5}]}
+            outlineColor={Colors.bordercolor}
+            activeOutlineColor={Colors.primary}
+            onPressIn={() => {
+              setShowTransportGoesPicker(true);
+              setShowTransportComesPicker(false);
+            }}
+          />
+        </View>
 
-          {showTransportGoesPicker && (
-            <DateTimePicker
-              value={formData.transportGoes}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                setShowTransportGoesPicker(false);
-                if (selectedDate) {
-                  handleChange('transportGoes', selectedDate);
-                }
-              }}
-            />
-          )}
-
-          {showTransportComesPicker && (
-            <DateTimePicker
-              value={formData.transportComes}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                setShowTransportComesPicker(false);
-                if (selectedDate) {
-                  handleChange('transportComes', selectedDate);
-                }
-              }}
-            />
-          )}
-
-          <DropDownPicker
-            open={openVehicleType}
-            value={formData.requiredVehicleType}
-            items={vehicleTypes}
-            setOpen={setOpenVehicleType}
-            setValue={callback =>
-              handleChange(
-                'requiredVehicleType',
-                callback(formData.requiredVehicleType),
-              )
-            }
-            setItems={setVehicleTypes}
-            placeholder="Chọn loại xe"
-            style={[
-              styles.dropdown,
-              errors.requiredVehicleType ? {borderColor: 'red'} : {},
-            ]}
-            dropDownContainerStyle={styles.dropdownContainer}
-            textStyle={{fontSize: 16}}
-            searchable={true}
-            searchPlaceholder="Tìm hoặc nhập loại xe..."
-            onChangeSearchText={text => {
-              if (!vehicleTypes.some(item => item.value === text)) {
-                setVehicleTypes(prev => [...prev, {label: text, value: text}]);
+        {showTransportGoesPicker && (
+          <DateTimePicker
+            value={formData.transportGoes}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowTransportGoesPicker(false);
+              if (selectedDate) {
+                handleChange('transportGoes', selectedDate);
               }
             }}
-            onChangeValue={value => handleChange('requiredVehicleType', value)}
           />
-          {errors.requiredVehicleType && (
-            <Text style={styles.errorText}>{errors.requiredVehicleType}</Text>
-          )}
+        )}
 
-          <TextInput
-            label="Loại hàng hóa"
-            mode="outlined"
-            value={formData.cargoTypeRequest}
-            onChangeText={text => handleChange('cargoTypeRequest', text)}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-            error={!!errors.cargoTypeRequest}
+        {showTransportComesPicker && (
+          <DateTimePicker
+            value={formData.transportComes}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowTransportComesPicker(false);
+              if (selectedDate) {
+                handleChange('transportComes', selectedDate);
+              }
+            }}
           />
-          {errors.cargoTypeRequest && (
-            <Text style={styles.errorText}>{errors.cargoTypeRequest}</Text>
-          )}
+        )}
 
-          <TextInput
-            label="Khối lượng hàng hóa"
-            mode="outlined"
-            value={String(formData.cargoWeight)}
-            onChangeText={text => handleChange('cargoWeight', text)}
-            style={styles.input}
-            outlineColor={Colors.bordercolor}
-            activeOutlineColor={Colors.primary}
-            error={!!errors.cargoWeight}
-          />
-          {errors.cargoWeight && (
-            <Text style={styles.errorText}>{errors.cargoWeight}</Text>
-          )}
-        </Card.Content>
-        <Card.Actions style={styles.cardActions}>
+        <DropDownPicker
+          open={openVehicleType}
+          value={formData.requiredVehicleType}
+          items={vehicleTypes}
+          setOpen={setOpenVehicleType}
+          setValue={callback =>
+            handleChange(
+              'requiredVehicleType',
+              callback(formData.requiredVehicleType),
+            )
+          }
+          setItems={setVehicleTypes}
+          placeholder="Chọn loại xe"
+          style={[
+            styles.dropdown,
+            errors.requiredVehicleType ? {borderColor: 'red'} : {},
+          ]}
+          dropDownContainerStyle={styles.dropdownContainer}
+          textStyle={{fontSize: 16}}
+          searchable={true}
+          searchPlaceholder="Tìm hoặc nhập loại xe..."
+          onChangeSearchText={text => {
+            if (!vehicleTypes.some(item => item.value === text)) {
+              setVehicleTypes(prev => [...prev, {label: text, value: text}]);
+            }
+          }}
+          onChangeValue={value => handleChange('requiredVehicleType', value)}
+        />
+        {errors.requiredVehicleType && (
+          <Text style={styles.errorText}>{errors.requiredVehicleType}</Text>
+        )}
+
+        <TextInput
+          label="Loại hàng hóa"
+          mode="outlined"
+          value={formData.cargoTypeRequest}
+          onChangeText={text => handleChange('cargoTypeRequest', text)}
+          style={styles.input}
+          outlineColor={Colors.bordercolor}
+          activeOutlineColor={Colors.primary}
+          error={!!errors.cargoTypeRequest}
+        />
+        {errors.cargoTypeRequest && (
+          <Text style={styles.errorText}>{errors.cargoTypeRequest}</Text>
+        )}
+
+        <TextInput
+          label="Khối lượng hàng hóa"
+          mode="outlined"
+          value={String(formData.cargoWeight)}
+          onChangeText={text => handleChange('cargoWeight', text)}
+          style={styles.input}
+          outlineColor={Colors.bordercolor}
+          activeOutlineColor={Colors.primary}
+          error={!!errors.cargoWeight}
+        />
+        {errors.cargoWeight && (
+          <Text style={styles.errorText}>{errors.cargoWeight}</Text>
+        )}
+        <View style={styles.actions}>
           <GradientButton title="Tạo Bài Đăng" onPress={handleSubmit} />
-        </Card.Actions>
-      </Card>
+        </View>
+      </View>
     );
   };
 
@@ -279,11 +277,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: Colors.background,
   },
-  card: {
+  formContainer: {
     padding: 15,
     borderRadius: 10,
     backgroundColor: '#fff',
-    elevation: 3,
   },
   input: {
     marginBottom: 15,
@@ -294,7 +291,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 12,
   },
-  cardActions: {
+  actions: {
     justifyContent: 'center',
     marginTop: 15,
   },

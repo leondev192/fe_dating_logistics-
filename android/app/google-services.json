@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1012977668759",
+    "project_id": "datinglogistic",
+    "storage_bucket": "datinglogistic.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1012977668759:android:d47362bb9788f5403b4fd2",
+        "android_client_info": {
+          "package_name": "com.fe_foodsm_vendor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbH6h5EDPrz1vK7m5bE4pp8JWnPeGmM3o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

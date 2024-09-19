@@ -37,7 +37,7 @@ export const getUserInfoById = async (userId: string) => {
     const response = await apiClient.get(`/user/info/${userId}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching user info by ID:', error);
+    // console.error('Error fetching user info by ID:', error);
     return null;
   }
 };

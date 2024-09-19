@@ -15,6 +15,7 @@ import {
   Filter,
   Guide,
   Help,
+  LocationUserEdit,
   MessScreen,
   Payment,
   PrivacyPolicy,
@@ -30,6 +31,7 @@ import EditMapScreenCreateOfferingTransportPost from '../screens/main/managepost
 import {Document} from 'iconsax-react-native'; // Import icon tài liệu
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import RootStackParamList from './RootStackParamList';
+import Notification from '../screens/main/NotificationScreen';
 
 const Stack = createStackNavigator();
 
@@ -302,6 +304,30 @@ const MainNavigator = () => {
           headerBackTitleVisible: false,
           headerBackImage: () => <BackButton />,
           headerTitle: () => <TitleHeader title="Thông tin người đăng bài" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="Notifications"
+        component={Notification}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Thông báo" />,
+          headerTransparent: false,
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Stack.Screen
+        name="LocationUserEdit"
+        component={LocationUserEdit}
+        options={{
+          title: '',
+          headerBackTitleVisible: false,
+          headerBackImage: () => <BackButton />,
+          headerTitle: () => <TitleHeader title="Chọn địa chỉ" />,
           headerTransparent: false,
           headerTitleAlign: 'center',
         }}

@@ -3,10 +3,10 @@ import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {AuthProvider} from './src/contexts/AuthContext';
 import RootNavigator from './src/navigations/RootNavigator';
-import useNetworkStatus from './src/hooks/useNetworkStatus';
+// import useNetworkStatus from './src/hooks/useNetworkStatus';
 
 const App: React.FC = () => {
-  useNetworkStatus();
+  // useNetworkStatus();
 
   return (
     <NavigationContainer>

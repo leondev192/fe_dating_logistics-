@@ -68,24 +68,38 @@ const AdvancedFilterScreen = () => {
   // Function to apply filters based on post type and additional criteria
   const applyFilters = () => {
     let filtered = posts.filter(post => {
-      let typeMatch = postType === 'all' || post.postType === postType;
+      // Chuyển cả postType và filter thành chữ thường để so sánh không phân biệt chữ hoa/thường
+      let typeMatch =
+        postType === 'all' ||
+        post.postType.toLowerCase() === postType.toLowerCase();
 
-      // Filter for LookingForTransport
+      // Chuyển chuỗi nhập vào và dữ liệu thành chữ thường để so sánh
       let cargoMatch =
         postType === 'LookingForTransport'
-          ? (!cargoType || post.cargoTypeRequest?.includes(cargoType)) &&
+          ? (!cargoType ||
+              post.cargoTypeRequest
+                ?.toLowerCase()
+                .includes(cargoType.toLowerCase())) &&
             (!selectedVehicleType ||
-              post.requiredVehicleType === selectedVehicleType) &&
-            (!cargoWeight || post.cargoWeight?.includes(cargoWeight))
+              post.requiredVehicleType
+                ?.toLowerCase()
+                .includes(selectedVehicleType.toLowerCase())) &&
+            (!cargoWeight ||
+              post.cargoWeight
+                ?.toLowerCase()
+                .includes(cargoWeight.toLowerCase()))
           : true;
 
-      // Filter for OfferingTransport
       let vehicleMatch =
         postType === 'OfferingTransport'
           ? (!selectedVehicleType ||
-              post.vehicleType === selectedVehicleType) &&
+              post.vehicleType
+                ?.toLowerCase()
+                .includes(selectedVehicleType.toLowerCase())) &&
             (!vehicleCapacity ||
-              post.vehicleCapacity?.includes(vehicleCapacity))
+              post.vehicleCapacity
+                ?.toLowerCase()
+                .includes(vehicleCapacity.toLowerCase()))
           : true;
 
       return typeMatch && cargoMatch && vehicleMatch;
@@ -156,33 +170,12 @@ const AdvancedFilterScreen = () => {
         <View style={styles.filterGroup}>
           <Text style={styles.filterLabel}>Lọc chi tiết (Tìm vận chuyển):</Text>
           {/* Vehicle Type Filter */}
-          <View style={styles.filterOptions}>
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                selectedVehicleType === 'Xe tải' && styles.activeButton,
-              ]}
-              onPress={() => setSelectedVehicleType('Xe tải')}>
-              <Text style={styles.filterText}>Xe tải</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                selectedVehicleType === 'Xe tải lạnh' && styles.activeButton,
-              ]}
-              onPress={() => setSelectedVehicleType('Xe tải lạnh')}>
-              <Text style={styles.filterText}>Xe tải lạnh</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                selectedVehicleType === 'Container' && styles.activeButton,
-              ]}
-              onPress={() => setSelectedVehicleType('Container')}>
-              <Text style={styles.filterText}>Container</Text>
-            </TouchableOpacity>
-          </View>
-          {/* Cargo Type Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập loại xe"
+            value={selectedVehicleType}
+            onChangeText={setSelectedVehicleType}
+          />
           <TextInput
             style={styles.input}
             placeholder="Nhập loại hàng hóa"
@@ -205,33 +198,13 @@ const AdvancedFilterScreen = () => {
           <Text style={styles.filterLabel}>
             Lọc chi tiết (Cung cấp vận chuyển):
           </Text>
-          {/* Vehicle Type Filter */}
-          <View style={styles.filterOptions}>
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                selectedVehicleType === 'Xe tải' && styles.activeButton,
-              ]}
-              onPress={() => setSelectedVehicleType('Xe tải')}>
-              <Text style={styles.filterText}>Xe tải</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                selectedVehicleType === 'Xe tải lạnh' && styles.activeButton,
-              ]}
-              onPress={() => setSelectedVehicleType('Xe tải lạnh')}>
-              <Text style={styles.filterText}>Xe tải lạnh</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                selectedVehicleType === 'Container' && styles.activeButton,
-              ]}
-              onPress={() => setSelectedVehicleType('Container')}>
-              <Text style={styles.filterText}>Container</Text>
-            </TouchableOpacity>
-          </View>
+          {/* Vehicle Type Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập loại xe"
+            value={selectedVehicleType}
+            onChangeText={setSelectedVehicleType}
+          />
           {/* Cargo Type Input */}
           <TextInput
             style={styles.input}

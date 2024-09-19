@@ -46,7 +46,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.errorCode) {
-        console.error('ImagePicker Error: ', response.errorMessage);
+        // console.error('ImagePicker Error: ', response.errorMessage);
       } else if (response.assets && response.assets.length > 0) {
         const asset = response.assets[0];
         await handleUploadPhoto(asset); // Upload ảnh ngay sau khi chọn

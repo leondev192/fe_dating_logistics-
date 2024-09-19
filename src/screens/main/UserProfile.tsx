@@ -1,4 +1,3 @@
-// src/screens/UserProfile.tsx
 import React, {useEffect, useState, useCallback} from 'react';
 import {
   View,
@@ -12,7 +11,7 @@ import {
   useNavigation,
   useFocusEffect,
 } from '@react-navigation/native';
-import {Avatar, Card, Divider, Text} from 'react-native-paper';
+import {Avatar, Divider, Text} from 'react-native-paper';
 import {getUserInfo} from '../../apis/services/userService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '../../constants/colors';
@@ -67,7 +66,7 @@ const UserProfile = () => {
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}>
       {userInfo ? (
-        <Card style={styles.card}>
+        <View style={styles.content}>
           <View style={styles.header}>
             {userInfo.profilePictureUrl ? (
               <Avatar.Image
@@ -92,14 +91,16 @@ const UserProfile = () => {
             </View>
           </View>
           <Divider style={styles.divider} />
-          <Card.Content>
+          <View style={styles.infoSection}>
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Địa chỉ:</Text>
-              <Text style={styles.value}>{userInfo.address || 'N/A'}</Text>
+              <Text style={styles.label}>Địa chỉ: </Text>
+              <Text style={styles.valueAddress}>
+                {userInfo.address || 'N/A'}
+              </Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Text style={styles.label}>Người đại diện:</Text>
+              <Text style={styles.label}> Người đại diện: </Text>
               <Text style={styles.value}>
                 {userInfo.representativeName || 'N/A'}
               </Text>
@@ -116,31 +117,38 @@ const UserProfile = () => {
                 <Text style={styles.placeholder}>Chưa có ảnh CCCD</Text>
               )}
             </View>
-          </Card.Content>
-          <Card.Actions style={styles.cardActions}>
+          </View>
+          <View style={styles.actions}>
             <GradientButton
               onPress={handleEditPress}
               title="Chỉnh sửa thông tin"
             />
-          </Card.Actions>
-        </Card>
+          </View>
+        </View>
       ) : (
         <Text>Không có thông tin người dùng.</Text>
       )}
     </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
+  valueAddress: {
+    fontSize: 16,
+
+    color: Colors.textbody,
+    flex: 1, // Để đảm bảo phần text chiếm hết không gian còn lại
+    flexWrap: 'wrap', // Cho phép text xuống dòng khi dài
+  },
   container: {
     flexGrow: 1,
     padding: 5,
     backgroundColor: Colors.background,
   },
-  card: {
+  content: {
     padding: 15,
     borderRadius: 10,
     backgroundColor: Colors.background,
-    elevation: 3,
   },
   header: {
     flexDirection: 'row',
@@ -164,6 +172,9 @@ const styles = StyleSheet.create({
   divider: {
     marginVertical: 10,
   },
+  infoSection: {
+    padding: 10,
+  },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -172,11 +183,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     color: Colors.text,
+    fontWeight: '500',
   },
   value: {
     fontSize: 16,
-    fontWeight: '500',
     color: Colors.textbody,
+    flex: 1, // Để đảm bảo phần text chiếm hết không gian còn lại
+    flexWrap: 'wrap', // Cho phép text xuống dòng khi dài
   },
   imageSection: {
     marginTop: 15,
@@ -193,7 +206,7 @@ const styles = StyleSheet.create({
     color: Colors.placeholder,
     fontStyle: 'italic',
   },
-  cardActions: {
+  actions: {
     justifyContent: 'center',
     marginTop: 15,
   },

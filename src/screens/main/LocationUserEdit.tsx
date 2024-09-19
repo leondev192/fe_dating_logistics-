@@ -16,7 +16,7 @@ import Geolocation from 'react-native-geolocation-service';
 import axios from 'axios';
 import {Add, Gps} from 'iconsax-react-native';
 import {useNavigation} from '@react-navigation/native';
-import GradientButton from '../../../components/button/GradientButton';
+import GradientButton from '../../components/button/GradientButton';
 
 const HERE_API_KEY = '0iK9NH7BKY8yWYhFjJIUHk4UQHcGjZ6NxvdFizl4rwc';
 
@@ -165,15 +165,22 @@ const MapScreen: React.FC = ({route}: any) => {
     getPlaceName(latitude, longitude);
   };
 
-  // Handle confirm button press
   const handleConfirm = () => {
     if (!locationName || !location) {
       Alert.alert('Chưa chọn vị trí', 'Vui lòng chọn vị trí trên bản đồ.');
       return;
     }
-    navigation.navigate('EditOfferingTransportPost', {
-      postId: route.params?.postId, // Truyền lại postId
-      selectedLocation: {field, locationName},
+
+    // Log dữ liệu trước khi truyền về `UserEdit`
+    // console.log('Truyền địa chỉ về UserEdit:', {
+    //   selectedLocation: {field, locationName},
+    //   userInfo: route.params?.userInfo,
+    // });
+
+    // Truyền địa chỉ và thông tin người dùng về UserEdit
+    navigation.navigate('UserEdit', {
+      selectedLocation: {field, locationName}, // Truyền địa chỉ mới
+      userInfo: route.params?.userInfo, // Truyền lại userInfo để cập nhật chính xác
     });
   };
 

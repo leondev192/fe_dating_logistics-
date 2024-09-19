@@ -25,6 +25,8 @@ export type RootStackParamList = {
   ChatDetail: {conversationId: string};
   ConversationDetail: undefined;
   UserDetailScreen: undefined;
+  Notifications: undefined;
+  LocationUserEdit: undefined;
 };
 
 export default RootStackParamList;

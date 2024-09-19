@@ -17,16 +17,16 @@ const ConversationDetailScreen = ({route}) => {
     const fetchConversation = async () => {
       try {
         const data = await getConversationDetails(conversationId);
-        console.log('Response data từ API:', data);
+        // console.log('Response data từ API:', data);
 
         if (data && data.contractImageUrl) {
           setContractImageUrl(data.contractImageUrl);
         } else {
-          console.log('Không có ảnh hợp đồng cho cuộc trò chuyện này.');
+          // console.log('Không có ảnh hợp đồng cho cuộc trò chuyện này.');
           setContractImageUrl('');
         }
       } catch (error) {
-        console.error('Error fetching conversation:', error);
+        // console.error('Error fetching conversation:', error);
         Alert.alert('Lỗi', 'Không thể tải thông tin cuộc trò chuyện.');
       } finally {
         setLoading(false); // Dừng loading khi hoàn thành
@@ -44,7 +44,7 @@ const ConversationDetailScreen = ({route}) => {
       Alert.alert('Thành công', 'Ảnh hợp đồng đã được cập nhật.');
     } catch (error) {
       Alert.alert('Lỗi', 'Không thể cập nhật ảnh hợp đồng.');
-      console.error('Error updating contract image:', error);
+      // console.error('Error updating contract image:', error);
     }
   };
 
@@ -52,11 +52,11 @@ const ConversationDetailScreen = ({route}) => {
   const handleDownloadContract = () => {
     if (contractImageUrl) {
       Linking.openURL(contractImageUrl).catch(err => {
-        console.error('Không thể mở URL:', err);
-        Alert.alert('Lỗi', 'Không thể mở ảnh hợp đồng.');
+        // console.error('Không thể mở URL:', err);
+        Alert.alert('Lỗi', 'Không thể mở file.');
       });
     } else {
-      Alert.alert('Không có ảnh hợp đồng để tải về');
+      Alert.alert('Không có file để tải về');
     }
   };
 

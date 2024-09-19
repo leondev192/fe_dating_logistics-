@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     top: '50%',
     left: '50%',
     marginLeft: -15,
-    marginTop: -15,
+    marginTop: '-16%',
   },
   headerContainer: {
     position: 'absolute',

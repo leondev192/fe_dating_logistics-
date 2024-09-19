@@ -5,7 +5,7 @@ import {
   Box,
   TruckFast,
   TruckRemove,
-  Building4,
+  Home3,
 } from 'iconsax-react-native';
 import GradientButton from '../../components/button/GradientButtonItem'; // Import GradientButton
 import {NavigationProp, useNavigation} from '@react-navigation/native';
@@ -100,7 +100,7 @@ const PostItem: React.FC<PostItemProps> = ({
     return (
       <View style={styles.titleWrapper}>
         <View style={styles.companyNameContainer}>
-          <Building4 size="20" color="#555" style={styles.companyIcon} />
+          <Home3 size="20" color="#555" style={styles.companyIcon} />
           <Text style={styles.companyName}>
             {companyName || 'Tên công ty không xác định'}
           </Text>
@@ -184,19 +184,19 @@ const PostItem: React.FC<PostItemProps> = ({
               {maxWeight && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Trọng tải tối đa:</Text>
-                  <Text style={styles.detail}>{maxWeight} tấn</Text>
+                  <Text style={styles.detail}>{maxWeight}</Text>
                 </View>
               )}
               {availableWeight && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Trọng tải còn lại:</Text>
-                  <Text style={styles.detail}>{availableWeight} tấn</Text>
+                  <Text style={styles.detail}>{availableWeight}</Text>
                 </View>
               )}
               {pricePerUnit && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Giá mỗi đơn vị:</Text>
-                  <Text style={styles.detail}>{pricePerUnit} VND</Text>
+                  <Text style={styles.detail}>{pricePerUnit}</Text>
                 </View>
               )}
               <View style={styles.rowInfo}>

@@ -6,7 +6,7 @@ import {
   Box,
   TruckFast,
   TruckRemove,
-  Building4,
+  Home3,
 } from 'iconsax-react-native';
 import GradientButton from '../../components/button/post/GradientButton';
 import OutlineButton from '../../components/button/post/OutlineButton';
@@ -83,7 +83,7 @@ const PostManagerItem: React.FC<PostManagerItemProps> = ({
     return (
       <View style={styles.titleWrapper}>
         <View style={styles.companyNameContainer}>
-          <Building4 size="20" color="#555" style={styles.companyIcon} />
+          <Home3 size="20" color="#555" style={styles.companyIcon} />
           <Text style={styles.companyName}>
             {companyName || 'Tên công ty không xác định'}
           </Text>
@@ -156,19 +156,19 @@ const PostManagerItem: React.FC<PostManagerItemProps> = ({
               {maxWeight !== undefined && maxWeight !== null && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Trọng tải tối đa:</Text>
-                  <Text style={styles.detail}>{maxWeight} tấn</Text>
+                  <Text style={styles.detail}>{maxWeight}</Text>
                 </View>
               )}
               {availableWeight !== undefined && availableWeight !== null && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Trọng tải còn lại:</Text>
-                  <Text style={styles.detail}>{availableWeight} tấn</Text>
+                  <Text style={styles.detail}>{availableWeight}</Text>
                 </View>
               )}
               {pricePerUnit !== undefined && pricePerUnit !== null && (
                 <View style={styles.rowInfo}>
                   <Text style={styles.label}>Giá mỗi đơn vị:</Text>
-                  <Text style={styles.detail}>{pricePerUnit} VND</Text>
+                  <Text style={styles.detail}>{pricePerUnit}</Text>
                 </View>
               )}
             </View>

@@ -9,6 +9,7 @@ import {
   StatusBar,
   Platform,
   Image,
+  Alert,
 } from 'react-native';
 import InputAuth from '../../components/input/InputAuth';
 import GradientButton from '../../components/button/auth/GradientButton';
@@ -77,13 +78,7 @@ const LoginScreen = () => {
 
         await login(response.data.token);
 
-        Toast.show({
-          type: 'success',
-          text1: 'Đăng nhập thành công',
-          onHide: () => {},
-          position: 'top',
-          topOffset: 300,
-        });
+        Alert.alert('Đăng nhập thành công', '', [{text: 'OK'}]);
       }
     } catch (error: any) {
       if (error.response && error.response.data) {

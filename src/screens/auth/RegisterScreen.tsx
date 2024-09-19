@@ -12,6 +12,7 @@ import {
   Platform,
   SafeAreaView,
   StatusBar,
+  Alert,
 } from 'react-native';
 import GradientButton from '../../components/button/auth/GradientButton';
 import Colors from '../../constants/colors';
@@ -82,13 +83,9 @@ const RegisterScreen = () => {
 
     // Nếu có lỗi, hiển thị lỗi bằng Toast
     if (hasError) {
-      Toast.show({
-        type: 'error',
-        text1: 'Đăng ký thất bại',
-        text2: 'Vui lòng kiểm tra lại thông tin.',
-        position: 'top',
-        topOffset: 300,
-      });
+      Alert.alert('Thất bại', 'Vui lòng kiểm tra lại thông tin.', [
+        {text: 'OK'},
+      ]);
       return;
     }
 
@@ -96,23 +93,15 @@ const RegisterScreen = () => {
     setLoading(true);
     try {
       await register({email, password, role});
-      Toast.show({
-        type: 'success',
-        text1: 'Đăng ký thành công',
-        text2: 'Vui lòng kiểm tra email để xác nhận tài khoản.',
-        position: 'top',
-        topOffset: 300,
-      });
+
+      Alert.alert(
+        'Đăng ký thành công',
+        'Vui lòng kiểm tra email để xác nhận tài khoản.',
+        [{text: 'OK'}],
+      );
       navigation.navigate('VerifyOtp', {email});
     } catch (error: any) {
-      Toast.show({
-        type: 'error',
-        text1: 'Đăng ký thất bại',
-        text2:
-          error.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
-        position: 'top',
-        topOffset: 300,
-      });
+      Alert.alert('Đăng ký thất bại', 'Email đã tồn tại', [{text: 'OK'}]);
     } finally {
       setLoading(false);
     }

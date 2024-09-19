@@ -1,7 +1,6 @@
-// src/navigations/TabNavigator.tsx
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Platform, Text} from 'react-native';
+import {Platform, Text, View, TouchableOpacity, StyleSheet} from 'react-native';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
 
 import {
@@ -10,7 +9,8 @@ import {
   Message,
   Notification,
   Profile,
-} from 'iconsax-react-native';
+  MessageProgramming,
+} from 'iconsax-react-native'; // Sử dụng Iconsax cho icon
 import HomeScreen from '../screens/main/HomeScreen';
 import ManagePostsScreen from '../screens/main/ManagePostsScreen';
 import MessagesScreen from '../screens/main/MessagesScreen';
@@ -20,11 +20,21 @@ import CustomHeader from '../components/customheader/CustomHomeHeader';
 import Colors from '../constants/colors';
 import AuthGuard from '../components/checktoken/AuthChecker'; // Import AuthGuard
 import RootStackParamList from './RootStackParamList';
+import AiScreen from '../screens/main/AiScreen';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  // Tạo nút thông báo ở headerRight
+  const NotificationIcon = () => (
+    <View style={styles.icon}>
+      <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>
+        <Notification size={24} color={'#000000'} variant="Outline" />
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <Tab.Navigator
@@ -58,9 +68,10 @@ const TabNavigator: React.FC = () => {
                   color={color}
                 />
               );
-            case 'Notifications':
+
+            case 'AI':
               return (
-                <Notification
+                <MessageProgramming
                   variant={focused ? 'Bold' : 'Outline'}
                   size={size}
                   color={color}
@@ -90,8 +101,9 @@ const TabNavigator: React.FC = () => {
             case 'Messages':
               label = 'Tin nhắn';
               break;
-            case 'Notifications':
-              label = 'Thông báo';
+
+            case 'AI':
+              label = 'Trợ lý AI';
               break;
             case 'Account':
               label = 'Tài khoản';
@@ -131,6 +143,7 @@ const TabNavigator: React.FC = () => {
         options={{
           headerTitle: 'Quản lý tin',
           headerTitleAlign: 'center',
+          headerRight: () => <NotificationIcon />, // Thêm icon thông báo ở đây
         }}>
         {() => (
           <AuthGuard>
@@ -143,6 +156,7 @@ const TabNavigator: React.FC = () => {
         options={{
           headerTitle: 'Tin nhắn',
           headerTitleAlign: 'center',
+          headerRight: () => <NotificationIcon />, // Thêm icon thông báo ở đây
         }}>
         {() => (
           <AuthGuard>
@@ -152,14 +166,15 @@ const TabNavigator: React.FC = () => {
       </Tab.Screen>
 
       <Tab.Screen
-        name="Notifications"
+        name="AI"
         options={{
-          headerTitle: 'Thông báo',
+          headerTitle: 'Trợ lý AI',
           headerTitleAlign: 'center',
+          headerRight: () => <NotificationIcon />, // Thêm icon thông báo ở đây
         }}>
         {() => (
           <AuthGuard>
-            <NotificationScreen />
+            <AiScreen />
           </AuthGuard>
         )}
       </Tab.Screen>
@@ -176,4 +191,9 @@ const TabNavigator: React.FC = () => {
   );
 };
 
+const styles = StyleSheet.create({
+  icon: {
+    marginRight: 19,
+  },
+});
 export default TabNavigator;

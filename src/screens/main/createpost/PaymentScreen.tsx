@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, StyleSheet, Alert, Image} from 'react-native';
-import {Card, Text, Divider} from 'react-native-paper';
+import {Text, Divider} from 'react-native-paper';
 import Colors from '../../../constants/colors';
 import {createPost} from '../../../apis/services/postService';
 import GradientButton from '../../../components/button/payment/GradientButton'; // Import GradientButton
@@ -29,7 +29,7 @@ const PaymentScreen = ({navigation, route}: any) => {
         // Hiển thị thông báo thành công
         Alert.alert(
           'Chờ trong giây lát',
-          'bài đăng của bạn sẻ được đăng sau khi chúng tôi xác thực thanh toán',
+          'Bài đăng của bạn sẽ được đăng sau khi chúng tôi xác thực thanh toán',
           [
             {
               text: 'OK',
@@ -46,7 +46,6 @@ const PaymentScreen = ({navigation, route}: any) => {
         );
       } catch (error) {
         // Xử lý lỗi nếu có
-        // console.error('Error creating post:', error);
         Alert.alert(
           'Lỗi',
           'Lỗi khi tạo bài đăng',
@@ -56,44 +55,47 @@ const PaymentScreen = ({navigation, route}: any) => {
       } finally {
         setLoading(false);
       }
-    }, 3000); // Thời gian chờ 5 giây
+    }, 3000); // Thời gian chờ 3 giây
   };
 
   return (
     <View style={styles.container}>
-      <Card style={styles.card}>
-        <Card.Content>
-          <Text style={styles.title}>Thông tin thanh toán</Text>
-          <Divider style={styles.divider} />
-          <View style={styles.paymentDetails}>
-            <Text style={styles.paymentLabel}>Tên dịch vụ:</Text>
-            <Text style={styles.paymentValue}>Đăng bài viết</Text>
-          </View>
-          <View style={styles.paymentDetails}>
-            <Text style={styles.paymentLabel}>Số tiền thanh toán:</Text>
-            <Text style={styles.paymentValue}>50.000 VND</Text>
-          </View>
-          <Divider style={styles.divider} />
-          <Text style={styles.sectionTitle}>Thông tin chuyển khoản</Text>
-          <Text style={styles.bankInfo}>
-            Ngân hàng: Techcombank
-            {'\n'}Chủ tài khoản: VO THI HANG NGA
-            {'\n'}Số tài khoản: 1903 9249 6300 17
-          </Text>
-          <Image
-            source={require('../../../assets/images/qr.png')} // Thay bằng link hoặc đường dẫn tới ảnh QR code
-            style={styles.qrImage}
-          />
-          <Divider style={styles.divider} />
-        </Card.Content>
-        <Card.Actions style={styles.cardActions}>
-          <GradientButton
-            title={isPaying ? 'Đang xử lý...' : 'Xác nhận đã chuyển khoản'}
-            onPress={handlePayment}
-            style={styles.button}
-          />
-        </Card.Actions>
-      </Card>
+      <View style={styles.card}>
+        <Text style={styles.title}>Thông tin thanh toán</Text>
+        <Divider style={styles.divider} />
+        <View style={styles.paymentDetails}>
+          <Text style={styles.paymentLabel}>Tên dịch vụ:</Text>
+          <Text style={styles.paymentValue}>Đăng bài viết</Text>
+        </View>
+        <View style={styles.paymentDetails}>
+          <Text style={styles.paymentLabel}>Số tiền thanh toán:</Text>
+          <Text style={styles.paymentValue}>50.000 VND</Text>
+        </View>
+        <Divider style={styles.divider} />
+        <Text style={styles.sectionTitle}>Thông tin chuyển khoản</Text>
+        <Text style={styles.bankInfo}>
+          Ngân hàng: Techcombank
+          {'\n'}Chủ tài khoản: VO THI HANG NGA
+          {'\n'}Số tài khoản: 1903 9249 6300 17
+        </Text>
+        <Image
+          source={require('../../../assets/images/qr.png')} // Thay bằng link hoặc đường dẫn tới ảnh QR code
+          style={styles.qrImage}
+        />
+        <Divider style={styles.divider} />
+      </View>
+      <View style={styles.actions}>
+        <GradientButton
+          title={isPaying ? 'Đang xử lý...' : 'Xác nhận đã chuyển khoản'}
+          onPress={handlePayment}
+          style={styles.button}
+        />
+      </View>
+      <GradientButton
+        title={isPaying ? 'Đang xử lý...' : 'Xác nhận đã chuyển khoản'}
+        onPress={handlePayment}
+        style={styles.button}
+      />
       {loading && <LoadingSpinner loading={loading} />}
     </View>
   );
@@ -154,7 +156,7 @@ const styles = StyleSheet.create({
   divider: {
     marginVertical: 10,
   },
-  cardActions: {
+  actions: {
     justifyContent: 'center',
     marginTop: 15,
   },

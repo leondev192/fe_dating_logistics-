@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const apiClient = axios.create({
-  baseURL: 'http://172.16.10.130:3000/api/v1',
+  baseURL: 'https://dvq.onrender.com/api/v1',
   timeout: 10000,
 });
 
