@@ -69,7 +69,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = () => {
     typeLetter();
   };
 
-  const truncateName = (name: string, maxLength: number = 25) => {
+  const truncateName = (name: string, maxLength: number = 20) => {
     return name.length > maxLength ? `${name.slice(0, maxLength)}...` : name;
   };
 

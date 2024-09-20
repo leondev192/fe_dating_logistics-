@@ -281,14 +281,9 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: '#fff',
-    margin: 5,
-    borderRadius: 10,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 4,
-    borderWidth: 1,
+    borderEndStartRadius: 0,
+    borderTopWidth: 0,
+    borderBottomWidth: 1,
     borderColor: '#ddd',
   },
   header: {

@@ -161,7 +161,7 @@ const HomeScreen = () => {
             source={require('../../assets/images/1.png')}
             style={styles.bannerImage}
           />
-          <View style={styles.bannerContainer}>
+          {/* <View style={styles.bannerContainer}>
             <Video
               source={require('../../assets/intro.mp4')} // Đường dẫn đến video cục bộ
               style={styles.youtubeVideo} // Định dạng kích thước video
@@ -172,7 +172,7 @@ const HomeScreen = () => {
               playInBackground={false} // Không phát khi ứng dụng chạy nền
               playWhenInactive={false} // Không phát khi màn hình tắt
             />
-          </View>
+          </View> */}
           <Image
             source={require('../../assets/images/2.png')}
             style={styles.bannerImage}
@@ -304,10 +304,10 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 10,
+    paddingVertical: 5,
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: '#ddd',
     marginHorizontal: 5,
     marginTop: 5,
